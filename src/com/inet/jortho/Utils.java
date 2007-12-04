@@ -31,7 +31,7 @@ public class Utils {
 
     private static final ResourceBundle resource;
     static{
-        resource = ResourceBundle.getBundle("com.inet.spell.resource");
+        resource = ResourceBundle.getBundle("com.inet.jortho.resource");
     }
     
     static String getResource(String value){
