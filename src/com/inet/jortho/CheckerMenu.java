@@ -64,6 +64,11 @@ class CheckerMenu extends JMenu implements PopupMenuListener, HierarchyListener 
                 final int endOffs = Utilities.getWordEnd(jText, offs);
                 String word = jText.getText(begOffs, endOffs-begOffs);
                 super.removeAll();
+                if(checker.dictionary == null){
+                    // without dictonary it is disabled
+                    this.setEnabled(false);
+                    return;
+                }
                 List list = checker.dictionary.suggestions(word);
 
                 //Disable wenn keine Vorschläge
