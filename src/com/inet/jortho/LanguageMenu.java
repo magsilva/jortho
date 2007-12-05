@@ -29,6 +29,7 @@ import java.util.Locale;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JMenu;
+import javax.swing.JOptionPane;
 import javax.swing.JRadioButtonMenuItem;
 
 public class LanguageMenu extends JMenu {
@@ -70,9 +71,8 @@ public class LanguageMenu extends JMenu {
             public void actionPerformed(ActionEvent e) {
                 try {
                     checker.setDictionary( new URL(baseURL, "dictionary_" + locale + ".ortho"), locale );
-                } catch( Exception e1 ) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
+                } catch( Exception ex ) {
+                    JOptionPane.showMessageDialog( checker.getTextComponent(), ex.toString(), "Error", JOptionPane.ERROR_MESSAGE );
                 }
             }
             
