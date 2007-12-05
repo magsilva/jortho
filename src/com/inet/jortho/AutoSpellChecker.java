@@ -79,16 +79,19 @@ public class AutoSpellChecker implements DocumentListener {
               } );
         }
         if(hasShortKey){
-            jText.getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_F3, 0 ), "spell-checking" );
+            jText.getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_F7, 0 ), "spell-checking" );
             jText.getActionMap().put( "spell-checking", new AbstractAction(){
                 public void actionPerformed( ActionEvent e ) {
-                    Window parent = SwingUtilities.getWindowAncestor( jText );
-                    if(parent instanceof Frame){
-                        new SpellCheckerDialog( (Frame)parent ).show( jText, dictionary);
-                    }else{
-                        new SpellCheckerDialog( (Dialog)parent ).show( jText, dictionary);
+                    if( dictionary != null ) {
+                        Window parent = SwingUtilities.getWindowAncestor( jText );
+                        SpellCheckerDialog dialog;
+                        if( parent instanceof Frame ) {
+                            dialog = new SpellCheckerDialog( (Frame)parent );
+                        } else {
+                            dialog = new SpellCheckerDialog( (Dialog)parent );
+                        }
+                        dialog.show( jText, dictionary );
                     }
-                    
                 }
             });
         }
