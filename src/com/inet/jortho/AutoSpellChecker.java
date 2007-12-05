@@ -22,18 +22,25 @@
  */
 package com.inet.jortho;
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.JMenu;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
 import javax.swing.text.Highlighter.Highlight;
 
 /**
  * This class check a <code>JTextComponent</code> automaticly (in the background) for orthography. Spell error are
- * highligted with a red zack line.
+ * highligted with a red zigzag line.
  * 
  * @author Volker Berlin
  */
@@ -44,16 +51,61 @@ public class AutoSpellChecker implements DocumentListener {
 
     Dictionary                            dictionary;
 
-    private CheckerMenu                   menu;
+    private CheckerMenu                   spellingMenu;
+    
+    private LanguageMenu                  languagesMenu;
+    
+    /**
+     * Empty Contstructor
+     */
+    public AutoSpellChecker(){
+        
+    }
+    
+    public AutoSpellChecker(JTextComponent text, URL baseURL, String availableDictionaries, String aktiveDictionary, boolean hasPopup, boolean hasShortKey){
+        this.jText = text;
+        languagesMenu = new LanguageMenu( this, baseURL, availableDictionaries, aktiveDictionary);
+        if(hasPopup){
+            final JPopupMenu menu = new JPopupMenu();
+            menu.add( getMenu() );
+            menu.add( languagesMenu );
+            jText.addMouseListener( new MouseAdapter() {
+                @Override
+                public void mouseReleased( MouseEvent me ) {
+                    if( me.isPopupTrigger() ) {
+                        menu.show( me.getComponent(), me.getX(), me.getY() );
+                    }
+                }
+              } );
+        }
+        if(hasShortKey){
+            jText.getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_F3, 0 ), "spell-checking" );
+            jText.getActionMap().put( "spell-checking", new AbstractAction(){
+                public void actionPerformed( ActionEvent e ) {
+                    Window parent = SwingUtilities.getWindowAncestor( jText );
+                    if(parent instanceof Frame){
+                        new SpellCheckerDialog( (Frame)parent ).show( jText, dictionary);
+                    }else{
+                        new SpellCheckerDialog( (Dialog)parent ).show( jText, dictionary);
+                    }
+                    
+                }
+            });
+        }
+    }
 
     public JMenu getMenu() {
-        if( menu == null )
-            menu = new CheckerMenu( this );
-        return menu;
+        if( spellingMenu == null )
+            spellingMenu = new CheckerMenu( this );
+        return spellingMenu;
+    }
+    
+    public JMenu getLanguages(){
+        return languagesMenu;
     }
 
     /**
-     * Set the TextComponet that should be checked fro orthography from this spell checker.
+     * Set the TextComponet that should be checked for orthography from this spell checker.
      * 
      * @see #getTextComponent()
      */
@@ -82,18 +134,39 @@ public class AutoSpellChecker implements DocumentListener {
      * 
      * @param dictionary
      *            the new Dictionary
+     * @param locale
+     *            the locale that descript the languge of the dictionary. The Locale can be used for additional grammar
+     *            rules.
      * @see #getDictionary()
+     * @see #setDictionary(URL, Locale)
      */
-    public void setDictionary( Dictionary dictionary ) {
+    public void setDictionary( Dictionary dictionary, Locale locale ) {
         this.dictionary = dictionary;
         checkAll();
+    }
+
+    /**
+     * Set the dictionary that should be use fpr spell checking.
+     * 
+     * @param url
+     *            the URL where the dictionary can be loaded.
+     * @param locale
+     *            the locale that descript the languge of the dictionary. The Locale can be used for additional grammar
+     *            rules.
+     * @see #getDictionary()
+     * @see #setDictionary(Dictionary, Locale)
+     */
+    public void setDictionary( URL url, Locale locale ) throws IOException {
+        DictionaryFactory factory = new DictionaryFactory();
+        factory.loadWordList( url );
+        setDictionary( factory.create(), locale );
     }
 
     /**
      * Get the current <code>Dictionary</code>.
      * 
      * @return the current Dictionary or null if nothing is set
-     * @see #setDictionary
+     * @see #setDictionary(URL, Locale)
      */
     public Dictionary getDictionary() {
         return dictionary;
