@@ -18,28 +18,41 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
  *  USA.
  *  
- *  Created on 10.11.2005
+ *  Created on 06.12.2007
  */
 package com.inet.jortho;
 
-import java.util.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import javax.swing.JPopupMenu;
 
 /**
+ * Implement a MouseListener for Popup Event. A that should be part of the standard Java.
  * @author Volker Berlin
  */
-class Utils {
-
-    private static final ResourceBundle resource;
-    static{
-        resource = ResourceBundle.getBundle("com.inet.jortho.resource");
+class PopupListener extends MouseAdapter {
+    
+    private final JPopupMenu menu;
+    
+    PopupListener(JPopupMenu menu){
+        this.menu = menu;
     }
     
-    static String getResource(String value){
-        try {
-            return resource.getString(value);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return value;
+    @Override
+    public void mousePressed(MouseEvent ev) {
+        maybeShowPopup(ev);
     }
+
+    @Override
+    public void mouseReleased(MouseEvent ev) {
+        maybeShowPopup(ev);
+    }
+
+    private void maybeShowPopup(MouseEvent ev) {
+        if( ev.isPopupTrigger() ) {
+            menu.show( ev.getComponent(), ev.getX(), ev.getY() );
+        }
+    }
+
 }

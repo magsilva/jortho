@@ -78,7 +78,7 @@ abstract class DictionaryBase {
      * @see Suggestion
      */
     public List suggestions(String word){
-        ArrayList list = new ArrayList();
+        ArrayList<Suggestion> list = new ArrayList<Suggestion>();
         if(word.length() == 0 || exist(word)){
             return list;
         }
@@ -102,7 +102,7 @@ abstract class DictionaryBase {
      * @param lastIdx Position im Suchindex der zur aktuellen Zeichenposition zeigt.
      * @param diff Die Unähnlichkeit bis zur aktuellen Zeichenposition
      */
-    private void suggestions( List list, char[] chars, int charPosition, int lastIdx, int diff){
+    private void suggestions( List<Suggestion> list, char[] chars, int charPosition, int lastIdx, int diff){
         
         // Erstmal mit dem richtigen Buchstaben weitermachen 
         idx = lastIdx;
@@ -128,7 +128,7 @@ abstract class DictionaryBase {
                 int tempIdx = idx;
                 
                 //Buchstabendreher
-                char[] chars2 = (char[])chars.clone();
+                char[] chars2 = chars.clone();
                 chars2[charPosition+1] = chars[charPosition];
                 chars2[charPosition] = c;
                 suggestions( list, chars2, charPosition+1, readIndex(), diff+5);
@@ -155,8 +155,10 @@ abstract class DictionaryBase {
         return true;
     }
     
-    
-    protected final int readIndex(){
+    /**
+     * Read the offset in the tree of the next character. 
+     */
+    final int readIndex(){
         return ((tree[idx+1] & 0x7fff)<<16) + tree[idx+2]; 
     }
     
@@ -166,7 +168,7 @@ abstract class DictionaryBase {
      * Sie sollte also bereits sortiert sein.
      * @param list darf nicht null sein 
      */
-    private void removeDuplicated(List list){
+    private void removeDuplicated(List<Suggestion> list){
         for(int i=0; i<list.size(); i++){
             Object obj = list.get( i );
             for(int j=i+1; j<list.size(); j++){

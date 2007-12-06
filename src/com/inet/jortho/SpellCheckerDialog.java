@@ -32,30 +32,25 @@ import javax.swing.*;
 import javax.swing.text.*;
 
 /**
+ * The Dialog for continues checking the orthography.
  * @author Volker Berlin
  */
-public class SpellCheckerDialog extends JDialog implements ActionListener {
+class SpellCheckerDialog extends JDialog implements ActionListener {
 
 
-    public SpellCheckerDialog(){
-        super( (Frame)null, Utils.getResource("spelling"));
-        init();
-    }
-
-
-    public SpellCheckerDialog(Dialog owner) throws HeadlessException {
+    SpellCheckerDialog(Dialog owner) throws HeadlessException {
         super(owner, Utils.getResource("spelling"));
         init();
     }
 
 
-    public SpellCheckerDialog(Dialog owner, boolean modal){
+    SpellCheckerDialog(Dialog owner, boolean modal){
         super(owner, Utils.getResource("spelling"), modal);
         init();
     }
 
 
-    public SpellCheckerDialog(Frame owner){
+    SpellCheckerDialog(Frame owner){
         super(owner, Utils.getResource("spelling"));
         init();
     }
@@ -215,7 +210,7 @@ public class SpellCheckerDialog extends JDialog implements ActionListener {
 
     final private JLabel notFound = new JLabel();
     final private JTextField word = new JTextField(); 
-    final private Vector suggestionsVector = new Vector();
+    final private Vector<String> suggestionsVector = new Vector<String>();
     final private JList suggestionsList = new JList(suggestionsVector);
     
     final private JButton ignore      = new JButton(Utils.getResource("ignore"));

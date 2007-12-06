@@ -26,6 +26,7 @@ import java.io.*;
 import java.util.zip.*;
 
 /**
+ * A container for a word list.
  * @author Volker Berlin
  */
 public final class Dictionary extends DictionaryBase{
@@ -40,6 +41,11 @@ public final class Dictionary extends DictionaryBase{
     }
     
     
+    /**
+     * Create an Dictionary from a serialize Dictionary. This is used from the DictionaryFactory.
+     * @see #toArray()
+     * @see DictionaryFactory
+     */
     public Dictionary(char[] tree){
         super(tree);
     }

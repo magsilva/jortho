@@ -24,27 +24,37 @@ package com.inet.jortho;
 
 
 /**
+ * This class hold one Suggestion for another spelling. 
  * Note: this class has a natural ordering that is inconsistent with equals.
  * @author Volker Berlin
  */
-final public class Suggestion implements Comparable{
+public final class Suggestion implements Comparable<Suggestion>{
 
     private final String word;
     private final int diff;
     
+    /**
+     * Construct a suggestion
+     * @param chars the char sequence of the word.
+     * @param diff the difference to the original word.
+     */
     Suggestion(char[] chars, int diff) {
         this.word = new String(chars);
         this.diff = diff;
     }
     
-    
+    /**
+     * Return the suggested word and it equals to getWord().
+     */
+    @Override
     public String toString(){
         return word;
     }
 
 
     /**
-     * @return
+     * Get the suggested word.
+     * @return the word
      */
     public String getWord() {
         return word;
@@ -64,6 +74,7 @@ final public class Suggestion implements Comparable{
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean equals(Object sugg){
         if (sugg instanceof Suggestion) {
             return word.equals( ((Suggestion)sugg).word );
@@ -75,6 +86,7 @@ final public class Suggestion implements Comparable{
     /**
      * {@inheritDoc}
      */
+    @Override
     public int hashCode(){
         return word.hashCode();
     }
@@ -83,7 +95,7 @@ final public class Suggestion implements Comparable{
     /**
      * {@inheritDoc}
      */
-    public int compareTo( Object sugg ) {
-        return diff - ((Suggestion)sugg).diff;
+    public int compareTo( Suggestion sugg ) {
+        return diff - sugg.diff;
     }
 }

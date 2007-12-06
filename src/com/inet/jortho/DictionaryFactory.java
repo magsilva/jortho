@@ -32,6 +32,9 @@ import java.util.ArrayList;
 import java.util.zip.InflaterInputStream;
 
 /** 
+ * With the DictionaryFactory you can create / load a Dictionary. A Dictionary is list of word with a API for searching. 
+ * The list is saved internal as a tree.
+ * @see Dictionary
  * @author Volker Berlin
  */
 public class DictionaryFactory {
@@ -40,6 +43,9 @@ public class DictionaryFactory {
     private char[] tree;
     private int size;
     
+    /**
+     * Empty Constructor.
+     */
     public DictionaryFactory(){
         
     }
@@ -99,7 +105,11 @@ public class DictionaryFactory {
         }
     }
 
-    
+    /**
+     * Create from the data in this factory a Dictionary object. If there 
+     * are no word added then the Dictionary is empty. The Dictionary need fewer memory as the DictionaryFactory.
+     * @return a Dictionary object.
+     */
     public Dictionary create(){
         tree = new char[10000];
         
@@ -125,7 +135,10 @@ public class DictionaryFactory {
         }
     }
     
-    private final static class Node extends ArrayList{
+    /**
+     * A node in the search tree. Every Node can include a list of NodeEnties
+     */
+    private final static class Node extends ArrayList<NodeEntry>{
 
         Node(){
             super(1);
@@ -133,7 +146,7 @@ public class DictionaryFactory {
                 
         NodeEntry searchCharOrAdd( char c ) {
             for(int i=0; i<size(); i++){
-                NodeEntry entry = (NodeEntry)get( i );
+                NodeEntry entry = get( i );
                 if(entry.c < c){
                     continue;
                 }
@@ -160,7 +173,7 @@ public class DictionaryFactory {
             factory.size = newSize;
             
             for(int i=0; i<size(); i++){
-                NodeEntry entry = (NodeEntry)get( i );
+                NodeEntry entry = get( i );
                 factory.tree[idx++] = entry.c;
                 Node nextNode = entry.nextNode;
                 int offset = 0;
@@ -178,6 +191,9 @@ public class DictionaryFactory {
         }
     }
     
+    /**
+     * Descript a single charchter in the Dictionary tree.
+     */
     private final static class NodeEntry{
         final char c;
         Node nextNode;

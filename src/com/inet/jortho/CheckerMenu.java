@@ -25,6 +25,7 @@ package com.inet.jortho;
 import java.awt.Component;
 import java.awt.event.*;
 import java.util.List;
+import java.util.Locale;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -33,14 +34,19 @@ import javax.swing.text.*;
 /**
  * @author Volker Berlin
  */
-class CheckerMenu extends JMenu implements PopupMenuListener, HierarchyListener {
+class CheckerMenu extends JMenu implements PopupMenuListener, HierarchyListener, DictionaryChangeListener {
     
-    private final AutoSpellChecker checker;
+    private Dictionary                    dictionary;
+
+    private Locale                        locale;
+
     
-    CheckerMenu(AutoSpellChecker checker){
+    CheckerMenu(){
         super( Utils.getResource("spelling"));
-        this.checker = checker;
         super.addHierarchyListener(this);
+        SpellChecker.addDictionaryChangeLister( this );
+        dictionary = SpellChecker.getCurrentDictionary();
+        locale = SpellChecker.getCurrentLocale();
     }
 
 
@@ -64,12 +70,12 @@ class CheckerMenu extends JMenu implements PopupMenuListener, HierarchyListener 
                 final int endOffs = Utilities.getWordEnd(jText, offs);
                 String word = jText.getText(begOffs, endOffs-begOffs);
                 super.removeAll();
-                if(checker.dictionary == null){
+                if(dictionary == null){
                     // without dictonary it is disabled
                     this.setEnabled(false);
                     return;
                 }
-                List list = checker.dictionary.suggestions(word);
+                List list = dictionary.suggestions(word);
 
                 //Disable wenn keine Vorschläge
                 this.setEnabled(list.size()>0);
@@ -106,6 +112,12 @@ class CheckerMenu extends JMenu implements PopupMenuListener, HierarchyListener 
                 ((JPopupMenu)ev.getChangedParent()).removePopupMenuListener(this);
             }
         }
+    }
+
+
+    public void languageChanged( DictionaryChangeEvent ev ) {
+        dictionary = ev.getCurrentDictionary();
+        locale = ev.getCurrentLocale();
     }
     
     

@@ -18,28 +18,26 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
  *  USA.
  *  
- *  Created on 10.11.2005
+ *  Created on 06.12.2007
  */
 package com.inet.jortho;
 
-import java.util.*;
+import java.util.EventListener;
 
 /**
+ * A "DictionaryChange" event gets fired whenever a dictionary is changed.
+ * You can register a DictionaryChangeListener in the class SpellChecker.
  * @author Volker Berlin
+ * @see SpellChecker#addDictionaryChangeLister(DictionaryChangeListener)
+ * @see SpellChecker#removeDictionaryChangeLister(DictionaryChangeListener)
  */
-class Utils {
-
-    private static final ResourceBundle resource;
-    static{
-        resource = ResourceBundle.getBundle("com.inet.jortho.resource");
-    }
+public interface DictionaryChangeListener extends EventListener{
     
-    static String getResource(String value){
-        try {
-            return resource.getString(value);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return value;
-    }
+    /**
+     * This method gets called when the language is changed.
+     * This occur if the user select another language in the languages menu.
+     * @param ev A DictionaryChangeEvent object describing the changes.
+     */
+    public void languageChanged(DictionaryChangeEvent ev);
+
 }

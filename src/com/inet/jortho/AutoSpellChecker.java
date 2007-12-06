@@ -44,136 +44,28 @@ import javax.swing.text.Highlighter.Highlight;
  * 
  * @author Volker Berlin
  */
-public class AutoSpellChecker implements DocumentListener {
+class AutoSpellChecker implements DocumentListener, DictionaryChangeListener {
     private static final RedZigZagPainter painter = new RedZigZagPainter();
 
     private JTextComponent                jText;
 
-    Dictionary                            dictionary;
+    private Dictionary                    dictionary;
 
-    private CheckerMenu                   spellingMenu;
+    private Locale                        locale;
+
     
-    private LanguageMenu                  languagesMenu;
-    
-    /**
-     * Empty Contstructor
-     */
-    public AutoSpellChecker(){
-        
-    }
-    
-    public AutoSpellChecker(JTextComponent text, URL baseURL, String availableDictionaries, String aktiveDictionary, boolean hasPopup, boolean hasShortKey){
+    public AutoSpellChecker(JTextComponent text){
         this.jText = text;
-        languagesMenu = new LanguageMenu( this, baseURL, availableDictionaries, aktiveDictionary);
-        if(hasPopup){
-            final JPopupMenu menu = new JPopupMenu();
-            menu.add( getMenu() );
-            menu.add( languagesMenu );
-            jText.addMouseListener( new MouseAdapter() {
-                @Override
-                public void mouseReleased( MouseEvent me ) {
-                    if( me.isPopupTrigger() ) {
-                        menu.show( me.getComponent(), me.getX(), me.getY() );
-                    }
-                }
-              } );
-        }
-        if(hasShortKey){
-            jText.getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_F7, 0 ), "spell-checking" );
-            jText.getActionMap().put( "spell-checking", new AbstractAction(){
-                public void actionPerformed( ActionEvent e ) {
-                    if( dictionary != null ) {
-                        Window parent = SwingUtilities.getWindowAncestor( jText );
-                        SpellCheckerDialog dialog;
-                        if( parent instanceof Frame ) {
-                            dialog = new SpellCheckerDialog( (Frame)parent );
-                        } else {
-                            dialog = new SpellCheckerDialog( (Dialog)parent );
-                        }
-                        dialog.show( jText, dictionary );
-                    }
-                }
-            });
-        }
-    }
+        jText.getDocument().addDocumentListener( this );
 
-    public JMenu getMenu() {
-        if( spellingMenu == null )
-            spellingMenu = new CheckerMenu( this );
-        return spellingMenu;
-    }
-    
-    public JMenu getLanguages(){
-        return languagesMenu;
-    }
-
-    /**
-     * Set the TextComponet that should be checked for orthography from this spell checker.
-     * 
-     * @see #getTextComponent()
-     */
-    public void setTextComponent( JTextComponent jText ) {
-        if( jText != null ) {
-            jText.getDocument().removeDocumentListener( this );
-        }
-        this.jText = jText;
-        if( jText != null ) {
-            jText.getDocument().addDocumentListener( this );
-        }
+        SpellChecker.addDictionaryChangeLister( this );
+        dictionary = SpellChecker.getCurrentDictionary();
+        locale = SpellChecker.getCurrentLocale();
         checkAll();
     }
 
-    /**
-     * Get the <code>JTextComponent</code> that is checed from this spell checker.
-     * 
-     * @return the JTextComponent or null if not set.
-     */
-    public JTextComponent getTextComponent() {
-        return jText;
-    }
 
-    /**
-     * Set the dictionary that should be use fpr spell checking.
-     * 
-     * @param dictionary
-     *            the new Dictionary
-     * @param locale
-     *            the locale that descript the languge of the dictionary. The Locale can be used for additional grammar
-     *            rules.
-     * @see #getDictionary()
-     * @see #setDictionary(URL, Locale)
-     */
-    public void setDictionary( Dictionary dictionary, Locale locale ) {
-        this.dictionary = dictionary;
-        checkAll();
-    }
 
-    /**
-     * Set the dictionary that should be use fpr spell checking.
-     * 
-     * @param url
-     *            the URL where the dictionary can be loaded.
-     * @param locale
-     *            the locale that descript the languge of the dictionary. The Locale can be used for additional grammar
-     *            rules.
-     * @see #getDictionary()
-     * @see #setDictionary(Dictionary, Locale)
-     */
-    public void setDictionary( URL url, Locale locale ) throws IOException {
-        DictionaryFactory factory = new DictionaryFactory();
-        factory.loadWordList( url );
-        setDictionary( factory.create(), locale );
-    }
-
-    /**
-     * Get the current <code>Dictionary</code>.
-     * 
-     * @return the current Dictionary or null if nothing is set
-     * @see #setDictionary(URL, Locale)
-     */
-    public Dictionary getDictionary() {
-        return dictionary;
-    }
 
     /*====================================================================
      * 
@@ -293,6 +185,12 @@ public class AutoSpellChecker implements DocumentListener {
         thread.setPriority( Thread.NORM_PRIORITY - 1 );
         thread.setDaemon( true );
         thread.start();
+    }
+
+    public void languageChanged( DictionaryChangeEvent ev ) {
+        dictionary = ev.getCurrentDictionary();
+        locale = ev.getCurrentLocale();
+        checkAll();
     }
 
 }
