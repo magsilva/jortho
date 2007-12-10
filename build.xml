@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="JOrtho" default="build">
+	<target name="javadoc">
+		<javadoc packagenames="com.inet.jortho.*" 
+				sourcepath="src"
+				destdir="doc"
+				author="false"
+				version="true"
+				use="true"
+				windowtitle="JOrtho - Java Spell Checker">
+			<bottom><![CDATA[<i>Copyright &#169; 2005 - 2007 i-net software. All Rights Reserved.</i>]]></bottom>
+		</javadoc>
+	</target>
+	
+	<target name="build" depends="javadoc">
+		<delete dir="temp"/>
+		<mkdir dir="temp"/>
+		<javac srcdir="src" destdir="temp">
+			<include name="com/inet/jortho/**/*.java"/>
+		</javac>
+		<jar destfile="temp/jortho.jar">
+			<fileset dir="temp"/>
+			<fileset dir="src" includes="com/inet/jortho/**/*.properties"/>
+		</jar>	
+		<zip destfile="JOrtho.zip">
+			<fileset dir="temp" includes="jortho.jar"/>
+			<fileset dir="." includes="doc/**.*"/>
+			<fileset dir="." includes="license.txt"/>
+		</zip>
+		<delete dir="temp"/>
+	</target>
+</project>
