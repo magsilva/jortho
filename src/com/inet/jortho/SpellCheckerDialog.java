@@ -53,6 +53,11 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
     final private JButton change      = new JButton(Utils.getResource("change"));
     final private JButton changeAll   = new JButton(Utils.getResource("changeAll"));
     final private JButton finish      = new JButton(Utils.getResource("finish"));
+    
+    /** List of ignore all words */  
+    final private ArrayList<String> ignoreWords = new ArrayList<String>();
+    /** Map of change all words */
+    final private HashMap<String,String> changeWords = new HashMap<String,String>();
 
     SpellCheckerDialog(Dialog owner) throws HeadlessException {
         this(owner, false);
@@ -134,13 +139,28 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
         setVisible( true );
     }
     
-    
+    /**
+     * Search the next misspelling word. If found it then refresh the dialig with the new informations.
+     * ignoreWords and changeWords will handle automaticly.
+     */
     private void searchNext() {
-        String wordStr = tok.nextInvalidWord();
-        if( wordStr == null ) {
-            setVisible( false );
-            JOptionPane.showMessageDialog( getParent(), Utils.getResource( "msgFinish" ), this.getTitle(), JOptionPane.INFORMATION_MESSAGE );
-            return;
+        String wordStr;
+        while( true ) {
+            wordStr = tok.nextInvalidWord();
+            if( wordStr == null ) {
+                setVisible( false );
+                JOptionPane.showMessageDialog( getParent(), Utils.getResource( "msgFinish" ), this.getTitle(), JOptionPane.INFORMATION_MESSAGE );
+                return;
+            }
+            if( ignoreWords.contains( wordStr ) ) {
+                continue;
+            }
+            String changeTo = changeWords.get( wordStr );
+            if( changeTo != null ) {
+                replaceWord( wordStr, changeTo );
+                continue;
+            }
+            break;
         }
         word.setText( wordStr );
         notFound.setText( wordStr );
@@ -163,29 +183,43 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
         Object source = ev.getSource();
         if( source == ignore ) {
             searchNext();
-        } else if( source == ignoreAll ) {
-            searchNext();
-        } else if( source == addToDic ) {
-            String wordStr = word.getText();
-            UserDictionaryProvider provider = SpellChecker.getUserDictionaryProvider();
-            if( provider != null ) {
-                provider.addWord( wordStr );
-            }
-            dictionary.add( wordStr );
-            dictionary.trimToSize();
-            searchNext();
-        } else if( source == change || source == changeAll ) {
-            Document doc = jText.getDocument();
-            try {
-                String wordStr = word.getText();
-                ((AbstractDocument)doc).replace( tok.getWordOffset(), notFound.getText().length(), wordStr, null );
-                tok.updatePhrase( jText.getText() );
-            } catch( BadLocationException e1 ) {
-                e1.printStackTrace();
-            }
-            searchNext();
         } else if( source == finish ) {
             setVisible(false);
+        } else{
+            String newWord = word.getText();
+            String oldWord = notFound.getText();
+            if( source == ignoreAll ) {
+                ignoreWords.add( oldWord );
+                searchNext();
+            } else if( source == addToDic ) {
+                UserDictionaryProvider provider = SpellChecker.getUserDictionaryProvider();
+                if( provider != null ) {
+                    provider.addWord( oldWord );
+                }
+                dictionary.add( oldWord );
+                dictionary.trimToSize();
+                searchNext();
+            } else if( source == change ) {
+                replaceWord( oldWord, newWord );
+                searchNext();
+            } else if( source == changeAll ) {
+                changeWords.put( oldWord, newWord );
+                replaceWord( oldWord, newWord );
+                searchNext();
+            }
         }
     }
+    
+    private void replaceWord( String oldWord, String newWord ) {
+        Document doc = jText.getDocument();
+        try {
+            ((AbstractDocument)doc).replace( tok.getWordOffset(), oldWord.length(), newWord, null );
+            tok.updatePhrase( jText.getText() );
+        } catch( BadLocationException e1 ) {
+            e1.printStackTrace();
+        }
+    }
+
+
+
 }
