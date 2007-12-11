@@ -171,7 +171,7 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
             suggestionsList.setListData( suggestionsVector );
             
         } catch (BadLocationException e) {
-            hide();
+            setVisible( false );
             JOptionPane.showMessageDialog( getParent(), Utils.getResource("msgFinish"), this.getTitle(), JOptionPane.INFORMATION_MESSAGE);
         }
     }
