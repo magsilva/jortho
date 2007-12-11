@@ -37,34 +37,40 @@ import javax.swing.text.*;
  */
 class SpellCheckerDialog extends JDialog implements ActionListener {
 
+    private JTextComponent jText;
+    private Dictionary dictionary;
+    private Tokenizer tok;
+    
+    
+
+    final private JLabel notFound = new JLabel();
+    final private JTextField word = new JTextField(); 
+    final private JList suggestionsList = new JList();
+    
+    final private JButton ignore      = new JButton(Utils.getResource("ignore"));
+    final private JButton ignoreAll   = new JButton(Utils.getResource("ignoreAll"));
+    final private JButton addToDic    = new JButton(Utils.getResource("addToDictionary"));
+    final private JButton change      = new JButton(Utils.getResource("change"));
+    final private JButton changeAll   = new JButton(Utils.getResource("changeAll"));
+    final private JButton finish      = new JButton(Utils.getResource("finish"));
 
     SpellCheckerDialog(Dialog owner) throws HeadlessException {
-        super(owner, Utils.getResource("spelling"));
-        init();
+        this(owner, false);
     }
 
 
     SpellCheckerDialog(Dialog owner, boolean modal){
-        super(owner, Utils.getResource("spelling"), modal);
-        init();
+        this(owner, Utils.getResource("spelling"), modal);
     }
 
 
     SpellCheckerDialog(Frame owner){
-        super(owner, Utils.getResource("spelling"));
-        init();
+        this(owner, false);
     }
     
 
     public SpellCheckerDialog(Frame owner, boolean modal){
-        super(owner, Utils.getResource("spelling"), modal);
-        init();
-    }
-
-
-    public SpellCheckerDialog(Dialog owner, String title){
-        super(owner, title);
-        init();
+        this(owner, Utils.getResource("spelling"), modal);
     }
 
 
@@ -74,29 +80,10 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
     }
 
 
-    public SpellCheckerDialog(Frame owner, String title){
-        super(owner, title);
-        init();
-    }
-
-
     public SpellCheckerDialog(Frame owner, String title, boolean modal){
         super(owner, title, modal);
         init();
     }
-    
-
-    public SpellCheckerDialog(Dialog owner, String title, boolean modal, GraphicsConfiguration gc){
-        super(owner, title, modal, gc);
-        init();
-    }
-
-
-    public SpellCheckerDialog(Frame owner, String title, boolean modal, GraphicsConfiguration gc) {
-        super(owner, title, modal, gc);
-        init();
-    }
-    
     
     final private void init(){
         Container cont = getContentPane();
@@ -136,44 +123,39 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
     }
     
     
-    public void show(JTextComponent jText, Dictionary dictionary){
-        this.jText = jText;
-        this.dictionary = dictionary;
-        
-        endIdx = 0;
+    public void show( JTextComponent jTextComponent, Dictionary dic, Locale loc ) {
+        this.jText = jTextComponent;
+        this.dictionary = dic;
+
+        tok = new Tokenizer( jTextComponent.getText(), dic, loc );
         searchNext();
-        
-        setVisible(true);
+
+        setLocationRelativeTo( jTextComponent );
+        setVisible( true );
     }
     
     
-    private void searchNext(){
-        try {
-            if(endIdx == 0)
-                beginIdx = Utilities.getWordStart(jText, endIdx);
-            else
-                beginIdx = Utilities.getNextWord(jText, endIdx);
-            endIdx = Utilities.getWordEnd(jText, beginIdx);
-            String wordStr = jText.getText(beginIdx, endIdx-beginIdx);
-            word.setText(wordStr);
-            notFound.setText(wordStr);
-            
-            List list = dictionary.suggestions(wordStr);
-            
-            suggestionsVector.clear();
-            for(int i=0; i<list.size(); i++){
-                Suggestion sugestion = (Suggestion)list.get(i);
-                String newWord = sugestion.getWord();
-                if(i == 0)
-                    word.setText(newWord);
-                suggestionsVector.add(newWord);
-            }
-            suggestionsList.setListData( suggestionsVector );
-            
-        } catch (BadLocationException e) {
+    private void searchNext() {
+        String wordStr = tok.nextInvalidWord();
+        if( wordStr == null ) {
             setVisible( false );
-            JOptionPane.showMessageDialog( getParent(), Utils.getResource("msgFinish"), this.getTitle(), JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog( getParent(), Utils.getResource( "msgFinish" ), this.getTitle(), JOptionPane.INFORMATION_MESSAGE );
+            return;
         }
+        word.setText( wordStr );
+        notFound.setText( wordStr );
+
+        List list = dictionary.suggestions( wordStr );
+
+        Vector<String> suggestionsVector = new Vector<String>();
+        for( int i = 0; i < list.size(); i++ ) {
+            Suggestion sugestion = (Suggestion)list.get( i );
+            String newWord = sugestion.getWord();
+            if( i == 0 )
+                word.setText( newWord );
+            suggestionsVector.add( newWord );
+        }
+        suggestionsList.setListData( suggestionsVector );
     }
     
     
@@ -196,33 +178,14 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
             Document doc = jText.getDocument();
             try {
                 String wordStr = word.getText();
-                ((AbstractDocument)doc).replace( beginIdx, endIdx - beginIdx, word.getText(), null );
-                endIdx = beginIdx + wordStr.length();
+                ((AbstractDocument)doc).replace( tok.getWordOffset(), notFound.getText().length(), wordStr, null );
+                tok.updatePhrase( jText.getText() );
             } catch( BadLocationException e1 ) {
+                e1.printStackTrace();
             }
             searchNext();
         } else if( source == finish ) {
             setVisible(false);
         }
     }
-    
-    
-    private JTextComponent jText;
-    private Dictionary dictionary;
-    private int endIdx;
-    private int beginIdx;
-    
-    
-
-    final private JLabel notFound = new JLabel();
-    final private JTextField word = new JTextField(); 
-    final private Vector<String> suggestionsVector = new Vector<String>();
-    final private JList suggestionsList = new JList(suggestionsVector);
-    
-    final private JButton ignore      = new JButton(Utils.getResource("ignore"));
-    final private JButton ignoreAll   = new JButton(Utils.getResource("ignoreAll"));
-    final private JButton addToDic    = new JButton(Utils.getResource("addToDictionary"));
-    final private JButton change      = new JButton(Utils.getResource("change"));
-    final private JButton changeAll   = new JButton(Utils.getResource("changeAll"));
-    final private JButton finish      = new JButton(Utils.getResource("finish"));
 }

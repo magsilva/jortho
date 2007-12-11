@@ -22,16 +22,7 @@
  */
 package com.inet.jortho;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.net.URL;
 import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -139,16 +130,27 @@ class AutoSpellChecker implements DocumentListener, LanguageChangeListener {
                 return;
             String phrase = jText.getText( i, j - i );
 
-            Pattern pattern = Pattern.compile( "[-A-Za-z]*" );
-            Matcher matcher = pattern.matcher( phrase );
-            while( matcher.find() ) {
-                int start = matcher.start();
-                int end = matcher.end();
-                String word = matcher.group();
-                if( !dictionary.exist( word ) ) {
-                    highlighter.addHighlight( i + start, i + end, painter );
-                }
+            Tokenizer tok = new Tokenizer( phrase, dictionary, locale );
+            String word;
+            while( (word = tok.nextInvalidWord()) != null ) {
+                int wordOffset = i + tok.getWordOffset();
+                highlighter.addHighlight( wordOffset, wordOffset + word.length(), painter );
             }
+            /*BreakIterator sentences = BreakIterator.getSentenceInstance( locale );
+            sentences.setText( phrase );
+            for( int start = sentences.first(), end = sentences.next(); end != BreakIterator.DONE; start = end, end = sentences.next() ) {
+                String sentence = phrase.substring( start, end );
+                BreakIterator words = BreakIterator.getWordInstance( locale );
+                words.setText( sentence );
+                for( int s = words.first(), e = words.next(); e != BreakIterator.DONE; s = e, e = words.next() ) {
+                    String word = sentence.substring( s, e ).trim();
+                    if(word.length() > 0 && Character.isLetter( word.charAt( 0 ) ) && !dictionary.exist( word ) ) {
+                        int wordOffset = i + start + s;
+                        highlighter.addHighlight( wordOffset, wordOffset + word.length(), painter );
+                        System.out.println(word);
+                    }
+                }
+            }*/
         } catch( BadLocationException e ) {
             e.printStackTrace();
         }

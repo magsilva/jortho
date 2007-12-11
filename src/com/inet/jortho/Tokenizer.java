@@ -22,37 +22,91 @@
  */
 package com.inet.jortho;
 
+import java.text.BreakIterator;
+import java.util.Locale;
+
 /**
+ * Break the text and words and search for misspelling.
  * @author Volker Berlin
  */
 class Tokenizer {
     
-    private final char[] phrase;
-    private int idx;
+    private String phrase;
+    private final Locale locale;
+    private final Dictionary dictionary;
+    private BreakIterator sentences;
+    private int startSentence, endSentence, startWord, endWord;
+    private String sentence;
+    private BreakIterator words;
+    private int offset;
     
-    
-    Tokenizer(String phrase){
-        this.phrase = phrase.toCharArray();
+    Tokenizer( String phrase, Dictionary dictionary, Locale locale ) {
+        this.phrase = phrase;
+        this.locale = locale;
+        this.dictionary = dictionary;
+        sentences = BreakIterator.getSentenceInstance( locale );
+        sentences.setText( phrase );
+        words = BreakIterator.getWordInstance( locale );
+
+        startSentence = sentences.first();
+        endSentence = sentences.next();
+        nextSentence();
     }
-    
-    
-    String nextInvalidToken(){
-        int startIdx = idx;
-        boolean isFirstLetter = true;
-        Loop:
-        while(idx<phrase.length){
-            char c = phrase[idx++];
-            if(c <=' '){
-                if(isFirstLetter){
-                    startIdx++;
-                }else{
-                    break Loop;
-                }                
+
+    /**
+     * Get the next misspelling word.
+     */
+    String nextInvalidWord() {
+        while( true ) {
+            if( endWord == BreakIterator.DONE ) {
+                startSentence = endSentence;
+                endSentence = sentences.next();
+                if( endSentence == BreakIterator.DONE ) {
+                    return null;
+                }
+                nextSentence();
+            }
+            while( endWord != BreakIterator.DONE ) {
+                String word = sentence.substring( startWord, endWord ).trim();
+                offset = startSentence + startWord;
+                startWord = endWord;
+                endWord = words.next();
+                if( word.length() > 0 && Character.isLetter( word.charAt( 0 ) ) && !dictionary.exist( word ) ) {
+                    return word;
+                }
             }
         }
-        if(isFirstLetter)
-            return null;
-        return new String(phrase, startIdx, idx-startIdx);
     }
-    
+
+    /**
+     * Load the next Sentence in the word breaker.
+     */
+    private void nextSentence() {
+        sentence = phrase.substring( startSentence, endSentence );
+        words.setText( sentence );
+        startWord = words.first();
+        endWord = words.next();
+    }
+
+    /**
+     * Get start offset of the last missspelling.
+     */
+    int getWordOffset() {
+        return offset;
+    }
+
+    /**
+     * Update the text after a word was replaced. the changes in the text should be only after the current word offset.
+     */
+    public void updatePhrase( String text ) {
+        phrase = text;
+
+        sentences.setText( phrase );
+        endSentence = sentences.following( startSentence );
+        sentence = phrase.substring( startSentence, endSentence );
+        
+        words.setText( sentence );
+        startWord = words.following( offset );
+        endWord = words.next();
+    }
 }

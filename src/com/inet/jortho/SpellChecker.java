@@ -155,11 +155,11 @@ public class SpellChecker {
                         Window parent = SwingUtilities.getWindowAncestor( text );
                         SpellCheckerDialog dialog;
                         if( parent instanceof Frame ) {
-                            dialog = new SpellCheckerDialog( (Frame)parent );
+                            dialog = new SpellCheckerDialog( (Frame)parent, true );
                         } else {
-                            dialog = new SpellCheckerDialog( (Dialog)parent );
+                            dialog = new SpellCheckerDialog( (Dialog)parent, true );
                         }
-                        dialog.show( text, dictionary );
+                        dialog.show( text, dictionary, currentLocale );
                     }
                 }
             });
