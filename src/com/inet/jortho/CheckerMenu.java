@@ -34,7 +34,7 @@ import javax.swing.text.*;
 /**
  * @author Volker Berlin
  */
-class CheckerMenu extends JMenu implements PopupMenuListener, HierarchyListener, DictionaryChangeListener {
+class CheckerMenu extends JMenu implements PopupMenuListener, HierarchyListener, LanguageChangeListener {
     
     private Dictionary                    dictionary;
 
@@ -44,7 +44,7 @@ class CheckerMenu extends JMenu implements PopupMenuListener, HierarchyListener,
     CheckerMenu(){
         super( Utils.getResource("spelling"));
         super.addHierarchyListener(this);
-        SpellChecker.addDictionaryChangeLister( this );
+        SpellChecker.addLanguageChangeLister( this );
         dictionary = SpellChecker.getCurrentDictionary();
         locale = SpellChecker.getCurrentLocale();
     }
@@ -115,9 +115,9 @@ class CheckerMenu extends JMenu implements PopupMenuListener, HierarchyListener,
     }
 
 
-    public void languageChanged( DictionaryChangeEvent ev ) {
-        dictionary = ev.getCurrentDictionary();
-        locale = ev.getCurrentLocale();
+    public void languageChanged( LanguageChangeEvent ev ) {
+        dictionary = SpellChecker.getCurrentDictionary();
+        locale = SpellChecker.getCurrentLocale();
     }
     
     

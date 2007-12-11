@@ -28,7 +28,7 @@ package com.inet.jortho;
  * Note: this class has a natural ordering that is inconsistent with equals.
  * @author Volker Berlin
  */
-public final class Suggestion implements Comparable<Suggestion>{
+final class Suggestion implements Comparable<Suggestion>{
 
     private final String word;
     private final int diff;

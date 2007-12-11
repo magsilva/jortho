@@ -143,7 +143,7 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
         endIdx = 0;
         searchNext();
         
-        show();
+        setVisible(true);
     }
     
     
@@ -202,7 +202,7 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
             }
             searchNext();
         } else if( source == finish ) {
-            hide();
+            setVisible(false);
         }
     }
     

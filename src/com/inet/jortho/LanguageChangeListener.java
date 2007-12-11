@@ -25,19 +25,19 @@ package com.inet.jortho;
 import java.util.EventListener;
 
 /**
- * A "DictionaryChange" event gets fired whenever a dictionary is changed.
- * You can register a DictionaryChangeListener in the class SpellChecker.
+ * A language change event gets fired whenever the language is changed.
+ * You can register a LanguageChangeListener in the class SpellChecker.
  * @author Volker Berlin
- * @see SpellChecker#addDictionaryChangeLister(DictionaryChangeListener)
- * @see SpellChecker#removeDictionaryChangeLister(DictionaryChangeListener)
+ * @see SpellChecker#addLanguageChangeLister(LanguageChangeListener)
+ * @see SpellChecker#removeLanguageChangeLister(LanguageChangeListener)
  */
-public interface DictionaryChangeListener extends EventListener{
+public interface LanguageChangeListener extends EventListener{
     
     /**
      * This method gets called when the language is changed.
      * This occur if the user select another language in the languages menu.
-     * @param ev A DictionaryChangeEvent object describing the changes.
+     * @param ev A LanguageChangeEvent object describing the changes.
      */
-    public void languageChanged(DictionaryChangeEvent ev);
+    public void languageChanged(LanguageChangeEvent ev);
 
 }

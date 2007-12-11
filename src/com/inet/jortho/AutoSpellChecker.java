@@ -44,7 +44,7 @@ import javax.swing.text.Highlighter.Highlight;
  * 
  * @author Volker Berlin
  */
-class AutoSpellChecker implements DocumentListener, DictionaryChangeListener {
+class AutoSpellChecker implements DocumentListener, LanguageChangeListener {
     private static final RedZigZagPainter painter = new RedZigZagPainter();
 
     private JTextComponent                jText;
@@ -58,7 +58,7 @@ class AutoSpellChecker implements DocumentListener, DictionaryChangeListener {
         this.jText = text;
         jText.getDocument().addDocumentListener( this );
 
-        SpellChecker.addDictionaryChangeLister( this );
+        SpellChecker.addLanguageChangeLister( this );
         dictionary = SpellChecker.getCurrentDictionary();
         locale = SpellChecker.getCurrentLocale();
         checkAll();
@@ -187,9 +187,9 @@ class AutoSpellChecker implements DocumentListener, DictionaryChangeListener {
         thread.start();
     }
 
-    public void languageChanged( DictionaryChangeEvent ev ) {
-        dictionary = ev.getCurrentDictionary();
-        locale = ev.getCurrentLocale();
+    public void languageChanged( LanguageChangeEvent ev ) {
+        dictionary = SpellChecker.getCurrentDictionary();
+        locale = SpellChecker.getCurrentLocale();
         checkAll();
     }
 

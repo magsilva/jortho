@@ -41,7 +41,7 @@ import javax.swing.text.AbstractDocument;
 import javax.swing.text.JTextComponent;
 
 /**
- * This class is the major class of the Spell Checker JOrtho. 
+ * This class is the major class of the Spell Checker JOrtho (Java Orthography Checker). 
  * In the most cases this is the only class that you need to add spell feature to your application.
  * First you need to register your dictionaries one times. This can look in standalone application like:<code><pre>
  * SpellChecker.registerDictionaries( new URL("file", null, ""), "en,de", "de" );
@@ -61,7 +61,7 @@ public class SpellChecker {
     private static Dictionary currentDictionary;
     private static Locale currentLocale;
     private static UserDictionaryProvider userDictionaryProvider;
-    private final static java.util.Map<DictionaryChangeListener, Object> listeners = Collections.synchronizedMap( new WeakHashMap<DictionaryChangeListener, Object>() );
+    private final static java.util.Map<LanguageChangeListener, Object> listeners = Collections.synchronizedMap( new WeakHashMap<LanguageChangeListener, Object>() );
     
     
     /**
@@ -183,26 +183,26 @@ public class SpellChecker {
     }
     
     /**
-     * Add the DictionaryChangeLister. You does not need to remove if the DictionaryChangeListener is not needed anymore.
+     * Add the LanguageChangeListener. You does not need to remove if the LanguageChangeListener is not needed anymore.
      */
-    public static void addDictionaryChangeLister(DictionaryChangeListener listener){
+    public static void addLanguageChangeLister(LanguageChangeListener listener){
         listeners.put( listener, null );
     }
     
     /**
-     * Remove the DictionaryChangeLister.
+     * Remove the LanguageChangeListener.
      */
-    public static void removeDictionaryChangeLister(DictionaryChangeListener listener){
+    public static void removeLanguageChangeLister(LanguageChangeListener listener){
         listeners.remove( listener );
     }
     
     /**
      * Helper method to fire an Language change event.
      */
-    private static void fireLanguageChanged(Dictionary oldDictionary, Locale oldLocale){
-        DictionaryChangeEvent ev = new DictionaryChangeEvent( currentDictionary, currentLocale, oldDictionary, oldLocale);
-        for(DictionaryChangeListener listener : listeners.keySet()){
-            listener.languageChanged(ev);
+    private static void fireLanguageChanged( Locale oldLocale ) {
+        LanguageChangeEvent ev = new LanguageChangeEvent( currentLocale, oldLocale );
+        for( LanguageChangeListener listener : listeners.keySet() ) {
+            listener.languageChanged( ev );
         }
     }
     
@@ -283,11 +283,10 @@ public class SpellChecker {
             } catch( Exception ex ) {
                 JOptionPane.showMessageDialog( null, ex.toString(), "Error", JOptionPane.ERROR_MESSAGE );
             }
-            Dictionary oldDictionary = currentDictionary;
             Locale oldLocale = locale;
             currentDictionary = factory.create();
             currentLocale = locale;
-            fireLanguageChanged(oldDictionary, oldLocale);
+            fireLanguageChanged( oldLocale );
         }
         
     }

@@ -25,38 +25,32 @@ package com.inet.jortho;
 import java.util.Locale;
 
 /**
- * This Event is used from <code>DictionaryChangeListener</code>.
- * @see DictionaryChangeListener
+ * This Event is used from <code>LanguageChangeListener</code>.
+ * @see LanguageChangeListener
  * @author Volker Berlin
  */
-public class DictionaryChangeEvent{
+public class LanguageChangeEvent{
 
-    private final Dictionary currentDictionary;
     private final Locale currentLocale;
-    private final Dictionary oldDictionary;
     private final Locale oldLocale;
     
     /**
-     * Create a new DictionaryChangeEvent
-     * @param currentDictionary the new Dictionary
+     * Create a new LanguageChangeEvent
      * @param currentLocale the new Locale
-     * @param oldDictionary the old Dictionary
      * @param oldLocale the old Locale
      */
-    public DictionaryChangeEvent( Dictionary currentDictionary, Locale currentLocale, Dictionary oldDictionary, Locale oldLocale ) {
-        this.currentDictionary = currentDictionary;
+    public LanguageChangeEvent( Locale currentLocale, Locale oldLocale ) {
         this.currentLocale = currentLocale;
-        this.oldDictionary = oldDictionary;
         this.oldLocale = oldLocale;
     }
 
     /**
-     * Get the value of the current Dictonary at the point of firing this Event. It general it should be equals to SpellChecker.getCurrentDictionary().
-     * @return the current Dictonary
-     * @see SpellChecker#getCurrentDictionary()
+     * Get the value of the old Locale before the point of firing this Event.
+     * @return the old Locale
+     * @see SpellChecker#getCurrentLocale()
      */
-    public Dictionary getCurrentDictionary() {
-        return currentDictionary;
+    public Locale getOldLocale() {
+        return oldLocale;
     }
 
     /**

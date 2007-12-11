@@ -38,7 +38,7 @@ import java.util.zip.InflaterInputStream;
  * @see Dictionary
  * @author Volker Berlin
  */
-public class DictionaryFactory {
+class DictionaryFactory {
 
     private final Node root = new Node();
     private char[] tree;
