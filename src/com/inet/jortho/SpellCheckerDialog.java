@@ -130,6 +130,8 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
         change.addActionListener(this);
         changeAll.addActionListener(this);
         finish.addActionListener(this);
+        
+        addToDic.setEnabled( SpellChecker.getUserDictionaryProvider() != null );
         pack();
     }
     
@@ -175,27 +177,31 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
     }
     
     
-    public void actionPerformed(ActionEvent ev) {
+    public void actionPerformed( ActionEvent ev ) {
         Object source = ev.getSource();
-        if(source == ignore){
+        if( source == ignore ) {
             searchNext();
-        }else
-        if(source == ignoreAll){
+        } else if( source == ignoreAll ) {
             searchNext();
-        }else
-        if(source == addToDic){
+        } else if( source == addToDic ) {
+            String wordStr = word.getText();
+            UserDictionaryProvider provider = SpellChecker.getUserDictionaryProvider();
+            if( provider != null ) {
+                provider.addWord( wordStr );
+            }
+            dictionary.add( wordStr );
+            dictionary.trimToSize();
             searchNext();
-        }else
-        if(source == change || source == changeAll){
+        } else if( source == change || source == changeAll ) {
             Document doc = jText.getDocument();
             try {
                 String wordStr = word.getText();
-                ((AbstractDocument)doc).replace(beginIdx, endIdx-beginIdx, word.getText(), null);
+                ((AbstractDocument)doc).replace( beginIdx, endIdx - beginIdx, word.getText(), null );
                 endIdx = beginIdx + wordStr.length();
-            } catch (BadLocationException e1) {}
+            } catch( BadLocationException e1 ) {
+            }
             searchNext();
-        }else
-        if(source == finish){
+        } else if( source == finish ) {
             hide();
         }
     }

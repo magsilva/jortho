@@ -28,6 +28,7 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseListener;
+import java.io.StringReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,6 +60,7 @@ public class SpellChecker {
     private final static ArrayList<LanguageAction> languages = new ArrayList<LanguageAction>();
     private static Dictionary currentDictionary;
     private static Locale currentLocale;
+    private static UserDictionaryProvider userDictionaryProvider;
     private final static java.util.Map<DictionaryChangeListener, Object> listeners = Collections.synchronizedMap( new WeakHashMap<DictionaryChangeListener, Object>() );
     
     
@@ -68,19 +70,46 @@ public class SpellChecker {
     private SpellChecker(){/*nothing*/}
     
     /**
-     * Register the available dictionaries. The dictionaries URLs must have the form "dictionary_xx.ortho" 
-     * and relative to the baseURL. Without the dictionary of the activeLocale no other dictionary is loaded. 
-     * @param baseURL the base URL where the dictionaries can be found
-     * @param availableLocales a comma separated list of locales
-     * @param aktiveLocale the locale that should be loaded and mak active.
+     * Set the UserDictionaryProvider. This is needed if the user should be able to add its own words. This method must
+     * be call before registerDictionaries.
+     * 
+     * @param userDictionaryProvider
+     *            The new UserDictionaryProvider or null
+     * @see #getUserDictionaryProvider()
+     * @see #registerDictionaries(URL, String, String)
      */
-    public static void registerDictionaries(URL baseURL, String availableLocales, String aktiveLocale){
+    public static void setUserDictionaryProvider( UserDictionaryProvider userDictionaryProvider ) {
+        SpellChecker.userDictionaryProvider = userDictionaryProvider;
+    }
+
+    /**
+     * Get the current UserDictionaryProvider. if not set then it return null.
+     * 
+     * @see #setUserDictionaryProvider(UserDictionaryProvider)
+     */
+    static UserDictionaryProvider getUserDictionaryProvider() {
+        return SpellChecker.userDictionaryProvider;
+    }
+
+    /**
+     * Register the available dictionaries. The dictionaries URLs must have the form "dictionary_xx.ortho" and relative
+     * to the baseURL. Without the dictionary of the activeLocale no other dictionary is loaded.
+     * 
+     * @param baseURL
+     *            the base URL where the dictionaries can be found
+     * @param availableLocales
+     *            a comma separated list of locales
+     * @param aktiveLocale
+     *            the locale that should be loaded and mak active.
+     * @see #setUserDictionaryProvider(UserDictionaryProvider)
+     */
+    public static void registerDictionaries( URL baseURL, String availableLocales, String aktiveLocale ) {
         aktiveLocale = aktiveLocale.trim();
         String[] locales = availableLocales.split( "," );
-        for(String locale : locales){
-            LanguageAction action = new LanguageAction( baseURL, new Locale(locale) );
+        for( String locale : locales ) {
+            LanguageAction action = new LanguageAction( baseURL, new Locale( locale ) );
             languages.add( action );
-            if(locale.equals( aktiveLocale )){
+            if( locale.equals( aktiveLocale ) ) {
                 action.setSelected( true );
                 action.actionPerformed( null );
             }
@@ -244,6 +273,13 @@ public class SpellChecker {
             DictionaryFactory factory = new DictionaryFactory();
             try {
                 factory.loadWordList( new URL(baseURL, "dictionary_" + locale + ".ortho") );
+                UserDictionaryProvider provider = userDictionaryProvider;
+                if(provider != null){
+                    String userWords = provider.getUserWords(locale);
+                    if(userWords != null){
+                        factory.loadPlainWordList( new StringReader(userWords) );
+                    }
+                }
             } catch( Exception ex ) {
                 JOptionPane.showMessageDialog( null, ex.toString(), "Error", JOptionPane.ERROR_MESSAGE );
             }
@@ -261,7 +297,7 @@ public class SpellChecker {
      * @return the current <code>Dictionary</code> or null if not set.
      * @see #registerDictionaries(URL, String, String)
      */
-    public static Dictionary getCurrentDictionary() {
+    static Dictionary getCurrentDictionary() {
         return currentDictionary;
     }
 

@@ -29,7 +29,7 @@ import java.util.zip.*;
  * A container for a word list.
  * @author Volker Berlin
  */
-public final class Dictionary extends DictionaryBase{
+final class Dictionary extends DictionaryBase{
 
    
     /**
@@ -122,7 +122,7 @@ public final class Dictionary extends DictionaryBase{
      * the storage of an <tt>Dictionary</tt> instance.
      * The load methods already call it.
      */
-    private void trimToSize(){
+    void trimToSize(){
         char[] temp = new char[size];
         System.arraycopy( tree, 0, temp, 0, size );
         tree = temp;
