@@ -34,7 +34,8 @@ public interface UserDictionaryProvider {
 
     /**
      * Get the list of user words for this locale. The implementation can decide if there is one user dictionary for all
-     * available languages or only one. This method is called if the language is changed and the dictionary is loaded.
+     * available languages or only one. This method is called if the language is changed and the dictionary is loaded
+     * and before the langauge change event is fire.
      * 
      * @param locale
      *            The locale of the selected language.

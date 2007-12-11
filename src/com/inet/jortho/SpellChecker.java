@@ -43,9 +43,12 @@ import javax.swing.text.JTextComponent;
 /**
  * This class is the major class of the Spell Checker JOrtho (Java Orthography Checker). 
  * In the most cases this is the only class that you need to add spell feature to your application.
- * First you need to register your dictionaries one times. This can look in standalone application like:<code><pre>
+ * First you need to register your dictionaries one times. This can look in standalone application like:
+ * <code><pre>
  * SpellChecker.registerDictionaries( new URL("file", null, ""), "en,de", "de" );
- * </pre></code>and in a applet like:<code><pre>
+ * </pre></code>
+ * and in a applet like:
+ * <code><pre>
  * SpellChecker.registerDictionaries( getCodeBase(), "en,de", "en" );
  * </pre></code>
  * After this you can register your text component that should have all spell checker feature (Highlighter. context menu, spelling dialog). 
