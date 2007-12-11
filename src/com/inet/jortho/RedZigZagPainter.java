@@ -41,7 +41,11 @@ class RedZigZagPainter extends DefaultHighlighter.DefaultHighlightPainter {
     }
 	
 
-	public Shape paintLayer(Graphics g, int i, int j, Shape shape, JTextComponent jtext, View view){
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+    public Shape paintLayer(Graphics g, int i, int j, Shape shape, JTextComponent jtext, View view){
         g.setColor(Color.red);
         try{
             Shape sh = view.modelToView(i, Position.Bias.Forward, j, Position.Bias.Backward, shape);
