@@ -35,7 +35,7 @@ class Suggestions {
         this.maxDiff = maxDiff;
     }
     
-    public void add(Suggestion suggestion){
+    void add(Suggestion suggestion){
         if(suggestion.getDissimilarity() > maxDiff){
             return;
         }
@@ -53,5 +53,9 @@ class Suggestions {
             list.add( sugg );
         }
         return list;
+    }
+
+    int getMaxDissimilarity() {
+        return maxDiff;
     }
 }

@@ -83,7 +83,7 @@ abstract class DictionaryBase {
         if(word.length() == 0 || exist(word)){
             return new ArrayList<Suggestion>();
         }
-        Suggestions suggesions = new Suggestions( Math.min( 15, word.length() * 5 / 2 ) );
+        Suggestions suggesions = new Suggestions( Math.min( 16, word.length() * 5 / 2 ) );
         idx = 0;
         char[] chars = word.toCharArray();
         searchSuggestions( suggesions, chars, 0, 0, 0);
@@ -105,7 +105,7 @@ abstract class DictionaryBase {
      * @param diff Die Unähnlichkeit bis zur aktuellen Zeichenposition
      */
     private void searchSuggestions( Suggestions list, char[] chars, int charPosition, int lastIdx, int diff){
-        if(diff > 15 ||  diff > chars.length * 5 / 2){
+        if(diff > list.getMaxDissimilarity()){
             return;
         }
         // Erstmal mit dem richtigen Buchstaben weitermachen 
@@ -148,7 +148,10 @@ abstract class DictionaryBase {
                 char[] chars2 = chars.clone();
                 chars2[charPosition+1] = chars[charPosition];
                 chars2[charPosition] = c;
-                searchSuggestions( list, chars2, charPosition+1, readIndex(), diff+5);
+                idx = readIndex();
+                if( idx > 0 ) {
+                    searchSuggestions( list, chars2, charPosition+1, idx, diff+3);
+                }
                 
                 //Zusatzbuchstaben
                 idx = tempIdx;
@@ -167,12 +170,16 @@ abstract class DictionaryBase {
                     int length = charPosition+1;
                     char[] chars2 = new char[length];
                     System.arraycopy(chars, 0, chars2, 0, length);
-                    list.add( new Suggestion( chars2, diff + (chars.length-length)*5 ) );
+                    chars2[charPosition] = tree[idx];
+                    list.add( new Suggestion( chars2, diff + 5 + (chars.length-length)*5 ) );
                 }
                 if(charPosition + 1 < chars.length){
                     char[] chars2 = chars.clone();
                     chars2[charPosition] = tree[idx];
-                    searchSuggestions( list, chars2, charPosition + 1, readIndex(), diff + 5 ); // modfiy the idx value
+                    idx = readIndex();
+                    if( idx > 0 ) {
+                        searchSuggestions( list, chars2, charPosition + 1, idx, diff + 5 );
+                    }
                 }
                 idx = tempIdx += 3;
             }
