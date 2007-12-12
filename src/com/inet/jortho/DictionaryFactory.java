@@ -105,7 +105,6 @@ class DictionaryFactory {
         String word = input.readLine();
         while( word != null ) {
             if( word.length() > 1 ) {
-                if(word.startsWith( "dop" )) System.err.println(word);
                 add( word );
             }
             word = input.readLine();
@@ -216,7 +215,7 @@ class DictionaryFactory {
                 factory.tree[idx++] = (char)(offset >> 16);
                 factory.tree[idx++] = (char)(offset);
             }
-            factory.tree[idx] = 0xFFFF;
+            factory.tree[idx] = DictionaryBase.LAST_CHAR;
             return start;
         }
     }
