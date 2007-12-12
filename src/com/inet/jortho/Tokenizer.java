@@ -39,6 +39,7 @@ class Tokenizer {
     private String sentence;
     private BreakIterator words;
     private int offset;
+    private boolean isFirstWordInSentence;
     
     Tokenizer( String phrase, Dictionary dictionary, Locale locale ) {
         this.phrase = phrase;
@@ -71,8 +72,16 @@ class Tokenizer {
                 offset = startSentence + startWord;
                 startWord = endWord;
                 endWord = words.next();
-                if( word.length() > 0 && Character.isLetter( word.charAt( 0 ) ) && !dictionary.exist( word ) ) {
-                    return word;
+                if( word.length() > 0 && Character.isLetter( word.charAt( 0 ) )){
+                    boolean exist = dictionary.exist( word );
+                    if(isFirstWordInSentence && !exist && Character.isUpperCase( word.charAt( 0 ) )){
+                        String lowerWord = word.substring( 0, 1 ).toLowerCase() + word.substring( 1 );
+                        exist = dictionary.exist( lowerWord );
+                    }
+                    isFirstWordInSentence = false;
+                    if( !exist ) {
+                        return word;
+                    }
                 }
             }
         }
@@ -86,6 +95,7 @@ class Tokenizer {
         words.setText( sentence );
         startWord = words.first();
         endWord = words.next();
+        isFirstWordInSentence = true;
     }
 
     /**
