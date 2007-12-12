@@ -75,7 +75,7 @@ class CheckerMenu extends JMenu implements PopupMenuListener, HierarchyListener,
                     this.setEnabled(false);
                     return;
                 }
-                List list = dictionary.suggestions(word);
+                List list = dictionary.searchSuggestions(word);
 
                 //Disable wenn keine Vorschläge
                 this.setEnabled(list.size()>0);

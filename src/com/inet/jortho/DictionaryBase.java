@@ -79,17 +79,17 @@ abstract class DictionaryBase {
      * @return a list of class Suggestion.
      * @see Suggestion
      */
-    public List<Suggestion> suggestions(String word){
-        ArrayList<Suggestion> list = new ArrayList<Suggestion>();
+    public List<Suggestion> searchSuggestions(String word){
         if(word.length() == 0 || exist(word)){
-            return list;
+            return new ArrayList<Suggestion>();
         }
-
+        Suggestions suggesions = new Suggestions( Math.min( 15, word.length() * 5 / 2 ) );
         idx = 0;
         char[] chars = word.toCharArray();
-        suggestions( list, chars, 0, 0, 0);
+        searchSuggestions( suggesions, chars, 0, 0, 0);
+        List<Suggestion> list = suggesions.getlist();
         Collections.sort( list );
-        removeDuplicated( list );
+        //removeDuplicated( list );
         return list;
     }
     
@@ -104,7 +104,7 @@ abstract class DictionaryBase {
      * @param lastIdx Position im Suchindex der zur aktuellen Zeichenposition zeigt.
      * @param diff Die Unähnlichkeit bis zur aktuellen Zeichenposition
      */
-    private void suggestions( List<Suggestion> list, char[] chars, int charPosition, int lastIdx, int diff){
+    private void searchSuggestions( Suggestions list, char[] chars, int charPosition, int lastIdx, int diff){
         if(diff > 15 ||  diff > chars.length * 5 / 2){
             return;
         }
@@ -130,10 +130,10 @@ abstract class DictionaryBase {
                 return;
             }
             if(charPosition+1 == chars.length){
-                suggestionsLonger( list, new String(chars), chars.length, idx, diff + 5);
+                searchSuggestionsLonger( list, new String(chars), chars.length, idx, diff + 5);
                 return;
             }
-            suggestions( list, chars, charPosition + 1, idx, diff );
+            searchSuggestions( list, chars, charPosition + 1, idx, diff );
         }
 
         
@@ -148,14 +148,14 @@ abstract class DictionaryBase {
                 char[] chars2 = chars.clone();
                 chars2[charPosition+1] = chars[charPosition];
                 chars2[charPosition] = c;
-                suggestions( list, chars2, charPosition+1, readIndex(), diff+5);
+                searchSuggestions( list, chars2, charPosition+1, readIndex(), diff+5);
                 
                 //Zusatzbuchstaben
                 idx = tempIdx;
                 char[] chars3 = new char[chars.length-1];
                 System.arraycopy(chars, 0, chars3, 0, charPosition);
                 System.arraycopy(chars, charPosition+1, chars3, charPosition, chars3.length-charPosition);
-                suggestions( list, chars3, charPosition, lastIdx, diff+5);
+                searchSuggestions( list, chars3, charPosition, lastIdx, diff+5);
             }
         }
 
@@ -172,14 +172,14 @@ abstract class DictionaryBase {
                 if(charPosition + 1 < chars.length){
                     char[] chars2 = chars.clone();
                     chars2[charPosition] = tree[idx];
-                    suggestions( list, chars2, charPosition + 1, readIndex(), diff + 5 ); // modfiy the idx value
+                    searchSuggestions( list, chars2, charPosition + 1, readIndex(), diff + 5 ); // modfiy the idx value
                 }
                 idx = tempIdx += 3;
             }
         }
     }
     
-    private void suggestionsLonger( List<Suggestion> list, String chars, int originalLength, int lastIdx, int diff){
+    private void searchSuggestionsLonger( Suggestions list, String chars, int originalLength, int lastIdx, int diff){
         idx = lastIdx;
         while(idx<size && tree[idx] < LAST_CHAR){
             if( isWordMatch() ){
@@ -217,24 +217,5 @@ abstract class DictionaryBase {
      */
     final int readIndex(){
         return ((tree[idx+1] & 0x7fff)<<16) + tree[idx+2]; 
-    }
-    
-    
-    
-    /**
-     * Enternt doppelte Einträge in der Liste, dabei werden die Einträge am Anfang der Liste behalten.
-     * Sie sollte also bereits sortiert sein.
-     * @param list darf nicht null sein 
-     */
-    private void removeDuplicated(List<Suggestion> list){
-        for(int i=0; i<list.size(); i++){
-            Object obj = list.get( i );
-            for(int j=i+1; j<list.size(); j++){
-                if(obj.equals( list.get( j ) )){
-                    list.remove( j );
-                    j--;
-                }
-            }
-        }
     }
 }

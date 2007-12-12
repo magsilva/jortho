@@ -105,6 +105,7 @@ class DictionaryFactory {
         String word = input.readLine();
         while( word != null ) {
             if( word.length() > 1 ) {
+                if(word.startsWith( "dop" )) System.err.println(word);
                 add( word );
             }
             word = input.readLine();
