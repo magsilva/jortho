@@ -37,7 +37,7 @@ final class Dictionary extends DictionaryBase{
      */
     public Dictionary(){
         tree = new char[10000];
-        tree[size++] = 0xFFFF;
+        tree[size++] = LAST_CHAR;
     }
     
     
@@ -172,7 +172,7 @@ final class Dictionary extends DictionaryBase{
     
     
     private void searchCharOrAdd(char c){
-        if(c == 0xFFFF)
+        if(c == LAST_CHAR)
             throw new RuntimeException("Invalid Character");
         while(idx<size && tree[idx] < c){
             idx += 3;
@@ -195,7 +195,7 @@ final class Dictionary extends DictionaryBase{
         tree[idx+2] = 0;
         size += 3;
         for(int i=0; i<size; ){
-            if(tree[i] == 0xFFFF){
+            if(tree[i] == LAST_CHAR){
                 i++;
             }else{
                 int index = (tree[i+1]<<16) + tree[i+2];
@@ -223,7 +223,7 @@ final class Dictionary extends DictionaryBase{
         tree[idx+1] |= (char)(size >> 16);
         tree[idx+2] |= (char)(size);
         idx = size;
-        tree[idx  ] = 0xFFFF;
+        tree[idx  ] = LAST_CHAR;
         size += 1;
         return idx;
     }
