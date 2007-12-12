@@ -34,6 +34,9 @@ abstract class DictionaryBase {
     protected int idx;
     
     
+    protected static final char LAST_CHAR = 0xFFFF;
+    
+    
     DictionaryBase(char[] tree){
         this.tree = tree;
         size = tree.length;
@@ -59,8 +62,7 @@ abstract class DictionaryBase {
             if((idx>=size || tree[idx] != c)){
                 return false;
             }
-            if(i == word.length()-1 && 
-              (tree[idx+1] & 0x8000) > 0){
+            if( i == word.length() - 1 && isWordMatch() ) {
                 return true;
             }
             idx = readIndex();
@@ -77,7 +79,7 @@ abstract class DictionaryBase {
      * @return a list of class Suggestion.
      * @see Suggestion
      */
-    public List suggestions(String word){
+    public List<Suggestion> suggestions(String word){
         ArrayList<Suggestion> list = new ArrayList<Suggestion>();
         if(word.length() == 0 || exist(word)){
             return list;
@@ -103,20 +105,35 @@ abstract class DictionaryBase {
      * @param diff Die Unähnlichkeit bis zur aktuellen Zeichenposition
      */
     private void suggestions( List<Suggestion> list, char[] chars, int charPosition, int lastIdx, int diff){
-        
+        if(diff > 15 ||  diff > chars.length * 5 / 2){
+            return;
+        }
         // Erstmal mit dem richtigen Buchstaben weitermachen 
         idx = lastIdx;
         char c = chars[charPosition];
         if(searchChar(c)){
-            if(charPosition+1 == chars.length){
-                if((tree[idx+1] & 0x8000) > 0 && diff > 0){
+            if( isWordMatch() ) {
+                if(charPosition+1 == chars.length){
+                    // exact match at this character position
                     list.add( new Suggestion(chars, diff));
+                }else{
+                    // a shorter match, we need to cut the string
+                    int length = charPosition+1;
+                    char[] chars2 = new char[length];
+                    System.arraycopy(chars, 0, chars2, 0, length);
+                    list.add( new Suggestion(chars2, diff + (chars.length-length)*5));
                 }
-                // ToDo Regel für Längere Wörter    
-                    
+            }
+            idx = readIndex();
+            if( idx <= 0 ) {
+                // no more charcters in the tree
                 return;
             }
-            suggestions( list, chars, charPosition+1, readIndex(), diff);
+            if(charPosition+1 == chars.length){
+                suggestionsLonger( list, new String(chars), chars.length, idx, diff + 5);
+                return;
+            }
+            suggestions( list, chars, charPosition + 1, idx, diff );
         }
 
         
@@ -142,9 +159,42 @@ abstract class DictionaryBase {
             }
         }
 
+        // Typus - wrong characters
+        if(charPosition < chars.length){
+            int tempIdx = idx = lastIdx;
+            while( idx < size && tree[idx] < LAST_CHAR ) {
+                if( isWordMatch() ){
+                    int length = charPosition+1;
+                    char[] chars2 = new char[length];
+                    System.arraycopy(chars, 0, chars2, 0, length);
+                    list.add( new Suggestion( chars2, diff + (chars.length-length)*5 ) );
+                }
+                if(charPosition + 1 < chars.length){
+                    char[] chars2 = chars.clone();
+                    chars2[charPosition] = tree[idx];
+                    suggestions( list, chars2, charPosition + 1, readIndex(), diff + 5 ); // modfiy the idx value
+                }
+                idx = tempIdx += 3;
+            }
+        }
     }
     
+    private void suggestionsLonger( List<Suggestion> list, String chars, int originalLength, int lastIdx, int diff){
+        idx = lastIdx;
+        while(idx<size && tree[idx] < LAST_CHAR){
+            if( isWordMatch() ){
+                list.add( new Suggestion( (chars + tree[idx]).toCharArray(), diff ) );
+            }
+            idx += 3;
+        }
+    }
     
+    /**
+     * Search if the character exist in the crrent node. If found then the varaible idx point to the locaction.
+     * If not found then it point on the next character (char value) item in the node. 
+     * @param c the searching character
+     * @return true if found
+     */
     private boolean searchChar(char c){
         while(idx<size && tree[idx] < c){
             idx += 3;
@@ -156,13 +206,21 @@ abstract class DictionaryBase {
     }
     
     /**
+     * Check if on the current item position a word ends.
+     */
+    private boolean isWordMatch(){
+        return (tree[idx + 1] & 0x8000) > 0;
+    }
+    
+    /**
      * Read the offset in the tree of the next character. 
      */
     final int readIndex(){
         return ((tree[idx+1] & 0x7fff)<<16) + tree[idx+2]; 
     }
     
-
+    
+    
     /**
      * Enternt doppelte Einträge in der Liste, dabei werden die Einträge am Anfang der Liste behalten.
      * Sie sollte also bereits sortiert sein.
