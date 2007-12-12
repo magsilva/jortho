@@ -83,13 +83,12 @@ abstract class DictionaryBase {
         if(word.length() == 0 || exist(word)){
             return new ArrayList<Suggestion>();
         }
-        Suggestions suggesions = new Suggestions( Math.min( 16, word.length() * 5 / 2 ) );
+        Suggestions suggesions = new Suggestions( Math.min( 20, 4+word.length() ) );
         idx = 0;
         char[] chars = word.toCharArray();
         searchSuggestions( suggesions, chars, 0, 0, 0);
         List<Suggestion> list = suggesions.getlist();
         Collections.sort( list );
-        //removeDuplicated( list );
         return list;
     }
     
@@ -178,7 +177,7 @@ abstract class DictionaryBase {
                     chars2[charPosition] = tree[idx];
                     idx = readIndex();
                     if( idx > 0 ) {
-                        searchSuggestions( list, chars2, charPosition + 1, idx, diff + 5 );
+                        searchSuggestions( list, chars2, charPosition + 1, idx, diff + charDiff( chars[charPosition], chars2[charPosition] ) );
                     }
                 }
                 idx = tempIdx += 3;
@@ -224,5 +223,27 @@ abstract class DictionaryBase {
      */
     final int readIndex(){
         return ((tree[idx+1] & 0x7fff)<<16) + tree[idx+2]; 
+    }
+    
+    /**
+     * Returns an int that descript the dissimilarity of the charatres. 
+     * The value is ever larger 0. A value of means only a small difference.
+     * @param a first char
+     * @param b second char
+     * @return the dissimilarity
+     */
+    private int charDiff( char a, char b ) {
+        a = Character.toLowerCase( a );
+        b = Character.toLowerCase( b );
+
+        if( a == b ) {
+            return 1;
+        }
+
+        if( Character.getType( a ) != Character.getType( b ) ) {
+            return 6;
+        }
+
+        return 5;
     }
 }
