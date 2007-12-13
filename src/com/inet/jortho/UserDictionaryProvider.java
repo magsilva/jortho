@@ -25,29 +25,27 @@ package com.inet.jortho;
 import java.util.Locale;
 
 /**
- * This class add the feature of a user dictionary. The application must be save it self if a user add a new word to the
- * list.
+ * Interface to be implemented by a user dictionary. Adding a new word via {@link #addWord(String)} must
+ * trigger a storing of the dictionary
  * 
  * @author Volker Berlin
  */
 public interface UserDictionaryProvider {
 
     /**
-     * Get the list of user words for this locale. The implementation can decide if there is one user dictionary for all
-     * available languages or only one. This method is called if the language is changed and the dictionary is loaded
-     * and before the langauge change event is fire.
+     * Gets the list of user words for this locale. The implementation can decide if there is a
+     * user dictionary for each available language or only one. This method is called before the
+     * language change event is fired if the language is changed and the dictionary is loaded.
      * 
-     * @param locale
-     *            The locale of the selected language.
+     * @param locale The locale of the selected language.
      * @return A list of words delimited with line breaks. It can be null.
      */
     String getUserWords( Locale locale );
 
     /**
-     * Add a new word to the current user dictionary. The implmentor must be save it in its own backend.
+     * Adds a new word to the current user dictionary. The implementor must save this word in its own backend.
      * 
-     * @param word
-     *            the new word.
+     * @param word the new word.
      */
     void addWord( String word );
 

@@ -35,24 +35,35 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.WeakHashMap;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.ButtonGroup;
+import javax.swing.ButtonModel;
+import javax.swing.JMenu;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JToggleButton;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.JTextComponent;
 
 /**
- * This class is the major class of the Spell Checker JOrtho (Java Orthography Checker). 
- * In the most cases this is the only class that you need to add spell feature to your application.
- * First you need to register your dictionaries one times. This can look in standalone application like:
+ * This class is the major class of the spellchecker JOrtho (Java Orthography Checker). 
+ * In the most cases this is the only class that you need to add spellchecking to your application.
+ * First you need to do a one-time registration of your dictionaries. In standalone applications this can
+ * look like:
  * <code><pre>
  * SpellChecker.registerDictionaries( new URL("file", null, ""), "en,de", "de" );
  * </pre></code>
- * and in a applet like:
+ * and in an applet this will look like:
  * <code><pre>
  * SpellChecker.registerDictionaries( getCodeBase(), "en,de", "en" );
  * </pre></code>
- * After this you can register your text component that should have all spell checker feature (Highlighter. context menu, spelling dialog). 
- * This look like:<code><pre>
+ * After this you can register your text component that should have the spell checker features
+ * (Highlighter, context menu, spell checking dialog). 
+ * This looks like:<code><pre>
  * JTextPane text = new JTextPane();
  * SpellChecker.register( text );
  * </pre></code>
@@ -73,11 +84,10 @@ public class SpellChecker {
     private SpellChecker(){/*nothing*/}
     
     /**
-     * Set the UserDictionaryProvider. This is needed if the user should be able to add its own words. This method must
-     * be call before registerDictionaries.
+     * Sets the UserDictionaryProvider. This is needed if the user should be able to add their own words.
+     * This method must be called before {@link #registerDictionaries(URL, String, String)}.
      * 
-     * @param userDictionaryProvider
-     *            The new UserDictionaryProvider or null
+     * @param userDictionaryProvider the new UserDictionaryProvider or null
      * @see #getUserDictionaryProvider()
      * @see #registerDictionaries(URL, String, String)
      */
@@ -86,7 +96,7 @@ public class SpellChecker {
     }
 
     /**
-     * Get the current UserDictionaryProvider. if not set then it return null.
+     * Gets the currently set UserDictionaryProvider. If none has been set then null is returned.
      * 
      * @see #setUserDictionaryProvider(UserDictionaryProvider)
      */
@@ -95,24 +105,25 @@ public class SpellChecker {
     }
 
     /**
-     * Register the available dictionaries. The dictionaries URLs must have the form "dictionary_xx.ortho" and relative
-     * to the baseURL. Without the dictionary of the activeLocale no other dictionary is loaded.
+     * Registers the available dictionaries. The dictionaries' URLs must have the form "dictionary_xx.ortho"
+     * and must be relative to the baseURL. If the dictionary of the active Locale does not exist, no other dictionary
+     * is loaded.
      * 
      * @param baseURL
      *            the base URL where the dictionaries can be found
      * @param availableLocales
      *            a comma separated list of locales
-     * @param aktiveLocale
-     *            the locale that should be loaded and mak active.
+     * @param activeLocale
+     *            the locale that should be loaded and made active.
      * @see #setUserDictionaryProvider(UserDictionaryProvider)
      */
-    public static void registerDictionaries( URL baseURL, String availableLocales, String aktiveLocale ) {
-        aktiveLocale = aktiveLocale.trim();
+    public static void registerDictionaries( URL baseURL, String availableLocales, String activeLocale ) {
+        activeLocale = activeLocale.trim();
         String[] locales = availableLocales.split( "," );
         for( String locale : locales ) {
             LanguageAction action = new LanguageAction( baseURL, new Locale( locale ) );
             languages.add( action );
-            if( locale.equals( aktiveLocale ) ) {
+            if( locale.equals( activeLocale ) ) {
                 action.setSelected( true );
                 action.actionPerformed( null );
             }
@@ -121,7 +132,7 @@ public class SpellChecker {
     }
     
     /**
-     * Activate the spell checker for the given <code>JTextComponent</code>. The call is equals to
+     * Activate the spell checker for the given <code>JTextComponent</code>. The call is equal to
      * register( text, true, true ).
      * @param text the JTextComponent
      * @throws NullPointerException if text is null
@@ -129,13 +140,13 @@ public class SpellChecker {
     public static void register( final JTextComponent text) throws NullPointerException{
         register( text, true, true );
     }
-    
+
     /**
-     * Activate the spell checker for the given <code>JTextComponent</code>. 
-     * You does not need to unregister if the JTextComponent is not needed anymore.
+     * Activates the spell checker for the given <code>JTextComponent</code>. 
+     * You do not need to unregister if the JTextComponent is not needed anymore.
      * @param text the JTextComponent
-     * @param hasPopup true, the JTextComponent should have a Popup menu the menu item "Orthography" and "Languages". 
-     * @param hasShortKey true, the pressing of the F7 key will display the spell check dialog.
+     * @param hasPopup if true, the JTextComponent is to have a popup menu with the menu item "Orthography" and "Languages". 
+     * @param hasShortKey if true, pressing the F7 key will display the spell check dialog.
      * @throws NullPointerException if text is null
      */
     public static void register( final JTextComponent text, boolean hasPopup, boolean hasShortKey) throws NullPointerException{
@@ -167,7 +178,8 @@ public class SpellChecker {
     }
     
     /**
-     * Remove all spell checker features from the JTextComponent.
+     * Removes all spell checker features from the JTextComponent. This does not need to be called
+     * if the text component is no longer needed.
      * @param text the JTextComponent
      */
     public static void unregister( JTextComponent text ){
@@ -186,14 +198,18 @@ public class SpellChecker {
     }
     
     /**
-     * Add the LanguageChangeListener. You does not need to remove if the LanguageChangeListener is not needed anymore.
+     * Adds the LanguageChangeListener. You do not need to remove if the
+     * LanguageChangeListener is not needed anymore.
+     * @param listener listener to add
+     * @see LanguageChangeListener
      */
     public static void addLanguageChangeLister(LanguageChangeListener listener){
         listeners.put( listener, null );
     }
     
     /**
-     * Remove the LanguageChangeListener.
+     * Removes the LanguageChangeListener.
+     * @param listener listener to remove
      */
     public static void removeLanguageChangeLister(LanguageChangeListener listener){
         listeners.remove( listener );
@@ -210,8 +226,9 @@ public class SpellChecker {
     }
     
     /**
-     * Create menu item "Orthography" (depends on the user language) with a submenu that include suggestions for a correct spelling.
-     * You can use it to add this menu item to your own popup.
+     * Creates a menu item "Orthography" (or the equivalent depending on the user language) with a
+     * sub-menu that includes suggestions for a correct spelling.
+     * You can use this to add this menu item to your own popup.
      * @return the new menu.
      */
     public static JMenu createCheckerMenu(){
@@ -219,8 +236,9 @@ public class SpellChecker {
     }
     
     /**
-     * Create menu item "Languages" (depends on the user language) with a submenu that list all available dictionary languagages. 
-     * You can use it to add this menu item to your own popup.
+     * Creates a menu item "Languages" (or the equivalent depending on the user language) with a sub-menu
+     * that lists all available dictionary languages. 
+     * You can use this to add this menu item to your own popup.
      * @return the new menu.
      */
     public static JMenu createLanguagesMenu(){
@@ -304,8 +322,9 @@ public class SpellChecker {
     }
 
     /**
-     * Get the current <code>Locale</code>. The current Locale will be set if the user one select or on calling <ode>registerDictionaries</code>.
-     * @return the current <code>Locale</code> or null if not set.
+     * Gets the current <code>Locale</code>. The current Locale will be set if the user selects
+     * one, or when calling <ode>registerDictionaries</code>.
+     * @return the current <code>Locale</code> or null if none is set.
      * @see #registerDictionaries(URL, String, String)
      */
     public static Locale getCurrentLocale() {

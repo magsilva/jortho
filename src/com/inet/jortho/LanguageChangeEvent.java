@@ -25,7 +25,7 @@ package com.inet.jortho;
 import java.util.Locale;
 
 /**
- * This Event is used from <code>LanguageChangeListener</code>.
+ * This Event is used by <code>LanguageChangeListener</code>.
  * @see LanguageChangeListener
  * @author Volker Berlin
  */
@@ -35,7 +35,7 @@ public class LanguageChangeEvent{
     private final Locale oldLocale;
     
     /**
-     * Create a new LanguageChangeEvent
+     * Creates a new LanguageChangeEvent
      * @param currentLocale the new Locale
      * @param oldLocale the old Locale
      */
@@ -45,7 +45,7 @@ public class LanguageChangeEvent{
     }
 
     /**
-     * Get the value of the old Locale before the point of firing this Event.
+     * Gets the value of the old Locale before the firing this Event.
      * @return the old Locale
      * @see SpellChecker#getCurrentLocale()
      */
@@ -54,7 +54,8 @@ public class LanguageChangeEvent{
     }
 
     /**
-     * Get the value of the current Locale at the point of firing this Event. It general it should be equals to SpellChecker.getCurrentLocale().
+     * Get the value of the current Locale after firing this Event.
+     * It general it should be equal to {@link SpellChecker#getCurrentLocale()}.
      * @return the current Locale
      * @see SpellChecker#getCurrentLocale()
      */
