@@ -75,6 +75,7 @@ class Tokenizer {
                 if( word.length() > 0 && Character.isLetter( word.charAt( 0 ) )){
                     boolean exist = dictionary.exist( word );
                     if(isFirstWordInSentence && !exist && Character.isUpperCase( word.charAt( 0 ) )){
+                        // Uppercase check on starting of sentence
                         String lowerWord = word.substring( 0, 1 ).toLowerCase() + word.substring( 1 );
                         exist = dictionary.exist( lowerWord );
                     }
