@@ -17,6 +17,7 @@
 		<mkdir dir="temp"/>
 		<javac srcdir="src" destdir="temp">
 			<include name="com/inet/jortho/**/*.java"/>
+			<exclude name="**/*Test*.java"/>
 		</javac>
 		<jar destfile="temp/jortho.jar">
 			<fileset dir="temp"/>
