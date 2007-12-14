@@ -24,7 +24,8 @@
 		</jar>	
 		<zip destfile="JOrtho.zip">
 			<fileset dir="temp" includes="jortho.jar"/>
-			<fileset dir="." includes="doc/**.*"/>
+			<fileset dir="." includes="doc/**/*.*"/>
+			<fileset dir="." includes="src/**/*.*" excludes="src/**/*Test*.java"/>
 			<fileset dir="." includes="license.txt"/>
 		</zip>
 		<delete dir="temp"/>
