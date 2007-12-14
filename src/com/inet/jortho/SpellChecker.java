@@ -122,6 +122,7 @@ public class SpellChecker {
         String[] locales = availableLocales.split( "," );
         for( String locale : locales ) {
             LanguageAction action = new LanguageAction( baseURL, new Locale( locale ) );
+            languages.remove( action );
             languages.add( action );
             if( locale.equals( activeLocale ) ) {
                 action.setSelected( true );
@@ -310,6 +311,18 @@ public class SpellChecker {
             fireLanguageChanged( oldLocale );
         }
         
+        @Override
+        public boolean equals(Object obj){
+            if(obj instanceof LanguageAction){
+                return locale.equals( ((LanguageAction)obj).locale );
+            }
+            return false;
+        }
+        
+        @Override
+        public int hashCode(){
+            return locale.hashCode();
+        }
     }
 
     /**
