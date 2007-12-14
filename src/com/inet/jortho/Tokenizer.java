@@ -32,7 +32,7 @@ import java.util.Locale;
 class Tokenizer {
     
     private String phrase;
-    private final Locale locale;
+    //private final Locale locale;
     private final Dictionary dictionary;
     private BreakIterator sentences;
     private int startSentence, endSentence, startWord, endWord;
@@ -43,7 +43,7 @@ class Tokenizer {
     
     Tokenizer( String phrase, Dictionary dictionary, Locale locale ) {
         this.phrase = phrase;
-        this.locale = locale;
+        //this.locale = locale;
         this.dictionary = dictionary;
         sentences = BreakIterator.getSentenceInstance( locale );
         sentences.setText( phrase );
@@ -72,7 +72,8 @@ class Tokenizer {
                 offset = startSentence + startWord;
                 startWord = endWord;
                 endWord = words.next();
-                if( word.length() > 0 && Character.isLetter( word.charAt( 0 ) )){
+                //only words with 2 or more characters are checked
+                if( word.length() > 1 && Character.isLetter( word.charAt( 0 ) )){
                     boolean exist = dictionary.exist( word );
                     if(isFirstWordInSentence && !exist && Character.isUpperCase( word.charAt( 0 ) )){
                         // Uppercase check on starting of sentence
