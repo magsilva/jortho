@@ -105,9 +105,9 @@ public class SpellChecker {
     }
 
     /**
-     * Registers the available dictionaries. The dictionaries' URLs must have the form "dictionary_xx.ortho"
-     * and must be relative to the baseURL. If the dictionary of the active Locale does not exist, no other dictionary
-     * is loaded.
+     * Registers the available dictionaries. The dictionaries' URLs must have the form "dictionary_xx.ortho" and must be
+     * relative to the baseURL. If the dictionary of the active Locale does not exist, no other dictionary is loaded.
+     * The file extension is ".ortho".
      * 
      * @param baseURL
      *            the base URL where the dictionaries can be found
@@ -118,10 +118,28 @@ public class SpellChecker {
      * @see #setUserDictionaryProvider(UserDictionaryProvider)
      */
     public static void registerDictionaries( URL baseURL, String availableLocales, String activeLocale ) {
+        registerDictionaries( baseURL, availableLocales, activeLocale, ".ortho" );
+    }
+
+    /**
+     * Registers the available dictionaries. The dictionaries' URLs must have the form "dictionary_xx.ortho" and must be
+     * relative to the baseURL. If the dictionary of the active Locale does not exist, no other dictionary is loaded.
+     * 
+     * @param baseURL
+     *            the base URL where the dictionaries can be found
+     * @param availableLocales
+     *            a comma separated list of locales
+     * @param activeLocale
+     *            the locale that should be loaded and made active.
+     * @param extension
+     *            the file extension of the dictionaries. Some web server like the IIS6 does not support the default ".ortho".
+     * @see #setUserDictionaryProvider(UserDictionaryProvider)
+     */
+    public static void registerDictionaries( URL baseURL, String availableLocales, String activeLocale, String extension ) {
         activeLocale = activeLocale.trim();
         String[] locales = availableLocales.split( "," );
         for( String locale : locales ) {
-            LanguageAction action = new LanguageAction( baseURL, new Locale( locale ) );
+            LanguageAction action = new LanguageAction( baseURL, new Locale( locale ), extension );
             languages.remove( action );
             languages.add( action );
             if( locale.equals( activeLocale ) ) {
@@ -133,10 +151,13 @@ public class SpellChecker {
     }
     
     /**
-     * Activate the spell checker for the given <code>JTextComponent</code>. The call is equal to
-     * register( text, true, true ).
-     * @param text the JTextComponent
-     * @throws NullPointerException if text is null
+     * Activate the spell checker for the given <code>JTextComponent</code>. The call is equal to register( text,
+     * true, true ).
+     * 
+     * @param text
+     *            the JTextComponent
+     * @throws NullPointerException
+     *             if text is null
      */
     public static void register( final JTextComponent text) throws NullPointerException{
         register( text, true, true );
@@ -267,11 +288,13 @@ public class SpellChecker {
         private final URL baseURL;
         private final Locale locale;
         private final ButtonModel model = new JToggleButton.ToggleButtonModel();
+        private String extension;
         
-        LanguageAction(URL baseURL, Locale locale){
+        LanguageAction(URL baseURL, Locale locale, String extension){
             super( locale.getDisplayLanguage() );
             this.baseURL = baseURL;
             this.locale = locale;
+            this.extension = extension;
         }
 
         /**
@@ -294,7 +317,7 @@ public class SpellChecker {
             // TODO Auto-generated method stub
             DictionaryFactory factory = new DictionaryFactory();
             try {
-                factory.loadWordList( new URL(baseURL, "dictionary_" + locale + ".ortho") );
+                factory.loadWordList( new URL(baseURL, "dictionary_" + locale + extension) );
                 UserDictionaryProvider provider = userDictionaryProvider;
                 if(provider != null){
                     String userWords = provider.getUserWords(locale);
