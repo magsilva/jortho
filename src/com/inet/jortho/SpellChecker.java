@@ -107,7 +107,6 @@ public class SpellChecker {
     /**
      * Registers the available dictionaries. The dictionaries' URLs must have the form "dictionary_xx.ortho" and must be
      * relative to the baseURL. If the dictionary of the active Locale does not exist, no other dictionary is loaded.
-     * The file extension is ".ortho".
      * 
      * @param baseURL
      *            the base URL where the dictionaries can be found
@@ -122,8 +121,9 @@ public class SpellChecker {
     }
 
     /**
-     * Registers the available dictionaries. The dictionaries' URLs must have the form "dictionary_xx.ortho" and must be
-     * relative to the baseURL. If the dictionary of the active Locale does not exist, no other dictionary is loaded.
+     * Registers the available dictionaries. The dictionaries' URLs must have the form "dictionary_xx.xxxxx" and must be
+     * relative to the baseURL. The extension can be set via parameter.
+     * If the dictionary of the active Locale does not exist, no other dictionary is loaded.
      * 
      * @param baseURL
      *            the base URL where the dictionaries can be found
@@ -309,29 +309,41 @@ public class SpellChecker {
         }
 
         public void actionPerformed( ActionEvent ev ) {
-            if( currentLocale == locale ){
+            if( !isEnabled() ){
                 //because multiple MenuItems share the same action that
                 //also the event occur multiple time
                 return;
             }
-            // TODO Auto-generated method stub
-            DictionaryFactory factory = new DictionaryFactory();
-            try {
-                factory.loadWordList( new URL(baseURL, "dictionary_" + locale + extension) );
-                UserDictionaryProvider provider = userDictionaryProvider;
-                if(provider != null){
-                    String userWords = provider.getUserWords(locale);
-                    if(userWords != null){
-                        factory.loadPlainWordList( new StringReader(userWords) );
+            setEnabled( false );
+            
+            Thread thread = new Thread( new Runnable() {
+                public void run() {
+                    try {
+                        DictionaryFactory factory = new DictionaryFactory();
+                        try {
+                            factory.loadWordList( new URL( baseURL, "dictionary_" + locale + extension ) );
+                            UserDictionaryProvider provider = userDictionaryProvider;
+                            if( provider != null ) {
+                                String userWords = provider.getUserWords( locale );
+                                if( userWords != null ) {
+                                    factory.loadPlainWordList( new StringReader( userWords ) );
+                                }
+                            }
+                        } catch( Exception ex ) {
+                            JOptionPane.showMessageDialog( null, ex.toString(), "Error", JOptionPane.ERROR_MESSAGE );
+                        }
+                        Locale oldLocale = locale;
+                        currentDictionary = factory.create();
+                        currentLocale = locale;
+                        fireLanguageChanged( oldLocale );
+                    } finally {
+                        setEnabled( true );
                     }
                 }
-            } catch( Exception ex ) {
-                JOptionPane.showMessageDialog( null, ex.toString(), "Error", JOptionPane.ERROR_MESSAGE );
-            }
-            Locale oldLocale = locale;
-            currentDictionary = factory.create();
-            currentLocale = locale;
-            fireLanguageChanged( oldLocale );
+            });
+            thread.setPriority( Thread.NORM_PRIORITY );
+            thread.setDaemon( true );
+            thread.start();
         }
         
         @Override
