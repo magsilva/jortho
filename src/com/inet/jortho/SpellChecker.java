@@ -106,14 +106,14 @@ public class SpellChecker {
 
     /**
      * Registers the available dictionaries. The dictionaries' URLs must have the form "dictionary_xx.ortho" and must be
-     * relative to the baseURL. If the dictionary of the active Locale does not exist, no other dictionary is loaded.
+     * relative to the baseURL. If the dictionary of the active Locale does not exist, the first dictionary is loaded.
      * 
      * @param baseURL
      *            the base URL where the dictionaries can be found
      * @param availableLocales
      *            a comma separated list of locales
      * @param activeLocale
-     *            the locale that should be loaded and made active.
+     *            the locale that should be loaded and made active. If null or empty then the default locale is used.
      * @see #setUserDictionaryProvider(UserDictionaryProvider)
      */
     public static void registerDictionaries( URL baseURL, String availableLocales, String activeLocale ) {
@@ -123,31 +123,50 @@ public class SpellChecker {
     /**
      * Registers the available dictionaries. The dictionaries' URLs must have the form "dictionary_xx.xxxxx" and must be
      * relative to the baseURL. The extension can be set via parameter.
-     * If the dictionary of the active Locale does not exist, no other dictionary is loaded.
+     * If the dictionary of the active Locale does not exist, the first dictionary is loaded.
      * 
      * @param baseURL
      *            the base URL where the dictionaries can be found
      * @param availableLocales
      *            a comma separated list of locales
      * @param activeLocale
-     *            the locale that should be loaded and made active.
+     *            the locale that should be loaded and made active. If null or empty then the default locale is used.
      * @param extension
      *            the file extension of the dictionaries. Some web server like the IIS6 does not support the default ".ortho".
      * @see #setUserDictionaryProvider(UserDictionaryProvider)
      */
     public static void registerDictionaries( URL baseURL, String availableLocales, String activeLocale, String extension ) {
+        if( activeLocale == null ) {
+            activeLocale = "";
+        }
         activeLocale = activeLocale.trim();
-        String[] locales = availableLocales.split( "," );
-        for( String locale : locales ) {
-            LanguageAction action = new LanguageAction( baseURL, new Locale( locale ), extension );
-            languages.remove( action );
-            languages.add( action );
-            if( locale.equals( activeLocale ) ) {
-                action.setSelected( true );
-                action.actionPerformed( null );
+        if( activeLocale.length() == 0 ) {
+            activeLocale = Locale.getDefault().getLanguage();
+        }
+        
+        boolean activeSelected = false;
+        for( String locale : availableLocales.split( "," ) ) {
+            locale = locale.trim().toLowerCase();
+            if(locale.length() > 0){
+                LanguageAction action = new LanguageAction( baseURL, new Locale( locale ), extension );
+                languages.remove( action );
+                languages.add( action );
+                if( locale.equals( activeLocale ) ) {
+                    action.setSelected( true );
+                    action.actionPerformed( null );
+                    activeSelected = true;
+                }
             }
         }
-
+        // if nothing selected then select the first entry
+        if( !activeSelected && languages.size() > 0 ) {
+            LanguageAction action = languages.get( 0 );
+            action.setSelected( true );
+            action.actionPerformed( null );
+        }
+        
+        //sort the display names in order of the current language 
+        Collections.sort( languages );
     }
     
     /**
@@ -266,8 +285,8 @@ public class SpellChecker {
     public static JMenu createLanguagesMenu(){
         JMenu menu = new JMenu(Utils.getResource("languages"));
         ButtonGroup group = new ButtonGroup();
+        menu.setEnabled( languages.size() > 0 );
         
-        //TODO sorting
         for(LanguageAction action : languages){
             JRadioButtonMenuItem item = new JRadioButtonMenuItem( action );
             //Hack that all items of the action have the same state.
@@ -283,7 +302,7 @@ public class SpellChecker {
     /**
      * Action for change the current dictionary language.
      */
-    private static class LanguageAction extends AbstractAction{
+    private static class LanguageAction extends AbstractAction implements Comparable<LanguageAction>{
         
         private final URL baseURL;
         private final Locale locale;
@@ -357,6 +376,13 @@ public class SpellChecker {
         @Override
         public int hashCode(){
             return locale.hashCode();
+        }
+
+        /**
+         * Sort the displaynames in the order of the current language
+         */
+        public int compareTo( LanguageAction obj ) {
+            return toString().compareTo( obj.toString() );
         }
     }
 
