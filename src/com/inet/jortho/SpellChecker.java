@@ -238,24 +238,24 @@ public class SpellChecker {
      * 
      * @param text
      *            the JTextComponent
-     * @param hasAutoSpell
-     *            if true, the JTextComponent has a auto spell checking.
      * @param hasPopup
      *            if true, the JTextComponent is to have a popup menu with the menu item "Orthography" and "Languages".
      * @param hasShortKey
      *            if true, pressing the F7 key will display the spell check dialog.
+     * @param hasAutoSpell
+     *            if true, the JTextComponent has a auto spell checking.
      * @throws NullPointerException
      *             if text is null
      */
-    public static void register( final JTextComponent text, boolean hasAutoSpell, boolean hasPopup, boolean hasShortKey ) throws NullPointerException {
-        if( hasAutoSpell ) {
-            enableAutoSpell( text, true );
-        }
+    public static void register( final JTextComponent text, boolean hasPopup, boolean hasShortKey, boolean hasAutoSpell ) throws NullPointerException {
         if( hasPopup ) {
             enablePopup( text, true );
         }
         if( hasShortKey ) {
             enableShortKey( text, true );
+        }
+        if( hasAutoSpell ) {
+            enableAutoSpell( text, true );
         }
     }
     
