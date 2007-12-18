@@ -229,26 +229,55 @@ public class SpellChecker {
      *             if text is null
      */
     public static void register( final JTextComponent text) throws NullPointerException{
-        register( text, true, true );
+        register( text, true, true, true );
     }
 
     /**
-     * Activates the spell checker for the given <code>JTextComponent</code>. 
-     * You do not need to unregister if the JTextComponent is not needed anymore.
-     * @param text the JTextComponent
-     * @param hasPopup if true, the JTextComponent is to have a popup menu with the menu item "Orthography" and "Languages". 
-     * @param hasShortKey if true, pressing the F7 key will display the spell check dialog.
-     * @throws NullPointerException if text is null
+     * Activates the spell checker for the given <code>JTextComponent</code>. You do not need to unregister if the
+     * JTextComponent is not needed anymore.
+     * 
+     * @param text
+     *            the JTextComponent
+     * @param hasAutoSpell
+     *            if true, the JTextComponent has a auto spell checking.
+     * @param hasPopup
+     *            if true, the JTextComponent is to have a popup menu with the menu item "Orthography" and "Languages".
+     * @param hasShortKey
+     *            if true, pressing the F7 key will display the spell check dialog.
+     * @throws NullPointerException
+     *             if text is null
      */
-    public static void register( final JTextComponent text, boolean hasPopup, boolean hasShortKey) throws NullPointerException{
-        new AutoSpellChecker(text);
-        if(hasPopup){
-            final JPopupMenu menu = new JPopupMenu();
-            menu.add( createCheckerMenu() );
-            menu.add( createLanguagesMenu() );
-            text.addMouseListener( new PopupListener(menu) );
+    public static void register( final JTextComponent text, boolean hasAutoSpell, boolean hasPopup, boolean hasShortKey ) throws NullPointerException {
+        if( hasAutoSpell ) {
+            enableAutoSpell( text, true );
         }
-        if(hasShortKey){
+        if( hasPopup ) {
+            enablePopup( text, true );
+        }
+        if( hasShortKey ) {
+            enableShortKey( text, true );
+        }
+    }
+    
+    /**
+     * Removes all spell checker features from the JTextComponent. This does not need to be called
+     * if the text component is no longer needed.
+     * @param text the JTextComponent
+     */
+    public static void unregister( JTextComponent text ){
+        enableShortKey( text, false );
+        enablePopup( text, false );
+        enableAutoSpell( text, false );
+    }
+    
+    /**
+     * Enable or disable the F7 key. Pressing the F7 key will display the spell check dialog. This also
+     * register an Action with the name "spell-checking".
+     * @param text the JTextComponent that should change
+     * @param enable true, enable the feature.
+     */
+    public static void enableShortKey( final JTextComponent text, boolean enable ){
+        if( enable ){
             text.getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_F7, 0 ), "spell-checking" );
             text.getActionMap().put( "spell-checking", new AbstractAction(){
                 public void actionPerformed( ActionEvent e ) {
@@ -265,25 +294,44 @@ public class SpellChecker {
                     }
                 }
             });
+        }else{
+            text.getActionMap().remove( "spell-checking" ); 
+        }
+    }
+    /**
+     * Enable or disable the a popup menu with the menu item "Orthography" and "Languages". 
+     * @param text the JTextComponent that should change
+     * @param enable true, enable the feature.
+     */
+    public static void enablePopup( JTextComponent text, boolean enable ){
+        if( enable ){
+            final JPopupMenu menu = new JPopupMenu();
+            menu.add( createCheckerMenu() );
+            menu.add( createLanguagesMenu() );
+            text.addMouseListener( new PopupListener(menu) );
+        } else {
+            for(MouseListener listener : text.getMouseListeners()){
+                if(listener instanceof PopupListener){
+                    text.removeMouseListener( listener );
+                }
+            }
         }
     }
     
     /**
-     * Removes all spell checker features from the JTextComponent. This does not need to be called
-     * if the text component is no longer needed.
-     * @param text the JTextComponent
+     * Enable or disable the auto spell checking feature (red zigzag line) for a text component.
+     * @param text the JTextComponent that should change
+     * @param enable true, enable the feature.
      */
-    public static void unregister( JTextComponent text ){
-        text.getActionMap().remove( "spell-checking" ); 
-        for(MouseListener listener : text.getMouseListeners()){
-            if(listener instanceof PopupListener){
-                text.removeMouseListener( listener );
-            }
-        }
-        AbstractDocument doc = (AbstractDocument)text.getDocument();
-        for(DocumentListener listener : doc.getDocumentListeners()){
-            if(listener instanceof AutoSpellChecker){
-                doc.removeDocumentListener( listener );
+    public static void enableAutoSpell( JTextComponent text, boolean enable ){
+        if( enable ){
+            new AutoSpellChecker(text);
+        } else {
+            AbstractDocument doc = (AbstractDocument)text.getDocument();
+            for(DocumentListener listener : doc.getDocumentListeners()){
+                if(listener instanceof AutoSpellChecker){
+                    doc.removeDocumentListener( listener );
+                }
             }
         }
     }
