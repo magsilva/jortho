@@ -133,24 +133,26 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
         this.dictionary = dic;
 
         tok = new Tokenizer( jTextComponent.getText(), dic, loc );
-        searchNext();
-
-        setLocationRelativeTo( jTextComponent );
-        setVisible( true );
+        
+        if( searchNext() ){
+            setLocationRelativeTo( jTextComponent );
+            setVisible( true );
+        }
     }
     
     /**
      * Search the next misspelling word. If found it then refresh the dialig with the new informations.
      * ignoreWords and changeWords will handle automaticly.
+     * @return true, if found a spell error.
      */
-    private void searchNext() {
+    private boolean searchNext() {
         String wordStr;
         while( true ) {
             wordStr = tok.nextInvalidWord();
             if( wordStr == null ) {
-                setVisible( false );
+                dispose();
                 JOptionPane.showMessageDialog( getParent(), Utils.getResource( "msgFinish" ), this.getTitle(), JOptionPane.INFORMATION_MESSAGE );
-                return;
+                return false;
             }
             if( ignoreWords.contains( wordStr ) ) {
                 continue;
@@ -176,6 +178,7 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
             suggestionsVector.add( newWord );
         }
         suggestionsList.setListData( suggestionsVector );
+        return true;
     }
     
     
