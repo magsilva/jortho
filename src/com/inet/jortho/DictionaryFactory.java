@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.zip.InflaterInputStream;
 
@@ -64,7 +65,9 @@ class DictionaryFactory {
      *             If filename is null.
      */
     public void loadWordList( URL filename ) throws IOException {
-        InputStream input = filename.openStream();
+        URLConnection conn = filename.openConnection();
+        conn.setReadTimeout( 5000 );
+        InputStream input = conn.getInputStream();
         input = new InflaterInputStream( input );
         input = new BufferedInputStream( input );
 
