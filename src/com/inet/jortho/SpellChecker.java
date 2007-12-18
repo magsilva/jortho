@@ -28,11 +28,14 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
+import java.util.Properties;
 import java.util.WeakHashMap;
 
 import javax.swing.AbstractAction;
@@ -102,6 +105,53 @@ public class SpellChecker {
      */
     static UserDictionaryProvider getUserDictionaryProvider() {
         return SpellChecker.userDictionaryProvider;
+    }
+    
+    /**
+     * Registers the available dictionaries. The dictionaries' URLs must have the form "dictionary_xx.xxxxx" and must be
+     * relative to the baseURL. The available languages and extension of the dictionaries is load from a config file.
+     * The config file must also relative to the baseURL and must be named dictionaries.cnf, dictionaries.properties or
+     * dictionaries.txt. If the dictionary of the active Locale does not exist, the first dictionary is loaded. The
+     * config file has a Java Properties format. Currently there are the follow options:
+     * <ul>
+     * <li>languages</li>
+     * <li>extension</li>
+     * </ul>
+     * 
+     * @param baseURL
+     *            the base URL where the dictionaries and config file can be found
+     * @param activeLocale
+     *            the locale that should be loaded and made active. If null or empty then the default locale is used.
+     */
+    public static void registerDictionaries( URL baseURL, String activeLocale ) {
+        InputStream input;
+        try {
+            input = new URL( baseURL, "dictionaries.cnf" ).openStream();
+        } catch( Exception e1 ) {
+            try {
+                input = new URL( baseURL, "dictionaries.properties" ).openStream();
+            } catch( Exception e2 ) {
+                try {
+                    input = new URL( baseURL, "dictionaries.txt" ).openStream();
+                } catch( Exception e3 ) {
+                    System.err.println( "JOrtho configuration file not found!" );
+                    e1.printStackTrace();
+                    e2.printStackTrace();
+                    e3.printStackTrace();
+                    return;
+                }
+            }
+        }
+        Properties props = new Properties();
+        try {
+            props.load( input );
+        } catch( IOException e ) {
+            e.printStackTrace();
+            return;
+        }
+        String availableLocales = props.getProperty( "languages" );
+        String extension = props.getProperty( "extension", ".ortho" );
+        registerDictionaries( baseURL, availableLocales, activeLocale, extension );
     }
 
     /**
