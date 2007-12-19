@@ -136,21 +136,6 @@ class AutoSpellChecker implements DocumentListener, LanguageChangeListener {
                 int wordOffset = i + tok.getWordOffset();
                 highlighter.addHighlight( wordOffset, wordOffset + word.length(), painter );
             }
-            /*BreakIterator sentences = BreakIterator.getSentenceInstance( locale );
-            sentences.setText( phrase );
-            for( int start = sentences.first(), end = sentences.next(); end != BreakIterator.DONE; start = end, end = sentences.next() ) {
-                String sentence = phrase.substring( start, end );
-                BreakIterator words = BreakIterator.getWordInstance( locale );
-                words.setText( sentence );
-                for( int s = words.first(), e = words.next(); e != BreakIterator.DONE; s = e, e = words.next() ) {
-                    String word = sentence.substring( s, e ).trim();
-                    if(word.length() > 0 && Character.isLetter( word.charAt( 0 ) ) && !dictionary.exist( word ) ) {
-                        int wordOffset = i + start + s;
-                        highlighter.addHighlight( wordOffset, wordOffset + word.length(), painter );
-                        System.out.println(word);
-                    }
-                }
-            }*/
         } catch( BadLocationException e ) {
             e.printStackTrace();
         }
