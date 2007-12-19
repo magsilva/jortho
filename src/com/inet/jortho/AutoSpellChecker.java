@@ -128,12 +128,11 @@ class AutoSpellChecker implements DocumentListener, LanguageChangeListener {
             j = Math.min( j, l );
             if( i >= j )
                 return;
-            String phrase = jText.getText( i, j - i );
 
-            Tokenizer tok = new Tokenizer( phrase, dictionary, locale );
+            Tokenizer tok = new Tokenizer( jText, dictionary, locale, i, j );
             String word;
             while( (word = tok.nextInvalidWord()) != null ) {
-                int wordOffset = i + tok.getWordOffset();
+                int wordOffset = tok.getWordOffset();
                 highlighter.addHighlight( wordOffset, wordOffset + word.length(), painter );
             }
         } catch( BadLocationException e ) {

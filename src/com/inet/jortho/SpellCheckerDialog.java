@@ -132,7 +132,7 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
         this.jText = jTextComponent;
         this.dictionary = dic;
 
-        tok = new Tokenizer( jTextComponent.getText(), dic, loc );
+        tok = new Tokenizer( jTextComponent, dic, loc );
         
         if( searchNext() ){
             setLocationRelativeTo( jTextComponent );
@@ -217,7 +217,7 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
         Document doc = jText.getDocument();
         try {
             ((AbstractDocument)doc).replace( tok.getWordOffset(), oldWord.length(), newWord, null );
-            tok.updatePhrase( jText.getText() );
+            tok.updatePhrase();
         } catch( BadLocationException e1 ) {
             e1.printStackTrace();
         }
