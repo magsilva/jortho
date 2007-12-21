@@ -26,15 +26,29 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * A hash list of Suggestions. The list is cut with a max dissimilarity. If a suggestion already exist then the
+ * suggestion with the lower dissimilarity will be hold.
+ * 
+ * @author Volker Berlin
+ */
 class Suggestions {
 
     private final int maxDiff;
     private final HashMap<Suggestion,Suggestion> map = new HashMap<Suggestion,Suggestion>();
 
+    /**
+     * Create a suggestions list. Suggestion with a larger dissimilarity can not be added.
+     * @param maxDiff the max dissimilarity
+     */
     Suggestions(int maxDiff){
         this.maxDiff = maxDiff;
     }
     
+    /**
+     * Add a suggestion. 
+     * @param suggestion the suggestion 
+     */
     void add(Suggestion suggestion){
         if(suggestion.getDissimilarity() > maxDiff){
             return;
@@ -55,6 +69,10 @@ class Suggestions {
         return list;
     }
 
+    /**
+     * Get the max dissimilarity. Suggestion with a larger value can not be added.
+     * @return
+     */
     int getMaxDissimilarity() {
         return maxDiff;
     }
