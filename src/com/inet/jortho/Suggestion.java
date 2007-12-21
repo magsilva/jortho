@@ -35,11 +35,11 @@ final class Suggestion implements Comparable<Suggestion>{
     
     /**
      * Construct a suggestion
-     * @param chars the char sequence of the word.
+     * @param word the characters of the suggested the word.
      * @param diff the difference to the original word.
      */
-    Suggestion(char[] chars, int diff) {
-        this.word = new String(chars);
+    Suggestion( CharSequence word, int diff) {
+        this.word = word.toString();
         this.diff = diff;
     }
     

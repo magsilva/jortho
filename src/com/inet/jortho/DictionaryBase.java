@@ -88,8 +88,7 @@ abstract class DictionaryBase {
         }
         Suggestions suggesions = new Suggestions( Math.min( 20, 4+word.length() ) );
         idx = 0;
-        char[] chars = word.toCharArray();
-        searchSuggestions( suggesions, chars, 0, 0, 0);
+        searchSuggestions( suggesions, word, 0, 0, 0);
         List<Suggestion> list = suggesions.getlist();
         Collections.sort( list );
         return list;
@@ -106,81 +105,81 @@ abstract class DictionaryBase {
      * @param lastIdx Position im Suchindex der zur aktuellen Zeichenposition zeigt.
      * @param diff Die Un�hnlichkeit bis zur aktuellen Zeichenposition
      */
-    private void searchSuggestions( Suggestions list, char[] chars, int charPosition, int lastIdx, int diff){
+    private void searchSuggestions( Suggestions list, CharSequence chars, int charPosition, int lastIdx, int diff){
         if(diff > list.getMaxDissimilarity()){
             return;
         }
-        // Erstmal mit dem richtigen Buchstaben weitermachen 
+        // First with the correct letters to go on 
         idx = lastIdx;
-        char c = chars[charPosition];
+        char c = chars.charAt(charPosition);
         if(searchChar(c)){
             if( isWordMatch() ) {
-                if(charPosition+1 == chars.length){
+                if(charPosition+1 == chars.length()){
                     // exact match at this character position
                     list.add( new Suggestion(chars, diff));
                 }else{
                     // a shorter match, we need to cut the string
                     int length = charPosition+1;
-                    char[] chars2 = new char[length];
-                    System.arraycopy(chars, 0, chars2, 0, length);
-                    list.add( new Suggestion(chars2, diff + (chars.length-length)*5));
+                    CharSequence chars2 = chars.subSequence( 0, length );
+                    list.add( new Suggestion(chars2, diff + (chars.length()-length)*5));
                 }
             }
             idx = readIndex();
             if( idx <= 0 ) {
-                // no more charcters in the tree
+                // no more characters in the tree
                 return;
             }
-            if(charPosition+1 == chars.length){
-                searchSuggestionsLonger( list, new String(chars), chars.length, idx, diff + 5);
+            if(charPosition+1 == chars.length()){
+                searchSuggestionsLonger( list, chars, chars.length(), idx, diff + 5);
                 return;
             }
             searchSuggestions( list, chars, charPosition + 1, idx, diff );
         }
 
         
-        // Buchstabendreher und Zusatzbuchstaben testen
-        if(charPosition+1 < chars.length){
+        // transposed letters and additional letter
+        if(charPosition+1 < chars.length()){
             idx = lastIdx;
-            c = chars[charPosition+1];
+            c = chars.charAt(charPosition+1);
             if(searchChar(c)){
                 int tempIdx = idx;
                 
-                //Buchstabendreher
-                char[] chars2 = chars.clone();
-                chars2[charPosition+1] = chars[charPosition];
-                chars2[charPosition] = c;
+                //transposed letters (German - Buchstabendreher)
                 idx = readIndex();
                 if( idx > 0 ) {
-                    searchSuggestions( list, chars2, charPosition+1, idx, diff+3);
+                    StringBuilder buffer = new StringBuilder( chars );
+                    buffer.setCharAt( charPosition+1, chars.charAt( charPosition ) );
+                    buffer.setCharAt( charPosition, c );
+                    searchSuggestions( list, buffer, charPosition+1, idx, diff+3);
                 }
                 
-                //Zusatzbuchstaben
+                // Additional character in the misspelled word
                 idx = tempIdx;
-                char[] chars3 = new char[chars.length-1];
-                System.arraycopy(chars, 0, chars3, 0, charPosition);
-                System.arraycopy(chars, charPosition+1, chars3, charPosition, chars3.length-charPosition);
-                searchSuggestions( list, chars3, charPosition, lastIdx, diff+5);
+                StringBuilder buffer = new StringBuilder();
+                buffer.append( chars, 0, charPosition );
+                buffer.append( chars, charPosition+1, chars.length() );
+                searchSuggestions( list, buffer, charPosition, lastIdx, diff+5);
             }
         }
 
-        // Typus - wrong characters
-        if(charPosition < chars.length){
+        // Typos - wrong letters (One character is replaced with any character)
+        if(charPosition < chars.length()){
             int tempIdx = idx = lastIdx;
             while( idx < size && tree[idx] < LAST_CHAR ) {
                 if( isWordMatch() ){
-                    int length = charPosition+1;
-                    char[] chars2 = new char[length];
-                    System.arraycopy(chars, 0, chars2, 0, length);
-                    chars2[charPosition] = tree[idx];
-                    list.add( new Suggestion( chars2, diff + 5 + (chars.length-length)*5 ) );
+                    StringBuilder buffer = new StringBuilder();
+                    buffer.append( chars, 0, charPosition );
+                    buffer.append( tree[idx] );
+                    list.add( new Suggestion( buffer, diff + 5 + (chars.length()-buffer.length())*5 ) );
                 }
-                if(charPosition + 1 < chars.length){
-                    char[] chars2 = chars.clone();
-                    chars2[charPosition] = tree[idx];
+                if(charPosition + 1 < chars.length()){
+                    char newChar = tree[idx];
                     idx = readIndex();
                     if( idx > 0 ) {
-                        searchSuggestions( list, chars2, charPosition + 1, idx, diff + charDiff( chars[charPosition], chars2[charPosition] ) );
+                        char oldChar = chars.charAt( charPosition );
+                        StringBuilder buffer = new StringBuilder( chars );
+                        buffer.setCharAt( charPosition, newChar );
+                        searchSuggestions( list, buffer, charPosition + 1, idx, diff + charDiff( oldChar, newChar ) );
                     }
                 }
                 idx = tempIdx += 3;
@@ -188,11 +187,11 @@ abstract class DictionaryBase {
         }
     }
     
-    private void searchSuggestionsLonger( Suggestions list, String chars, int originalLength, int lastIdx, int diff){
+    private void searchSuggestionsLonger( Suggestions list, CharSequence chars, int originalLength, int lastIdx, int diff){
         idx = lastIdx;
         while(idx<size && tree[idx] < LAST_CHAR){
             if( isWordMatch() ){
-                list.add( new Suggestion( (chars + tree[idx]).toCharArray(), diff ) );
+                list.add( new Suggestion( chars.toString() + tree[idx], diff ) );
             }
             idx += 3;
         }
