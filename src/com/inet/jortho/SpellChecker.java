@@ -320,19 +320,17 @@ public class SpellChecker {
     
     /**
      * Enable or disable the auto spell checking feature (red zigzag line) for a text component.
-     * @param text the JTextComponent that should change
-     * @param enable true, enable the feature.
+     * 
+     * @param text
+     *            the JTextComponent that should change
+     * @param enable
+     *            true, enable the feature.
      */
     public static void enableAutoSpell( JTextComponent text, boolean enable ){
         if( enable ){
             new AutoSpellChecker(text);
         } else {
-            AbstractDocument doc = (AbstractDocument)text.getDocument();
-            for(DocumentListener listener : doc.getDocumentListeners()){
-                if(listener instanceof AutoSpellChecker){
-                    doc.removeDocumentListener( listener );
-                }
-            }
+            AutoSpellChecker.disable( text );
         }
     }
     
@@ -421,8 +419,14 @@ public class SpellChecker {
             return model;
         }
 
+        /**
+         * Selects or deselects the menu item.
+         * 
+         * @param b
+         *            true selects the menu item, false deselects the menu item.
+         */
         public void setSelected( boolean b ) {
-            model.setSelected( true );
+            model.setSelected( b );
         }
 
         public void actionPerformed( ActionEvent ev ) {

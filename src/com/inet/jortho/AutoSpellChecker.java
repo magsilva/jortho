@@ -30,8 +30,8 @@ import javax.swing.text.*;
 import javax.swing.text.Highlighter.Highlight;
 
 /**
- * This class check a <code>JTextComponent</code> automaticly (in the background) for orthography. Spell error are
- * highligted with a red zigzag line.
+ * This class check a <code>JTextComponent</code> automatically (in the background) for orthography. Spell error are
+ * highlighted with a red zigzag line.
  * 
  * @author Volker Berlin
  */
@@ -55,8 +55,27 @@ class AutoSpellChecker implements DocumentListener, LanguageChangeListener {
         checkAll();
     }
 
-
-
+    /**
+     * Remove the AutoSpellChecker from the given JTextComponent.
+     * 
+     * @param text
+     *            the JTextComponent
+     */
+    static void disable( JTextComponent text ){
+        AbstractDocument doc = (AbstractDocument)text.getDocument();
+        for(DocumentListener listener : doc.getDocumentListeners()){
+            if(listener instanceof AutoSpellChecker){
+                AutoSpellChecker autoSpell = (AutoSpellChecker)listener;
+                doc.removeDocumentListener( autoSpell );
+                Highlighter highlighter = text.getHighlighter();
+                for( Highlight highlight : highlighter.getHighlights() ) {
+                    if( highlight.getPainter() == painter ){
+                        highlighter.removeHighlight( highlight );
+                    }
+                }
+            }
+        }
+    }
 
     /*====================================================================
      * 
@@ -86,7 +105,7 @@ class AutoSpellChecker implements DocumentListener, LanguageChangeListener {
     }
 
     /**
-     * Check the Elment on the current cursor position.
+     * Check the Element on the current cursor position.
      */
     private void checkCurrentElement() {
         int i = jText.getSelectionStart();
@@ -141,7 +160,7 @@ class AutoSpellChecker implements DocumentListener, LanguageChangeListener {
     }
 
     /**
-     * Check the completly text. Because this can consume many times with large Documents that this will do in a thread
+//     * Check the completely text. Because this can consume many times with large Documents that this will do in a thread
      * in the background step by step.
      */
     private void checkAll() {
