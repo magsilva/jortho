@@ -100,12 +100,9 @@ class CheckerMenu extends JMenu implements PopupMenuListener, HierarchyListener,
                     item.addActionListener(new ActionListener(){
                         
                         public void actionPerformed(ActionEvent e) {
-                            Document doc = jText.getDocument();
-                            try {
-                                ((AbstractDocument)doc).replace(begOffs, endOffs - begOffs, newWord, null);
-                            } catch (BadLocationException ex) {
-                                ex.printStackTrace();
-                            }
+                            jText.setSelectionStart( begOffs );
+                            jText.setSelectionEnd( endOffs );
+                            jText.replaceSelection( newWord );
                         }
                         
                     });

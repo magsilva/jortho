@@ -214,13 +214,10 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
     }
     
     private void replaceWord( String oldWord, String newWord ) {
-        Document doc = jText.getDocument();
-        try {
-            ((AbstractDocument)doc).replace( tok.getWordOffset(), oldWord.length(), newWord, null );
-            tok.updatePhrase();
-        } catch( BadLocationException e1 ) {
-            e1.printStackTrace();
-        }
+        jText.setSelectionStart( tok.getWordOffset() );
+        jText.setSelectionEnd( tok.getWordOffset() + oldWord.length() );
+        jText.replaceSelection( newWord );
+        tok.updatePhrase();
     }
 
 
