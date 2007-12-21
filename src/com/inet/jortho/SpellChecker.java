@@ -279,7 +279,7 @@ public class SpellChecker {
             text.getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_F7, 0 ), "spell-checking" );
             text.getActionMap().put( "spell-checking", new AbstractAction(){
                 public void actionPerformed( ActionEvent e ) {
-                    if( text.isEditable() ){
+                    if( !text.isEditable() ){
                         // only editable text component have spell checking
                         return;
                     }
