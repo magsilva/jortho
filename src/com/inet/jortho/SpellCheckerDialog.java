@@ -167,11 +167,11 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
         word.setText( wordStr );
         notFound.setText( wordStr );
 
-        List list = dictionary.searchSuggestions( wordStr );
+        List<Suggestion> list = dictionary.searchSuggestions( wordStr );
 
         Vector<String> suggestionsVector = new Vector<String>();
         for( int i = 0; i < list.size(); i++ ) {
-            Suggestion sugestion = (Suggestion)list.get( i );
+            Suggestion sugestion = list.get( i );
             String newWord = sugestion.getWord();
             if( i == 0 )
                 word.setText( newWord );

@@ -49,7 +49,7 @@ class DictionaryFactory {
      * Empty Constructor.
      */
     public DictionaryFactory(){
-        
+        /* empty */
     }
     
     

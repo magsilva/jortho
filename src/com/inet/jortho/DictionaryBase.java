@@ -42,8 +42,11 @@ abstract class DictionaryBase {
         size = tree.length;
     }
     
-    
+    /**
+     * Empty Constructor.
+     */
     protected DictionaryBase(){
+        /* empty */
     }
     
     
@@ -94,14 +97,14 @@ abstract class DictionaryBase {
     
     
     /**
-     * Es wird nach verschiedenen Regeln nach ähnlichen Wörtern gesucht.
-     * Je nach Regel gibt es einen anderen diff. Jekleiner der diff desto ähnlicher.
+     * Es wird nach verschiedenen Regeln nach ï¿½hnlichen Wï¿½rtern gesucht.
+     * Je nach Regel gibt es einen anderen diff. Jekleiner der diff desto ï¿½hnlicher.
      * Diese Methode ruft sich rekursiv auf.
-     * @param list Kontainer für die gefundenen Wörter
+     * @param list Kontainer fï¿½r die gefundenen Wï¿½rter
      * @param chars bis zur charPosition bereits gemappte Buchstaben, danach noch zu mappende des orignal Wortes
      * @param charPosition Zeichenposition im char array
      * @param lastIdx Position im Suchindex der zur aktuellen Zeichenposition zeigt.
-     * @param diff Die Unähnlichkeit bis zur aktuellen Zeichenposition
+     * @param diff Die Unï¿½hnlichkeit bis zur aktuellen Zeichenposition
      */
     private void searchSuggestions( Suggestions list, char[] chars, int charPosition, int lastIdx, int diff){
         if(diff > list.getMaxDissimilarity()){
@@ -196,7 +199,7 @@ abstract class DictionaryBase {
     }
     
     /**
-     * Search if the character exist in the crrent node. If found then the varaible idx point to the locaction.
+     * Search if the character exist in the current node. If found then the variable <code>idx</code> point to the location.
      * If not found then it point on the next character (char value) item in the node. 
      * @param c the searching character
      * @return true if found
@@ -226,7 +229,7 @@ abstract class DictionaryBase {
     }
     
     /**
-     * Returns an int that descript the dissimilarity of the charatres. 
+     * Returns an int that describe the dissimilarity of the characters. 
      * The value is ever larger 0. A value of means only a small difference.
      * @param a first char
      * @param b second char

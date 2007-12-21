@@ -51,10 +51,12 @@ class CheckerMenu extends JMenu implements PopupMenuListener, HierarchyListener,
 
 
     public void popupMenuCanceled(PopupMenuEvent e) {
+        /* empty */
     }
     
 
     public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+        /* empty */
     }
 
 
@@ -71,17 +73,17 @@ class CheckerMenu extends JMenu implements PopupMenuListener, HierarchyListener,
                 String word = jText.getText(begOffs, endOffs-begOffs);
                 super.removeAll();
                 if(dictionary == null){
-                    // without dictonary it is disabled
+                    // without dictionary it is disabled
                     this.setEnabled(false);
                     return;
                 }
-                List list = dictionary.searchSuggestions(word);
+                List<Suggestion> list = dictionary.searchSuggestions(word);
 
-                //Disable wenn keine Vorschläge
+                //Disable then menu item if there are no suggestions
                 this.setEnabled(list.size()>0);
                 
                 for(int i=0; i<list.size(); i++){
-                    Suggestion sugestion = (Suggestion)list.get(i);
+                    Suggestion sugestion = list.get(i);
                     final String newWord = sugestion.getWord();
                     JMenuItem item = super.add(newWord);
                     item.addActionListener(new ActionListener(){
@@ -90,20 +92,23 @@ class CheckerMenu extends JMenu implements PopupMenuListener, HierarchyListener,
                             Document doc = jText.getDocument();
                             try {
                                 ((AbstractDocument)doc).replace(begOffs, endOffs - begOffs, newWord, null);
-                            } catch (BadLocationException e1) {}
+                            } catch (BadLocationException ex) {
+                                ex.printStackTrace();
+                            }
                         }
                         
                     });
                 }
-            } catch (BadLocationException e) { }
+            } catch (BadLocationException ex) { 
+                ex.printStackTrace();
+            }
         }
     }
 
 
     public void hierarchyChanged(HierarchyEvent ev) {
-        // Wenn dieses SubMenü zu einem Parent hinzugefügt
-        // wird ein Listener hinzugefügt um über das aufpopen des
-        // Popupmenüs informiert zu werden
+        // If this sub menu is added to a parent
+        // then an Listener is added to request show popup events of the parent
         if(ev.getChangeFlags() == HierarchyEvent.PARENT_CHANGED && ev.getChanged() == this){
             JPopupMenu parent = (JPopupMenu)getParent();
             if(parent != null){
