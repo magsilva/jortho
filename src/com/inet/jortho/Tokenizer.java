@@ -50,7 +50,7 @@ class Tokenizer {
     private boolean isFirstWordInSentence;
     
     /**
-     * Create a Tokenizer for the completly text document. 
+     * Create a tokenizer for the completely text document. 
      */
     Tokenizer( JTextComponent jText, Dictionary dictionary, Locale locale ) {
         this( jText, dictionary, locale, 0, jText.getDocument().getLength() );
@@ -110,7 +110,7 @@ class Tokenizer {
     }
     
     /**
-     * Init the variables for the next paragraph.
+     * Initialize the variables for the next paragraph.
      * @return true, if there is a next paragraph
      */
     private boolean nextParagraph(){
@@ -157,7 +157,6 @@ class Tokenizer {
      * Load the next Sentence in the word breaker.
      */
     private void nextSentence() {
-        System.out.println(startSentence+", "+endSentence);
         sentence = phrase.substring( startSentence, endSentence );
         words.setText( sentence );
         startWord = words.first();
@@ -166,7 +165,7 @@ class Tokenizer {
     }
 
     /**
-     * Get start offset of the last missspelling in the JTextComponent.
+     * Get start offset of the last misspelling in the JTextComponent.
      */
     int getWordOffset() {
         return paragraphOffset + wordOffset;
