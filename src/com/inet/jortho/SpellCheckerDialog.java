@@ -141,8 +141,8 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
     }
     
     /**
-     * Search the next misspelling word. If found it then refresh the dialig with the new informations.
-     * ignoreWords and changeWords will handle automaticly.
+     * Search the next misspelling word. If found it then refresh the dialog with the new information.
+     * ignoreWords and changeWords will handle automatically.
      * @return true, if found a spell error.
      */
     private boolean searchNext() {
