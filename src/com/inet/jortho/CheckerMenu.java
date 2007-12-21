@@ -71,8 +71,14 @@ class CheckerMenu extends JMenu implements PopupMenuListener, HierarchyListener,
                 setEnabled( false );
                 return;
             }
-            int offs = jText.getCaretPosition();
+            Caret caret = jText.getCaret();
+            int offs = Math.min(caret.getDot(), caret.getMark());
             try {
+                Document doc = jText.getDocument();
+                if( offs >0 && (offs >= doc.getLength() || Character.isWhitespace(doc.getText(offs, 1).charAt(0)))){
+                    // if the next character is a white space then use the word on the left site
+                    offs--;
+                }
                 final int begOffs = Utilities.getWordStart(jText, offs);
                 final int endOffs = Utilities.getWordEnd(jText, offs);
                 String word = jText.getText(begOffs, endOffs-begOffs);
