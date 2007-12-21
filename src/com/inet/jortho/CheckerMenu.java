@@ -66,6 +66,11 @@ class CheckerMenu extends JMenu implements PopupMenuListener, HierarchyListener,
         Component invoker = popup.getInvoker();
         if(invoker instanceof JTextComponent){
             final JTextComponent jText = (JTextComponent)invoker;
+            if( !jText.isEditable() ){
+                // Suggestions only for editable text components
+                setEnabled( false );
+                return;
+            }
             int offs = jText.getCaretPosition();
             try {
                 final int begOffs = Utilities.getWordStart(jText, offs);

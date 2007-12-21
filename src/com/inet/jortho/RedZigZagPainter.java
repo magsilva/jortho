@@ -46,15 +46,18 @@ class RedZigZagPainter extends DefaultHighlighter.DefaultHighlightPainter {
      */
 	@Override
     public Shape paintLayer(Graphics g, int i, int j, Shape shape, JTextComponent jtext, View view){
-        g.setColor(Color.red);
-        try{
-            Shape sh = view.modelToView(i, Position.Bias.Forward, j, Position.Bias.Backward, shape);
-            Rectangle rect = (sh instanceof Rectangle) ? (Rectangle)sh : sh.getBounds();
-            drawZigZagLine(g, rect);
-            return rect;
-        }catch(BadLocationException badlocationexception){
-            return null;
-        }
+	    if(jtext.isEditable()){
+            g.setColor(Color.red);
+            try{
+                Shape sh = view.modelToView(i, Position.Bias.Forward, j, Position.Bias.Backward, shape);
+                Rectangle rect = (sh instanceof Rectangle) ? (Rectangle)sh : sh.getBounds();
+                drawZigZagLine(g, rect);
+                return rect;
+            }catch(BadLocationException badlocationexception){
+                return null;
+            }
+	    }
+	    return null;
     }
 	
 
