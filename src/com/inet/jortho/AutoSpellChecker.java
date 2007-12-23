@@ -86,42 +86,45 @@ class AutoSpellChecker implements DocumentListener, LanguageChangeListener {
     /**
      * {@inheritDoc}
      */
-    public void changedUpdate( DocumentEvent e ) {
+    public void changedUpdate( DocumentEvent ev ) {
         //Nothing
     }
 
     /**
      * {@inheritDoc}
      */
-    public void insertUpdate( DocumentEvent e ) {
-        checkCurrentElement();
+    public void insertUpdate( DocumentEvent ev ) {
+        checkElements( ev.getOffset(), ev.getLength() );
     }
 
     /**
      * {@inheritDoc}
      */
-    public void removeUpdate( DocumentEvent e ) {
-        checkCurrentElement();
+    public void removeUpdate( DocumentEvent ev ) {
+        checkElements( ev.getOffset(), 0 );
     }
 
     /**
-     * Check the Element on the current cursor position.
+     * Check the Elements on the given position.
      */
-    private void checkCurrentElement() {
-        int i = jText.getSelectionStart();
+    private void checkElements( int offset, int length ) {
+        int end = offset + length;
         Document document = jText.getDocument();
         Element element;
 
-        try {
-            element = ((javax.swing.text.StyledDocument)document).getCharacterElement( i );
-        } catch( java.lang.Exception exception ) {
+        do{
             try {
-                element = ((AbstractDocument)document).getParagraphElement( i );
-            } catch( java.lang.Exception ex ) {
-                return;
+                element = ((javax.swing.text.StyledDocument)document).getCharacterElement( offset );
+            } catch( java.lang.Exception exception ) {
+                try {
+                    element = ((AbstractDocument)document).getParagraphElement( offset );
+                } catch( java.lang.Exception ex ) {
+                    return;
+                }
             }
-        }
-        checkElement( element );
+            checkElement( element );
+            offset = element.getEndOffset();
+        }while( offset < end && offset < document.getLength() );
     }
 
     /**
@@ -192,6 +195,9 @@ class AutoSpellChecker implements DocumentListener, LanguageChangeListener {
         thread.start();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void languageChanged( LanguageChangeEvent ev ) {
         dictionary = SpellChecker.getCurrentDictionary();
         locale = SpellChecker.getCurrentLocale();
