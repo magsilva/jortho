@@ -111,8 +111,8 @@ abstract class DictionaryBase {
         }
         // First with the correct letters to go on 
         idx = lastIdx;
-        char c = chars.charAt(charPosition);
-        if(searchChar(c)){
+        char currentChar = chars.charAt(charPosition);
+        if(searchChar(currentChar)){
             if( isWordMatch() ) {
                 if(charPosition+1 == chars.length()){
                     // exact match at this character position
@@ -140,8 +140,8 @@ abstract class DictionaryBase {
         // transposed letters and additional letter
         if(charPosition+1 < chars.length()){
             idx = lastIdx;
-            c = chars.charAt(charPosition+1);
-            if(searchChar(c)){
+            currentChar = chars.charAt(charPosition+1);
+            if(searchChar(currentChar)){
                 int tempIdx = idx;
                 
                 //transposed letters (German - Buchstabendreher)
@@ -149,7 +149,7 @@ abstract class DictionaryBase {
                 if( idx > 0 ) {
                     StringBuilder buffer = new StringBuilder( chars );
                     buffer.setCharAt( charPosition+1, chars.charAt( charPosition ) );
-                    buffer.setCharAt( charPosition, c );
+                    buffer.setCharAt( charPosition, currentChar );
                     searchSuggestions( list, buffer, charPosition+1, idx, diff+3);
                 }
                 
@@ -162,6 +162,21 @@ abstract class DictionaryBase {
             }
         }
 
+        // Missing letters, we need to add one character
+        {
+            int tempIdx = idx = lastIdx;
+            while( idx < size && tree[idx] < LAST_CHAR ) {
+                char newChar = tree[idx];
+                idx = readIndex();
+                if( idx > 0 && newChar != currentChar) {
+                    StringBuilder buffer = new StringBuilder( chars );
+                    buffer.insert( charPosition, newChar );
+                    searchSuggestions( list, buffer, charPosition + 1, idx, diff + 5 );
+                }
+                idx = tempIdx += 3;
+            }
+        }
+        
         // Typos - wrong letters (One character is replaced with any character)
         if(charPosition < chars.length()){
             int tempIdx = idx = lastIdx;
@@ -175,11 +190,10 @@ abstract class DictionaryBase {
                 if(charPosition + 1 < chars.length()){
                     char newChar = tree[idx];
                     idx = readIndex();
-                    if( idx > 0 ) {
-                        char oldChar = chars.charAt( charPosition );
+                    if( idx > 0 && newChar != currentChar) {
                         StringBuilder buffer = new StringBuilder( chars );
                         buffer.setCharAt( charPosition, newChar );
-                        searchSuggestions( list, buffer, charPosition + 1, idx, diff + charDiff( oldChar, newChar ) );
+                        searchSuggestions( list, buffer, charPosition + 1, idx, diff + charDiff( currentChar, newChar ) );
                     }
                 }
                 idx = tempIdx += 3;
