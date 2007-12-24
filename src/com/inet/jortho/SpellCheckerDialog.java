@@ -40,7 +40,7 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
     private JTextComponent jText;
     private Dictionary dictionary;
     private Tokenizer tok;
-    
+    private boolean isDictionaryModify;
     
 
     final private JLabel notFound = new JLabel();
@@ -91,6 +91,7 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
     }
     
     final private void init(){
+        setDefaultCloseOperation( WindowConstants.DISPOSE_ON_CLOSE );
         Container cont = getContentPane();
         cont.setLayout(new GridBagLayout());
         Insets insetL = new Insets(8,8,0,8);
@@ -187,7 +188,7 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
         if( source == ignore ) {
             searchNext();
         } else if( source == finish ) {
-            setVisible(false);
+            dispose();
         } else{
             String newWord = word.getText();
             String oldWord = notFound.getText();
@@ -201,6 +202,7 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
                 }
                 dictionary.add( oldWord );
                 dictionary.trimToSize();
+                isDictionaryModify = true;
                 searchNext();
             } else if( source == change ) {
                 replaceWord( oldWord, newWord );
@@ -221,5 +223,11 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
     }
 
 
-
+    @Override
+    public void dispose(){
+        super.dispose();
+        if( isDictionaryModify ){
+            AutoSpellChecker.refresh( jText );
+        }
+    }
 }

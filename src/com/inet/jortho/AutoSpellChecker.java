@@ -76,6 +76,22 @@ class AutoSpellChecker implements DocumentListener, LanguageChangeListener {
             }
         }
     }
+    
+    /**
+     * Refresh the highlighting. This can be useful if the dictionary was modify.
+     * 
+     * @param text
+     *            the JTextComponent
+     */
+    static void refresh( JTextComponent text ){
+        AbstractDocument doc = (AbstractDocument)text.getDocument();
+        for(DocumentListener listener : doc.getDocumentListeners()){
+            if( listener instanceof AutoSpellChecker ){
+                AutoSpellChecker autoSpell = (AutoSpellChecker)listener;
+                autoSpell.checkAll();
+            }
+        }
+    }
 
     /*====================================================================
      * 
