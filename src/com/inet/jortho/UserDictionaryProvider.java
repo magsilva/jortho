@@ -49,4 +49,12 @@ public interface UserDictionaryProvider {
      */
     void addWord( String word );
 
+    /**
+     * Set a completely new word list
+     * 
+     * @param wordList
+     *            the new word list. Can be empty but not null.
+     */
+    void setUserWords( String wordList );
+
 }

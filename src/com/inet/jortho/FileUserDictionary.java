@@ -101,4 +101,17 @@ public class FileUserDictionary implements UserDictionaryProvider{
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void setUserWords(String wordList){
+        try{
+            FileOutputStream output = new FileOutputStream( file );
+            Writer writer = new OutputStreamWriter( output, "UTF8" );
+            writer.write( wordList );
+            writer.close();
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+    }
 }
