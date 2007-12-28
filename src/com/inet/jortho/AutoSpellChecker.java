@@ -167,7 +167,14 @@ class AutoSpellChecker implements DocumentListener, LanguageChangeListener {
             if( i >= j )
                 return;
 
-            Tokenizer tok = new Tokenizer( jText, dictionary, locale, i, j );
+            // prevent a NPE if the dictionary is currently not loaded.
+            Dictionary dic = dictionary;
+            Locale loc = locale;
+            if( dic == null || loc == null ){
+                return;
+            }
+            
+            Tokenizer tok = new Tokenizer( jText, dic, loc, i, j );
             String word;
             while( (word = tok.nextInvalidWord()) != null ) {
                 int wordOffset = tok.getWordOffset();
