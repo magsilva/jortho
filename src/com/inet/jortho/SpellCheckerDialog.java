@@ -50,6 +50,7 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
     final private JButton ignore      = new JButton(Utils.getResource("ignore"));
     final private JButton ignoreAll   = new JButton(Utils.getResource("ignoreAll"));
     final private JButton addToDic    = new JButton(Utils.getResource("addToDictionary"));
+    final private JButton editDic     = new JButton(Utils.getResource("editDictionary"));
     final private JButton change      = new JButton(Utils.getResource("change"));
     final private JButton changeAll   = new JButton(Utils.getResource("changeAll"));
     final private JButton finish      = new JButton(Utils.getResource("finish"));
@@ -107,24 +108,28 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
         
         cont.add( new JLabel(Utils.getResource("suggestions")+":"), new GridBagConstraints( 1, 3, 2, 1, 0.0, 0.0, GridBagConstraints.SOUTHWEST ,GridBagConstraints.NONE, insetL, 0, 0));
         JScrollPane scrollPane = new JScrollPane(suggestionsList);
-        cont.add( scrollPane, new GridBagConstraints( 1, 4, 2, 4, 1.0, 1.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.BOTH, new Insets(8,8,8,8), 0, 0));
+        cont.add( scrollPane, new GridBagConstraints( 1, 4, 2, 5, 1.0, 1.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.BOTH, new Insets(8,8,8,8), 0, 0));
         
         cont.add( ignore,       new GridBagConstraints( 3, 1, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.HORIZONTAL, insetR, 0, 0));
         cont.add( ignoreAll,    new GridBagConstraints( 3, 2, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.HORIZONTAL, insetR, 0, 0));
         cont.add( addToDic,     new GridBagConstraints( 3, 3, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.HORIZONTAL, insetR, 0, 0));
-        cont.add( change,       new GridBagConstraints( 3, 4, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.HORIZONTAL, insetR, 0, 0));
-        cont.add( changeAll,    new GridBagConstraints( 3, 5, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.HORIZONTAL, insetR, 0, 0));
-        cont.add( finish,       new GridBagConstraints( 3, 6, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.HORIZONTAL, insetR, 0, 0));
-        cont.add( new JLabel(), new GridBagConstraints( 3, 7, 1, 1, 0.0, 1.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.HORIZONTAL, insetR, 0, 0));
+        cont.add( editDic,      new GridBagConstraints( 3, 4, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.HORIZONTAL, insetR, 0, 0));
+        cont.add( change,       new GridBagConstraints( 3, 5, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.HORIZONTAL, insetR, 0, 0));
+        cont.add( changeAll,    new GridBagConstraints( 3, 6, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.HORIZONTAL, insetR, 0, 0));
+        cont.add( finish,       new GridBagConstraints( 3, 7, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.HORIZONTAL, insetR, 0, 0));
+        cont.add( new JLabel(), new GridBagConstraints( 3, 8, 1, 1, 0.0, 1.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.HORIZONTAL, insetR, 0, 0));
         
         ignore.addActionListener(this);
         ignoreAll.addActionListener(this);
         addToDic.addActionListener(this);
+        editDic.addActionListener(this);
         change.addActionListener(this);
         changeAll.addActionListener(this);
         finish.addActionListener(this);
         
-        addToDic.setEnabled( SpellChecker.getUserDictionaryProvider() != null );
+        boolean isUserDictionary = SpellChecker.getUserDictionaryProvider() != null;
+        addToDic.setEnabled( isUserDictionary );
+        editDic.setEnabled( isUserDictionary );
         pack();
     }
     
@@ -204,6 +209,8 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
                 dictionary.trimToSize();
                 isDictionaryModify = true;
                 searchNext();
+            } else if( source == editDic ) {
+                new DictionaryEditDialog( this ).setVisible( true );
             } else if( source == change ) {
                 replaceWord( oldWord, newWord );
                 searchNext();
