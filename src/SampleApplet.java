@@ -29,7 +29,7 @@ public class SampleApplet extends JApplet {
 
     @Override
     public void start() {
-        JEditorPane text = new JEditorPane();
+        JEditorPane text = new JTextPane();
         text.setText( "This is a simppler textt with spellingg errors." );
         add( text );
 
