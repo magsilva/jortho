@@ -322,6 +322,7 @@ public class SpellChecker {
     
     /**
      * Enable or disable the auto spell checking feature (red zigzag line) for a text component.
+     * If you change the document then you need to reenable it.
      * 
      * @param text
      *            the JTextComponent that should change
