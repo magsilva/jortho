@@ -37,22 +37,16 @@ import javax.swing.*;
 
 
 /**
+ * Implements edit dialog for the user dictionary.
  * @author Volker Berlin
  */
-public class DictionaryEditDialog extends JDialog implements ActionListener{
-    
-    public static void main(String[] args){
-        JDialog main = new JDialog();
-        DictionaryEditDialog dlg = new DictionaryEditDialog(main);
-        dlg.pack();
-        dlg.show();
-    }
+class DictionaryEditDialog extends JDialog implements ActionListener{
     
     private final JList list;
     private final JButton delete;
     private boolean isModify;
 
-    public DictionaryEditDialog( JDialog parent ){
+    DictionaryEditDialog( JDialog parent ){
         super( parent, Utils.getResource("userDictionary"), true );
         setDefaultCloseOperation( WindowConstants.DISPOSE_ON_CLOSE );
         Container content = getContentPane();
@@ -102,6 +96,9 @@ public class DictionaryEditDialog extends JDialog implements ActionListener{
         }
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void dispose(){
         super.dispose();
