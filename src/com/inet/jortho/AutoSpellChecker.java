@@ -130,13 +130,10 @@ class AutoSpellChecker implements DocumentListener, LanguageChangeListener {
 
         do{
             try {
-                element = ((javax.swing.text.StyledDocument)document).getCharacterElement( offset );
-            } catch( java.lang.Exception exception ) {
-                try {
-                    element = ((AbstractDocument)document).getParagraphElement( offset );
-                } catch( java.lang.Exception ex ) {
-                    return;
-                }
+                // We need to use a ParagraphElement because a CharacterElement produce problems with formating in a word
+                element = ((AbstractDocument)document).getParagraphElement( offset );
+            } catch( java.lang.Exception ex ) {
+                return;
             }
             checkElement( element );
             offset = element.getEndOffset();
