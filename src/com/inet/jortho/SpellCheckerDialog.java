@@ -54,7 +54,7 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
     final private JButton editDic     = new JButton(Utils.getResource("editDictionary"));
     final private JButton change      = new JButton(Utils.getResource("change"));
     final private JButton changeAll   = new JButton(Utils.getResource("changeAll"));
-    final private JButton finish      = new JButton(Utils.getResource("finish"));
+    final private JButton close       = new JButton(Utils.getResource("close"));
     
     /** List of ignore all words */  
     final private ArrayList<String> ignoreWords = new ArrayList<String>();
@@ -117,7 +117,7 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
         cont.add( editDic,      new GridBagConstraints( 3, 4, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.HORIZONTAL, insetR, 0, 0));
         cont.add( change,       new GridBagConstraints( 3, 5, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.HORIZONTAL, insetR, 0, 0));
         cont.add( changeAll,    new GridBagConstraints( 3, 6, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.HORIZONTAL, insetR, 0, 0));
-        cont.add( finish,       new GridBagConstraints( 3, 7, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.HORIZONTAL, insetR, 0, 0));
+        cont.add( close,       new GridBagConstraints( 3, 7, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.HORIZONTAL, insetR, 0, 0));
         cont.add( new JLabel(), new GridBagConstraints( 3, 8, 1, 1, 0.0, 1.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.HORIZONTAL, insetR, 0, 0));
         
         ignore.addActionListener(this);
@@ -126,11 +126,11 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
         editDic.addActionListener(this);
         change.addActionListener(this);
         changeAll.addActionListener(this);
-        finish.addActionListener(this);
+        close.addActionListener(this);
         
         //ESCAPE Taste
-        finish.getInputMap( JComponent.WHEN_IN_FOCUSED_WINDOW ).put( KeyStroke.getKeyStroke( KeyEvent.VK_ESCAPE, 0, false ), "ESCAPE" );
-        finish.getActionMap().put( "ESCAPE", new AbstractAction() {
+        close.getInputMap( JComponent.WHEN_IN_FOCUSED_WINDOW ).put( KeyStroke.getKeyStroke( KeyEvent.VK_ESCAPE, 0, false ), "ESCAPE" );
+        close.getActionMap().put( "ESCAPE", new AbstractAction() {
             public void actionPerformed( ActionEvent e ) {
                 dispose();
             }
@@ -205,7 +205,7 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
         Object source = ev.getSource();
         if( source == ignore ) {
             searchNext();
-        } else if( source == finish ) {
+        } else if( source == close ) {
             dispose();
         } else{
             String newWord = word.getText();
