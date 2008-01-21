@@ -32,6 +32,10 @@ import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.text.Collator;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import javax.swing.*;
 
@@ -84,12 +88,18 @@ class DictionaryEditDialog extends JDialog implements ActionListener{
                 String userWords = provider.getUserWords( SpellChecker.getCurrentLocale() );
                 if( userWords != null ) {
                     BufferedReader input = new BufferedReader( new StringReader( userWords ) );
+                    ArrayList<String> wordList = new ArrayList<String>();
                     String word = input.readLine();
                     while( word != null ) {
                         if( word.length() > 1 ) {
-                            data.addElement( word );
+                            wordList.add( word );
                         }
                         word = input.readLine();
+                    }
+                    // Liste alphabetical sorting with the user language
+                    Collections.sort( wordList, Collator.getInstance() );
+                    for(String str : wordList){
+                        data.addElement( str );
                     }
                 }
             }
