@@ -77,7 +77,7 @@ public class SpellChecker {
     private static Locale currentLocale;
     private static UserDictionaryProvider userDictionaryProvider;
     private final static java.util.Map<LanguageChangeListener, Object> listeners = Collections.synchronizedMap( new WeakHashMap<LanguageChangeListener, Object>() );
-    
+    private static String applicationName;
     
     /**
      * There is no instance needed of SpellChecker. All methods are static.
@@ -508,5 +508,20 @@ public class SpellChecker {
      */
     public static Locale getCurrentLocale() {
         return currentLocale;
+    }
+    
+    /**
+     * Set the title of your application. This valuse is used as title for info boxes (JOptionPane).
+     * If not set then the translated "Spelling" is used.
+     */
+    public static void setApplicationName( String name ){
+        applicationName = name;
+    }
+
+    /**
+     * Get the title of your application.
+     */
+    public static String getApplicationName(){
+        return applicationName;
     }
 }
