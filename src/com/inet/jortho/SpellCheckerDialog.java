@@ -146,6 +146,7 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
     public void show( JTextComponent jTextComponent, Dictionary dic, Locale loc ) {
         this.jText = jTextComponent;
         this.dictionary = dic;
+        change.requestFocus();
 
         tok = new Tokenizer( jTextComponent, dic, loc );
         
