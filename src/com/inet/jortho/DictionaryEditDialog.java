@@ -128,7 +128,7 @@ class DictionaryEditDialog extends JDialog implements ActionListener{
                 ListModel model = list.getModel();
                 StringBuilder builder = new StringBuilder();
                 for( int i=0; i<model.getSize(); i++){
-                    if( builder.length() == 0 ){
+                    if( builder.length() != 0 ){
                         builder.append( '\n' );
                     }
                     builder.append( model.getElementAt(i) );
