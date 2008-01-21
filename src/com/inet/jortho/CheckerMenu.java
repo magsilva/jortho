@@ -23,6 +23,7 @@
 package com.inet.jortho;
 
 import java.awt.Component;
+import java.awt.Point;
 import java.awt.event.*;
 import java.util.List;
 import java.util.Locale;
@@ -73,6 +74,11 @@ class CheckerMenu extends JMenu implements PopupMenuListener, HierarchyListener,
             }
             Caret caret = jText.getCaret();
             int offs = Math.min(caret.getDot(), caret.getMark());
+            Point p = jText.getMousePosition();
+            if(p != null){
+                // use position from mouse click and not from editor cursor position 
+                offs = jText.viewToModel( p );
+            }
             try {
                 Document doc = jText.getDocument();
                 if( offs >0 && (offs >= doc.getLength() || Character.isWhitespace(doc.getText(offs, 1).charAt(0)))){
