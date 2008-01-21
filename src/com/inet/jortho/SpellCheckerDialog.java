@@ -166,7 +166,11 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
             wordStr = tok.nextInvalidWord();
             if( wordStr == null ) {
                 dispose();
-                JOptionPane.showMessageDialog( getParent(), Utils.getResource( "msgFinish" ), this.getTitle(), JOptionPane.INFORMATION_MESSAGE );
+                String title = SpellChecker.getApplicationName();
+                if(title == null){
+                    title = this.getTitle();
+                }
+                JOptionPane.showMessageDialog( getParent(), Utils.getResource( "msgFinish" ), title, JOptionPane.INFORMATION_MESSAGE );
                 return false;
             }
             if( ignoreWords.contains( wordStr ) ) {
