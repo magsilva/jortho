@@ -67,7 +67,8 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
 
 
     SpellCheckerDialog(Dialog owner, boolean modal){
-        this(owner, Utils.getResource("spelling"), modal);
+        super(owner, modal);
+        init();
     }
 
 
@@ -77,21 +78,10 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
     
 
     public SpellCheckerDialog(Frame owner, boolean modal){
-        this(owner, Utils.getResource("spelling"), modal);
-    }
-
-
-    public SpellCheckerDialog(Dialog owner, String title, boolean modal){
-        super(owner, title, modal);
+        super(owner, modal);
         init();
     }
 
-
-    public SpellCheckerDialog(Frame owner, String title, boolean modal){
-        super(owner, title, modal);
-        init();
-    }
-    
     final private void init(){
         setDefaultCloseOperation( WindowConstants.DISPOSE_ON_CLOSE );
         Container cont = getContentPane();
@@ -147,6 +137,7 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
         this.jText = jTextComponent;
         this.dictionary = dic;
         change.requestFocus();
+        setTitle( Utils.getResource("spelling") + ": " + loc.getDisplayLanguage() );
 
         tok = new Tokenizer( jTextComponent, dic, loc );
         
