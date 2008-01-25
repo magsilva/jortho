@@ -30,6 +30,7 @@ import java.util.*;
 import java.util.List;
 
 import javax.swing.*;
+import javax.swing.event.*;
 import javax.swing.text.*;
 
 /**
@@ -126,6 +127,31 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
             }
         } );
         
+        word.getDocument().addDocumentListener(new DocumentListener(){
+            public void changedUpdate(DocumentEvent ev){
+                // disable "Add To Dictionary" if word was changed, not this word would added else the original misspelled word
+                addToDic.setEnabled( false );
+            }
+            public void insertUpdate(DocumentEvent ev){
+                // disable "Add To Dictionary" if word was changed, not this word would added else the original misspelled word
+                addToDic.setEnabled( false );
+            }
+            public void removeUpdate(DocumentEvent ev){
+                // disable "Add To Dictionary" if word was changed, not this word would added else the original misspelled word
+                addToDic.setEnabled( false );
+            }
+        });
+        
+        suggestionsList.addListSelectionListener(new ListSelectionListener(){
+            public void valueChanged(ListSelectionEvent ev){
+                // Update the word field if a suggestion is click
+                if( !ev.getValueIsAdjusting() && suggestionsList.getSelectedIndex() >= 0 ){
+                    word.setText( (String)suggestionsList.getSelectedValue() );
+                    addToDic.setEnabled( true );
+                }
+            }
+        });
+        
         boolean isUserDictionary = SpellChecker.getUserDictionaryProvider() != null;
         addToDic.setEnabled( isUserDictionary );
         editDic.setEnabled( isUserDictionary );
@@ -189,6 +215,8 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
             suggestionsVector.add( newWord );
         }
         suggestionsList.setListData( suggestionsVector );
+        
+        addToDic.setEnabled( true );
         return true;
     }
     
