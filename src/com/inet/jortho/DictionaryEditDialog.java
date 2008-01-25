@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 import javax.swing.*;
@@ -123,10 +124,14 @@ class DictionaryEditDialog extends JDialog implements ActionListener{
         }    
     }
 
+    /**
+     * Delete the selected entries. The "Delete" Button it the only Listener.
+     */
     public void actionPerformed(ActionEvent e){
-        int idx = list.getSelectedIndex();
-        if( idx >= 0 ){
-            ((DefaultListModel)list.getModel()).remove( list.getSelectedIndex() );
+        int[] selected = list.getSelectedIndices();
+        Arrays.sort( selected );
+        for( int i=selected.length-1; i>=0; i-- ){
+            ((DefaultListModel)list.getModel()).remove( selected[i] );
             isModify = true;
         }
     }
