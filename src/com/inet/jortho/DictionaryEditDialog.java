@@ -23,6 +23,7 @@
 package com.inet.jortho;
 
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -35,7 +36,6 @@ import java.io.StringReader;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 
 import javax.swing.*;
 
@@ -75,6 +75,21 @@ class DictionaryEditDialog extends JDialog implements ActionListener{
 
         pack();
         setLocationRelativeTo( parent );
+    }
+    
+    /**
+     * A hack for the layout manger to prevent that the dialog is to small to show the title line. The problem occur
+     * only if there are small words in the list. With a empty list there are no problems.
+     */
+    @Override
+    public Dimension getPreferredSize() {
+        Dimension dim = super.getPreferredSize();
+        String title = getTitle();
+        int titleWidth = getFontMetrics(getFont()).stringWidth(title) + 80;
+        if( dim.width < titleWidth ){
+            dim.width = titleWidth;
+        }
+        return dim;
     }
     
     /**
