@@ -28,7 +28,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -46,7 +45,7 @@ import javax.swing.*;
  * Implements edit dialog for the user dictionary.
  * @author Volker Berlin
  */
-class DictionaryEditDialog extends JDialog implements ActionListener{
+class DictionaryEditDialog extends JDialog{
     
     private final JList list;
     private final JButton delete;
@@ -64,9 +63,13 @@ class DictionaryEditDialog extends JDialog implements ActionListener{
         
         delete = new JButton( Utils.getResource("delete") );
         content.add( delete, new GridBagConstraints( 1, 2, 1, 1, 1.0, 0.0, GridBagConstraints.NORTH ,GridBagConstraints.BOTH, new Insets( 0,8,8,8 ), 0, 0) );
-        delete.addActionListener( this );
+        DeleteAction deleteAction = new DeleteAction();
+        delete.addActionListener( deleteAction );
+        // DELETE Key
+        getRootPane().getInputMap( JComponent.WHEN_IN_FOCUSED_WINDOW ).put( KeyStroke.getKeyStroke( KeyEvent.VK_DELETE, 0, false ), "DELETE" );
+        getRootPane().getActionMap().put( "DELETE", deleteAction );
         
-        //ESCAPE Taste
+        //ESCAPE Key
         getRootPane().getInputMap( JComponent.WHEN_IN_FOCUSED_WINDOW ).put( KeyStroke.getKeyStroke( KeyEvent.VK_ESCAPE, 0, false ), "ESCAPE" );
         getRootPane().getActionMap().put( "ESCAPE", new AbstractAction() {
             public void actionPerformed( ActionEvent e ) {
@@ -124,15 +127,17 @@ class DictionaryEditDialog extends JDialog implements ActionListener{
         }    
     }
 
-    /**
-     * Delete the selected entries. The "Delete" Button it the only Listener.
-     */
-    public void actionPerformed(ActionEvent e){
-        int[] selected = list.getSelectedIndices();
-        Arrays.sort( selected );
-        for( int i=selected.length-1; i>=0; i-- ){
-            ((DefaultListModel)list.getModel()).remove( selected[i] );
-            isModify = true;
+    private class DeleteAction extends AbstractAction{
+        /**
+         * Delete the selected entries. The "Delete" Button it the only Listener.
+         */
+        public void actionPerformed(ActionEvent e){
+            int[] selected = list.getSelectedIndices();
+            Arrays.sort( selected );
+            for( int i=selected.length-1; i>=0; i-- ){
+                ((DefaultListModel)list.getModel()).remove( selected[i] );
+                isModify = true;
+            }
         }
     }
     
