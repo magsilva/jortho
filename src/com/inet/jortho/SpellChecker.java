@@ -31,6 +31,7 @@ import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -117,11 +118,19 @@ public class SpellChecker {
      * </ul>
      * 
      * @param baseURL
-     *            the base URL where the dictionaries and config file can be found
+     *            the base URL where the dictionaries and config file can be found. If null then URL("file", null, "") is used.
      * @param activeLocale
      *            the locale that should be loaded and made active. If null or empty then the default locale is used.
      */
     public static void registerDictionaries( URL baseURL, String activeLocale ) {
+        if( baseURL == null ){
+            try {
+                baseURL = new URL("file", null, "");
+            } catch( MalformedURLException e ) {
+                // should never occur because the URL is valid
+                e.printStackTrace();
+            }
+        }
         InputStream input;
         try {
             input = new URL( baseURL, "dictionaries.cnf" ).openStream();
@@ -157,7 +166,7 @@ public class SpellChecker {
      * relative to the baseURL. If the dictionary of the active Locale does not exist, the first dictionary is loaded.
      * 
      * @param baseURL
-     *            the base URL where the dictionaries can be found
+     *            the base URL where the dictionaries can be found. If null then URL("file", null, "") is used.
      * @param availableLocales
      *            a comma separated list of locales
      * @param activeLocale
@@ -174,7 +183,7 @@ public class SpellChecker {
      * If the dictionary of the active Locale does not exist, the first dictionary is loaded.
      * 
      * @param baseURL
-     *            the base URL where the dictionaries can be found
+     *            the base URL where the dictionaries can be found. If null then URL("file", null, "") is used.
      * @param availableLocales
      *            a comma separated list of locales
      * @param activeLocale
@@ -184,6 +193,14 @@ public class SpellChecker {
      * @see #setUserDictionaryProvider(UserDictionaryProvider)
      */
     public static void registerDictionaries( URL baseURL, String availableLocales, String activeLocale, String extension ) {
+        if( baseURL == null ){
+            try {
+                baseURL = new URL("file", null, "");
+            } catch( MalformedURLException e ) {
+                // should never occur because the URL is valid
+                e.printStackTrace();
+            }
+        }
         if( activeLocale == null ) {
             activeLocale = "";
         }
