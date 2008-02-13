@@ -40,6 +40,7 @@ import java.util.Properties;
 import java.util.WeakHashMap;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ButtonGroup;
 import javax.swing.ButtonModel;
 import javax.swing.JMenu;
@@ -296,27 +297,42 @@ public class SpellChecker {
             text.getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_F7, 0 ), "spell-checking" );
             text.getActionMap().put( "spell-checking", new AbstractAction(){
                 public void actionPerformed( ActionEvent e ) {
-                    if( !text.isEditable() ){
-                        // only editable text component have spell checking
-                        return;
-                    }
-                    Dictionary dictionary = currentDictionary;
-                    if( dictionary != null ) {
-                        Window parent = SwingUtilities.getWindowAncestor( text );
-                        SpellCheckerDialog dialog;
-                        if( parent instanceof Frame ) {
-                            dialog = new SpellCheckerDialog( (Frame)parent, true );
-                        } else {
-                            dialog = new SpellCheckerDialog( (Dialog)parent, true );
-                        }
-                        dialog.show( text, dictionary, currentLocale );
-                    }
+                    showSpellCheckerDialog( text );
                 }
             });
         }else{
             text.getActionMap().remove( "spell-checking" ); 
         }
     }
+    
+    /**
+     * Show the Spell Checker dialog for the given JTextComponent. It will be do nothing if
+     * the JTextComponent is not editable or there are no dictionary loaded.
+     * The action for this method can you receive via:
+     * <code><pre>
+     * Action action = text.getActionMap().get("spell-checking");
+     * </pre></code>
+     * The action is only available if you have enable the short key (F7).
+     * @param text JTextComponent to check
+     */
+    public static void showSpellCheckerDialog( final JTextComponent text ) {
+        if( !text.isEditable() ) {
+            // only editable text component have spell checking
+            return;
+        }
+        Dictionary dictionary = currentDictionary;
+        if( dictionary != null ) {
+            Window parent = SwingUtilities.getWindowAncestor( text );
+            SpellCheckerDialog dialog;
+            if( parent instanceof Frame ) {
+                dialog = new SpellCheckerDialog( (Frame)parent, true );
+            } else {
+                dialog = new SpellCheckerDialog( (Dialog)parent, true );
+            }
+            dialog.show( text, dictionary, currentLocale );
+        }
+    }
+    
     /**
      * Enable or disable the a popup menu with the menu item "Orthography" and "Languages". 
      * @param text the JTextComponent that should change
