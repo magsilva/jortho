@@ -378,7 +378,11 @@ public class SpellChecker {
     /**
      * Creates a menu item "Languages" (or the equivalent depending on the user language) with a sub-menu
      * that lists all available dictionary languages. 
-     * You can use this to add this menu item to your own popup.
+     * You can use this to add this menu item to your own popup or to your menu bar.
+     * <code><pre>
+     * JPopupMenu popup = new JPopupMenu();
+     * popup.add( SpellChecker.createLanguagesMenu() );
+     * </pre></code>
      * @return the new menu.
      */
     public static JMenu createLanguagesMenu(){
