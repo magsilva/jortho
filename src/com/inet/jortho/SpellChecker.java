@@ -40,7 +40,6 @@ import java.util.Properties;
 import java.util.WeakHashMap;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.ButtonGroup;
 import javax.swing.ButtonModel;
 import javax.swing.JMenu;
