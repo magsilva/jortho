@@ -22,12 +22,23 @@
  */
 package com.inet.jortho;
 
+/**
+ * This class hold some options for spell checking. You can change it global see ({@link SpellChecker#getOptions()}
+ * or for every JTextComponent on registering.
+ * @author Volker Berlin
+ */
 public class SpellCheckerOptions {
     
     private int suggestionsLimitMenu = 15;
     private int suggestionsLimitDialog = 15;
     private boolean caseSensitive = true;
 
+    /**
+     * Create a SpellCheckerOptions with default values.
+     */
+    public SpellCheckerOptions(){
+        //empty block
+    }
     /**
      * Set the maximun count of enties for the suggestion menu.
      * @param count the suggestions limit
