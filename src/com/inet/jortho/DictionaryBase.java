@@ -179,6 +179,7 @@ abstract class DictionaryBase {
         
         // Typos - wrong letters (One character is replaced with any character)
         if(charPosition < chars.length()){
+            currentChar = chars.charAt(charPosition);
             int tempIdx = idx = lastIdx;
             while( idx < size && tree[idx] < LAST_CHAR ) {
                 if( isWordMatch() ){
