@@ -75,6 +75,7 @@ class Tokenizer {
      * Get the next misspelling word. If not found then it return null.
      */
     String nextInvalidWord() {
+        isFirstWordInSentence = false;
         while( true ) {
             if( endWord == BreakIterator.DONE ) {
                 startSentence = endSentence;
@@ -100,13 +101,21 @@ class Tokenizer {
                         String lowerWord = word.substring( 0, 1 ).toLowerCase() + word.substring( 1 );
                         exist = dictionary.exist( lowerWord );
                     }
-                    isFirstWordInSentence = false;
                     if( !exist ) {
                         return word;
                     }
+                    isFirstWordInSentence = false;
                 }
             }
         }
+    }
+    
+    /**
+     * Was the last invalid word the first word in a sentence.
+     * @return true if it was the first word.
+     */
+    boolean isFirstWordInSentence(){
+        return isFirstWordInSentence;
     }
     
     /**
@@ -174,7 +183,7 @@ class Tokenizer {
     /**
      * Update the text after a word was replaced. The changes in the text should be only after the current word offset.
      */
-    public void updatePhrase() {
+    void updatePhrase() {
         endOffset = doc.getLength();
         setSentencesText();
         

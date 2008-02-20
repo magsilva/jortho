@@ -85,24 +85,46 @@ class CheckerMenu extends JMenu implements PopupMenuListener, HierarchyListener,
                     // if the next character is a white space then use the word on the left site
                     offs--;
                 }
+                // get the word from current position
                 final int begOffs = Utilities.getWordStart(jText, offs);
                 final int endOffs = Utilities.getWordEnd(jText, offs);
                 String word = jText.getText(begOffs, endOffs-begOffs);
+                
+                //find the first invalid word from current position
+                Tokenizer tokenizer = new Tokenizer(jText, dictionary, locale );
+                String invalidWord;
+                do{
+                    invalidWord = tokenizer.nextInvalidWord();
+                }while(tokenizer.getWordOffset() < begOffs);
                 super.removeAll();
+                
+                if(!word.equals( invalidWord )){
+                    // the current word is not invalid
+                    this.setEnabled(false);
+                    return;
+                }
+                
                 if(dictionary == null){
                     // without dictionary it is disabled
                     this.setEnabled(false);
                     return;
                 }
+                
                 List<Suggestion> list = dictionary.searchSuggestions(word);
 
                 //Disable then menu item if there are no suggestions
                 this.setEnabled(list.size()>0);
                 
+                boolean needCapitalization = tokenizer.isFirstWordInSentence() && Utils.isCapitalization( word );
+                
                 for(int i=0; i<list.size(); i++){
                     Suggestion sugestion = list.get(i);
-                    final String newWord = sugestion.getWord();
-                    JMenuItem item = super.add(newWord);
+                    String sugestionWord = sugestion.getWord();
+                    if( needCapitalization ){
+                        sugestionWord = Utils.getCapitalization( sugestionWord );
+                    }
+                    JMenuItem item = super.add(sugestionWord);
+                    final String newWord = sugestionWord;
                     item.addActionListener(new ActionListener(){
                         
                         public void actionPerformed(ActionEvent e) {

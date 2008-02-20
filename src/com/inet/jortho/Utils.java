@@ -42,4 +42,25 @@ class Utils {
         }
         return value;
     }
+    
+    /**
+     * Create a String where the first letter is written with a uppercase.
+     * @param word the word that should be change
+     * @return the new String if needed
+     */
+    static String getCapitalization( String word ) {
+        if( (word.length() > 0) && Character.isLowerCase( word.charAt( 0 ) ) ) {
+            return word.substring( 0, 1 ).toUpperCase() + word.substring( 1 );
+        }
+        return word;
+    }
+    
+    /**
+     * Check if the first character is a uppcase letter
+     * @param word the word that should be check.
+     * @return true if the first character is a uppercase letter
+     */
+    static boolean isCapitalization( String word ){
+        return (word.length() > 0) && Character.isUpperCase( word.charAt( 0 ) );
+    }
 }
