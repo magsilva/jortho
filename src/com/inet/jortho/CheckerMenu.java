@@ -91,7 +91,7 @@ class CheckerMenu extends JMenu implements PopupMenuListener, HierarchyListener,
                 String word = jText.getText(begOffs, endOffs-begOffs);
                 
                 //find the first invalid word from current position
-                Tokenizer tokenizer = new Tokenizer(jText, dictionary, locale );
+                Tokenizer tokenizer = new Tokenizer(jText, dictionary, locale, offs );
                 String invalidWord;
                 do{
                     invalidWord = tokenizer.nextInvalidWord();
