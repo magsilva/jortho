@@ -168,7 +168,7 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
         change.requestFocus();
         setTitle( Utils.getResource("spelling") + ": " + loc.getDisplayLanguage() );
 
-        tok = new Tokenizer( jTextComponent, dic, loc );
+        tok = new Tokenizer( jTextComponent, dic, loc, options );
         
         if( searchNext() ){
             setLocationRelativeTo( jTextComponent );
@@ -209,14 +209,14 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
 
         List<Suggestion> list = dictionary.searchSuggestions( wordStr );
         
-        boolean needCapitalization = tok.isFirstWordInSentence() && Utils.isCapitalization( wordStr );
+        boolean needCapitalization = tok.isFirstWordInSentence() && Utils.isCapitalized( wordStr );
 
         Vector<String> suggestionsVector = new Vector<String>();
         for( int i = 0; i < list.size() && i < options.getSuggestionsLimitDialog(); i++ ) {
             Suggestion sugestion = list.get( i );
             String newWord = sugestion.getWord();
             if( needCapitalization ) {
-                newWord = Utils.getCapitalization( newWord );
+                newWord = Utils.getCapitalized( newWord );
             }
             if( i == 0 )
                 word.setText( newWord );

@@ -48,9 +48,29 @@ class Utils {
      * @param word the word that should be change
      * @return the new String if needed
      */
-    static String getCapitalization( String word ) {
+    static String getCapitalized( String word ) {
         if( (word.length() > 0) && Character.isLowerCase( word.charAt( 0 ) ) ) {
             return word.substring( 0, 1 ).toUpperCase() + word.substring( 1 );
+        }
+        return word;
+    }
+    
+    /**
+     * Create a String with inverted case for the first letter. If it is lowercase then it will change to uppercase and
+     * vice versa.
+     * 
+     * @param word
+     *            the word that should be change
+     * @return the new String if needed
+     */
+    static String getInvertedCapitalizion( String word ) {
+        if( word.length() > 0 ) {
+            if( Character.isLowerCase( word.charAt( 0 ) ) ) {
+                return word.substring( 0, 1 ).toUpperCase() + word.substring( 1 );
+            }
+            if( Character.isUpperCase( word.charAt( 0 ) ) ) {
+                return word.substring( 0, 1 ).toLowerCase() + word.substring( 1 );
+            }
         }
         return word;
     }
@@ -60,7 +80,7 @@ class Utils {
      * @param word the word that should be check.
      * @return true if the first character is a uppercase letter
      */
-    static boolean isCapitalization( String word ){
+    static boolean isCapitalized( String word ){
         return (word.length() > 0) && Character.isUpperCase( word.charAt( 0 ) );
     }
 }

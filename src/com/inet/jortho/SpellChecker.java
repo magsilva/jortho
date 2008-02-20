@@ -325,6 +325,7 @@ public class SpellChecker {
      * </pre></code>
      * The action is only available if you have enable the short key (F7).
      * @param text JTextComponent to check
+     * @param options override the default options for this menu.
      */
     public static void showSpellCheckerDialog( final JTextComponent text, SpellCheckerOptions options ) {
         if( !text.isEditable() ) {
@@ -374,8 +375,23 @@ public class SpellChecker {
      *            true, enable the feature.
      */
     public static void enableAutoSpell( JTextComponent text, boolean enable ){
+        enableAutoSpell( text, enable, null );
+    }
+
+    /**
+     * Enable or disable the auto spell checking feature (red zigzag line) for a text component. If you change the
+     * document then you need to reenable it.
+     * 
+     * @param text
+     *            the JTextComponent that should change
+     * @param enable
+     *            true, enable the feature.
+     * @param options
+     *            override the default options for this menu.
+     */
+    public static void enableAutoSpell( JTextComponent text, boolean enable, SpellCheckerOptions options ){
         if( enable ){
-            new AutoSpellChecker(text);
+            new AutoSpellChecker( text, options );
         } else {
             AutoSpellChecker.disable( text );
         }

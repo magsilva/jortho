@@ -38,6 +38,7 @@ import javax.swing.text.Utilities;
 class Tokenizer {
     
     private final Document doc;
+    private final SpellCheckerOptions options;
     /** start offset of current paragraph */
     private int paragraphOffset;
     /** end offset of current paragraph */
@@ -55,8 +56,8 @@ class Tokenizer {
     /**
      * Create a tokenizer for the completely text document. 
      */
-    Tokenizer( JTextComponent jText, Dictionary dictionary, Locale locale ) {
-        this( jText, dictionary, locale, 0, jText.getDocument().getLength() );
+    Tokenizer( JTextComponent jText, Dictionary dictionary, Locale locale, SpellCheckerOptions options ) {
+        this( jText, dictionary, locale, 0, jText.getDocument().getLength(), options );
     }
 
     /**
@@ -66,18 +67,19 @@ class Tokenizer {
      * @param locale the used Locale, is needed for the word and sentence breaker
      * @param offset the current offset.
      */
-    Tokenizer( JTextComponent jText, Dictionary dictionary, Locale locale, int offset ) {
+    Tokenizer( JTextComponent jText, Dictionary dictionary, Locale locale, int offset, SpellCheckerOptions options ) {
         this( jText, dictionary, locale, Utilities.getParagraphElement( jText, offset ).getStartOffset(), 
-                                         Utilities.getParagraphElement( jText, offset ).getEndOffset() );
+                                         Utilities.getParagraphElement( jText, offset ).getEndOffset(), options );
     }
 
         /**
      * Create a tokenizer for the selected range.
      */
-    Tokenizer( JTextComponent jText, Dictionary dictionary, Locale locale, int startOffset, int endOffset ) {
+    Tokenizer( JTextComponent jText, Dictionary dictionary, Locale locale, int startOffset, int endOffset, SpellCheckerOptions options ) {
 
         this.dictionary = dictionary;
         doc = jText.getDocument();
+        this.options = options == null ? SpellChecker.getOptions() : options;
         sentences = BreakIterator.getSentenceInstance( locale );
         words = BreakIterator.getWordInstance( locale );
 
@@ -114,6 +116,9 @@ class Tokenizer {
                 //only words with 2 or more characters are checked
                 if( word.length() > 1 && Character.isLetter( word.charAt( 0 ) )){
                     boolean exist = dictionary.exist( word );
+                    if(!exist && !options.isCaseSensitive()){
+                        exist = dictionary.exist( Utils.getInvertedCapitalizion( word ) );
+                    }else
                     if(isFirstWordInSentence && !exist && Character.isUpperCase( word.charAt( 0 ) )){
                         // Uppercase check on starting of sentence
                         String lowerWord = word.substring( 0, 1 ).toLowerCase() + word.substring( 1 );

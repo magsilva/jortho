@@ -93,7 +93,7 @@ class CheckerMenu extends JMenu implements PopupMenuListener, HierarchyListener,
                 String word = jText.getText(begOffs, endOffs-begOffs);
                 
                 //find the first invalid word from current position
-                Tokenizer tokenizer = new Tokenizer(jText, dictionary, locale, offs );
+                Tokenizer tokenizer = new Tokenizer(jText, dictionary, locale, offs, options );
                 String invalidWord;
                 do{
                     invalidWord = tokenizer.nextInvalidWord();
@@ -117,13 +117,13 @@ class CheckerMenu extends JMenu implements PopupMenuListener, HierarchyListener,
                 //Disable then menu item if there are no suggestions
                 this.setEnabled(list.size()>0);
                 
-                boolean needCapitalization = tokenizer.isFirstWordInSentence() && Utils.isCapitalization( word );
+                boolean needCapitalization = tokenizer.isFirstWordInSentence() && Utils.isCapitalized( word );
                 
                 for( int i = 0; i < list.size() && i < options.getSuggestionsLimitMenu(); i++ ) {
                     Suggestion sugestion = list.get(i);
                     String sugestionWord = sugestion.getWord();
                     if( needCapitalization ){
-                        sugestionWord = Utils.getCapitalization( sugestionWord );
+                        sugestionWord = Utils.getCapitalized( sugestionWord );
                     }
                     JMenuItem item = super.add(sugestionWord);
                     final String newWord = sugestionWord;

@@ -38,15 +38,17 @@ import javax.swing.text.Highlighter.Highlight;
 class AutoSpellChecker implements DocumentListener, LanguageChangeListener {
     private static final RedZigZagPainter painter = new RedZigZagPainter();
 
-    private JTextComponent                jText;
+    private final JTextComponent                jText;
+    private final SpellCheckerOptions options;
 
     private Dictionary                    dictionary;
 
     private Locale                        locale;
 
     
-    public AutoSpellChecker(JTextComponent text){
+    public AutoSpellChecker(JTextComponent text, SpellCheckerOptions options){
         this.jText = text;
+        this.options = options == null ? SpellChecker.getOptions() : options;
         jText.getDocument().addDocumentListener( this );
 
         SpellChecker.addLanguageChangeLister( this );
@@ -171,7 +173,7 @@ class AutoSpellChecker implements DocumentListener, LanguageChangeListener {
                 return;
             }
             
-            Tokenizer tok = new Tokenizer( jText, dic, loc, i, j );
+            Tokenizer tok = new Tokenizer( jText, dic, loc, i, j, options );
             String word;
             while( (word = tok.nextInvalidWord()) != null ) {
                 int wordOffset = tok.getWordOffset();
