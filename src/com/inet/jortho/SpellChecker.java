@@ -79,6 +79,7 @@ public class SpellChecker {
     private static UserDictionaryProvider userDictionaryProvider;
     private final static java.util.Map<LanguageChangeListener, Object> listeners = Collections.synchronizedMap( new WeakHashMap<LanguageChangeListener, Object>() );
     private static String applicationName;
+    private static final SpellCheckerOptions globalOptions = new SpellCheckerOptions();
     
     /**
      * There is no instance needed of SpellChecker. All methods are static.
@@ -292,11 +293,22 @@ public class SpellChecker {
      * @param enable true, enable the feature.
      */
     public static void enableShortKey( final JTextComponent text, boolean enable ){
+        enableShortKey( text, enable, null );
+    }
+    
+    /**
+     * Enable or disable the F7 key. Pressing the F7 key will display the spell check dialog. This also
+     * register an Action with the name "spell-checking".
+     * @param text the JTextComponent that should change
+     * @param enable true, enable the feature.
+     * @param options override the default options for this menu.
+     */
+    public static void enableShortKey( final JTextComponent text, boolean enable, final SpellCheckerOptions options ){
         if( enable ){
             text.getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_F7, 0 ), "spell-checking" );
             text.getActionMap().put( "spell-checking", new AbstractAction(){
                 public void actionPerformed( ActionEvent e ) {
-                    showSpellCheckerDialog( text );
+                    showSpellCheckerDialog( text, options );
                 }
             });
         }else{
@@ -314,7 +326,7 @@ public class SpellChecker {
      * The action is only available if you have enable the short key (F7).
      * @param text JTextComponent to check
      */
-    public static void showSpellCheckerDialog( final JTextComponent text ) {
+    public static void showSpellCheckerDialog( final JTextComponent text, SpellCheckerOptions options ) {
         if( !text.isEditable() ) {
             // only editable text component have spell checking
             return;
@@ -324,9 +336,9 @@ public class SpellChecker {
             Window parent = SwingUtilities.getWindowAncestor( text );
             SpellCheckerDialog dialog;
             if( parent instanceof Frame ) {
-                dialog = new SpellCheckerDialog( (Frame)parent, true );
+                dialog = new SpellCheckerDialog( (Frame)parent, true, options );
             } else {
-                dialog = new SpellCheckerDialog( (Dialog)parent, true );
+                dialog = new SpellCheckerDialog( (Dialog)parent, true, options );
             }
             dialog.show( text, dictionary, currentLocale );
         }
@@ -404,7 +416,18 @@ public class SpellChecker {
      * @return the new menu.
      */
     public static JMenu createCheckerMenu(){
-        return new CheckerMenu();
+        return createCheckerMenu( null );
+    }
+    
+    /**
+     * Creates a menu item "Orthography" (or the equivalent depending on the user language) with a
+     * sub-menu that includes suggestions for a correct spelling.
+     * You can use this to add this menu item to your own popup.
+     * @param options override the default options for this menu.
+     * @return the new menu.
+     */
+    public static JMenu createCheckerMenu(SpellCheckerOptions options){
+        return new CheckerMenu(options);
     }
     
     /**
@@ -559,5 +582,13 @@ public class SpellChecker {
      */
     public static String getApplicationName(){
         return applicationName;
+    }
+ 
+    /**
+     * Get the default SpellCheckerOptions. This object is a singleton. That there is no get method.
+     * @return the default SpellCheckerOptions
+     */
+    public static SpellCheckerOptions getOptions(){
+        return globalOptions;
     }
 }

@@ -43,6 +43,7 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
     private Dictionary dictionary;
     private Tokenizer tok;
     private boolean isDictionaryModify;
+    private final SpellCheckerOptions options;
     
 
     final private JLabel notFound = new JLabel();
@@ -63,23 +64,25 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
     final private HashMap<String,String> changeWords = new HashMap<String,String>();
 
     SpellCheckerDialog(Dialog owner) throws HeadlessException {
-        this(owner, false);
+        this(owner, false, null);
     }
 
 
-    SpellCheckerDialog(Dialog owner, boolean modal){
+    SpellCheckerDialog(Dialog owner, boolean modal, SpellCheckerOptions options){
         super(owner, modal);
+        this.options = options == null ? SpellChecker.getOptions() : options;
         init();
     }
 
 
     SpellCheckerDialog(Frame owner){
-        this(owner, false);
+        this(owner, false, null);
     }
     
 
-    public SpellCheckerDialog(Frame owner, boolean modal){
+    SpellCheckerDialog(Frame owner, boolean modal, SpellCheckerOptions options){
         super(owner, modal);
+        this.options = options == null ? SpellChecker.getOptions() : options;
         init();
     }
 
@@ -209,7 +212,7 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
         boolean needCapitalization = tok.isFirstWordInSentence() && Utils.isCapitalization( wordStr );
 
         Vector<String> suggestionsVector = new Vector<String>();
-        for( int i = 0; i < list.size(); i++ ) {
+        for( int i = 0; i < list.size() && i < options.getSuggestionsLimitDialog(); i++ ) {
             Suggestion sugestion = list.get( i );
             String newWord = sugestion.getWord();
             if( needCapitalization ) {

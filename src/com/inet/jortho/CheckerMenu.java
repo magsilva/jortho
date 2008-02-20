@@ -41,13 +41,15 @@ class CheckerMenu extends JMenu implements PopupMenuListener, HierarchyListener,
 
     private Locale                        locale;
 
+    private final SpellCheckerOptions options;
     
-    CheckerMenu(){
+    CheckerMenu(SpellCheckerOptions options){
         super( Utils.getResource("spelling"));
         super.addHierarchyListener(this);
         SpellChecker.addLanguageChangeLister( this );
         dictionary = SpellChecker.getCurrentDictionary();
         locale = SpellChecker.getCurrentLocale();
+        this.options = options == null ? SpellChecker.getOptions() : options;
     }
 
 
@@ -117,7 +119,7 @@ class CheckerMenu extends JMenu implements PopupMenuListener, HierarchyListener,
                 
                 boolean needCapitalization = tokenizer.isFirstWordInSentence() && Utils.isCapitalization( word );
                 
-                for(int i=0; i<list.size(); i++){
+                for( int i = 0; i < list.size() && i < options.getSuggestionsLimitMenu(); i++ ) {
                     Suggestion sugestion = list.get(i);
                     String sugestionWord = sugestion.getWord();
                     if( needCapitalization ){
