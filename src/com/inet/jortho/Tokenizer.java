@@ -29,6 +29,7 @@ import javax.swing.text.AbstractDocument;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.Utilities;
 
 /**
  * Break the text and words and search for misspelling.
@@ -59,6 +60,18 @@ class Tokenizer {
     }
 
     /**
+     * Create a Tokenizer for the current paragraph
+     * @param jText the checking JTextComponent
+     * @param dictionary the used Dictionary
+     * @param locale the used Locale, is needed for the word and sentence breaker
+     * @param offset the current offset.
+     */
+    Tokenizer( JTextComponent jText, Dictionary dictionary, Locale locale, int offset ) {
+        this( jText, dictionary, locale, Utilities.getParagraphElement( jText, offset ).getStartOffset(), 
+                                         Utilities.getParagraphElement( jText, offset ).getEndOffset() );
+    }
+
+        /**
      * Create a tokenizer for the selected range.
      */
     Tokenizer( JTextComponent jText, Dictionary dictionary, Locale locale, int startOffset, int endOffset ) {
