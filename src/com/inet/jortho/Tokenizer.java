@@ -37,7 +37,9 @@ import javax.swing.text.JTextComponent;
 class Tokenizer {
     
     private final Document doc;
+    /** start offset of current paragraph */
     private int paragraphOffset;
+    /** end offset of current paragraph */
     private int endOffset;
     
     private String phrase;
@@ -68,7 +70,10 @@ class Tokenizer {
 
         paragraphOffset = startOffset;
         this.endOffset = endOffset;
-        loadSentences();
+        //loadSentences();
+        setSentencesText();
+        endSentence = sentences.first();
+        endWord = BreakIterator.DONE;
     }
 
     /**
