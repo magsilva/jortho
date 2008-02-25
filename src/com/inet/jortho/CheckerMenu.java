@@ -22,125 +22,21 @@
  */
 package com.inet.jortho;
 
-import java.awt.Component;
-import java.awt.Point;
 import java.awt.event.*;
-import java.util.List;
-import java.util.Locale;
 
 import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.text.*;
 
 /**
  * @author Volker Berlin
  */
-class CheckerMenu extends JMenu implements PopupMenuListener, HierarchyListener, LanguageChangeListener {
+class CheckerMenu extends JMenu implements HierarchyListener {
     
-    private Dictionary                    dictionary;
+    private final CheckerListener listener;
 
-    private Locale                        locale;
-
-    private final SpellCheckerOptions options;
-    
     CheckerMenu(SpellCheckerOptions options){
         super( Utils.getResource("spelling"));
+        listener = new CheckerListener(this, options);
         super.addHierarchyListener(this);
-        SpellChecker.addLanguageChangeLister( this );
-        dictionary = SpellChecker.getCurrentDictionary();
-        locale = SpellChecker.getCurrentLocale();
-        this.options = options == null ? SpellChecker.getOptions() : options;
-    }
-
-
-    public void popupMenuCanceled(PopupMenuEvent e) {
-        /* empty */
-    }
-    
-
-    public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-        /* empty */
-    }
-
-
-    public void popupMenuWillBecomeVisible(PopupMenuEvent ev) {
-       JPopupMenu popup = (JPopupMenu)ev.getSource();
-        
-        Component invoker = popup.getInvoker();
-        if(invoker instanceof JTextComponent){
-            final JTextComponent jText = (JTextComponent)invoker;
-            if( !jText.isEditable() ){
-                // Suggestions only for editable text components
-                setEnabled( false );
-                return;
-            }
-            Caret caret = jText.getCaret();
-            int offs = Math.min(caret.getDot(), caret.getMark());
-            Point p = jText.getMousePosition();
-            if(p != null){
-                // use position from mouse click and not from editor cursor position 
-                offs = jText.viewToModel( p );
-            }
-            try {
-                Document doc = jText.getDocument();
-                if( offs >0 && (offs >= doc.getLength() || Character.isWhitespace(doc.getText(offs, 1).charAt(0)))){
-                    // if the next character is a white space then use the word on the left site
-                    offs--;
-                }
-                // get the word from current position
-                final int begOffs = Utilities.getWordStart(jText, offs);
-                final int endOffs = Utilities.getWordEnd(jText, offs);
-                String word = jText.getText(begOffs, endOffs-begOffs);
-                
-                //find the first invalid word from current position
-                Tokenizer tokenizer = new Tokenizer(jText, dictionary, locale, offs, options );
-                String invalidWord;
-                do{
-                    invalidWord = tokenizer.nextInvalidWord();
-                }while(tokenizer.getWordOffset() < begOffs);
-                super.removeAll();
-                
-                if(!word.equals( invalidWord )){
-                    // the current word is not invalid
-                    this.setEnabled(false);
-                    return;
-                }
-                
-                if(dictionary == null){
-                    // without dictionary it is disabled
-                    this.setEnabled(false);
-                    return;
-                }
-                
-                List<Suggestion> list = dictionary.searchSuggestions(word);
-
-                //Disable then menu item if there are no suggestions
-                this.setEnabled(list.size()>0);
-                
-                boolean needCapitalization = tokenizer.isFirstWordInSentence() && Utils.isCapitalized( word );
-                
-                for( int i = 0; i < list.size() && i < options.getSuggestionsLimitMenu(); i++ ) {
-                    Suggestion sugestion = list.get(i);
-                    String sugestionWord = sugestion.getWord();
-                    if( needCapitalization ){
-                        sugestionWord = Utils.getCapitalized( sugestionWord );
-                    }
-                    JMenuItem item = super.add(sugestionWord);
-                    final String newWord = sugestionWord;
-                    item.addActionListener(new ActionListener(){
-                        
-                        public void actionPerformed(ActionEvent e) {
-                            jText.setSelectionStart( begOffs );
-                            jText.setSelectionEnd( endOffs );
-                            jText.replaceSelection( newWord );
-                        }
-                        
-                    });
-                }
-            } catch (BadLocationException ex) { 
-                ex.printStackTrace();
-            }
-        }
     }
 
 
@@ -150,18 +46,10 @@ class CheckerMenu extends JMenu implements PopupMenuListener, HierarchyListener,
         if(ev.getChangeFlags() == HierarchyEvent.PARENT_CHANGED && ev.getChanged() == this){
             JPopupMenu parent = (JPopupMenu)getParent();
             if(parent != null){
-                parent.addPopupMenuListener(this);
+                parent.addPopupMenuListener(listener);
             }else{
-                ((JPopupMenu)ev.getChangedParent()).removePopupMenuListener(this);
+                ((JPopupMenu)ev.getChangedParent()).removePopupMenuListener(listener);
             }
         }
     }
-
-
-    public void languageChanged( LanguageChangeEvent ev ) {
-        dictionary = SpellChecker.getCurrentDictionary();
-        locale = SpellChecker.getCurrentLocale();
-    }
-    
-    
 }

@@ -346,7 +346,7 @@ public class SpellChecker {
     }
     
     /**
-     * Enable or disable the a popup menu with the menu item "Orthography" and "Languages". 
+     * Enable or disable the popup menu with the menu item "Orthography" and "Languages". 
      * @param text the JTextComponent that should change
      * @param enable true, enable the feature.
      */
@@ -444,6 +444,30 @@ public class SpellChecker {
      */
     public static JMenu createCheckerMenu(SpellCheckerOptions options){
         return new CheckerMenu(options);
+    }
+    
+    /**
+     * Create a dynamic JPopupMenu with a list of suggestion. You can use the follow code sequence:<pre><code>
+     * JPopupMenu popup = SpellChecker.createCheckerPopup();
+     * text.addMouseListener( new PopupListener(popup) );
+     * </code></pre>
+     * @return the new JPopupMenu.
+     * @see #createCheckerMenu()
+     */
+    public static JPopupMenu createCheckerPopup(){
+        return createCheckerPopup( null );
+    }
+    
+    /**
+     * Create a dynamic JPopupMenu with a list of suggestion. You can use the follow code sequence:<pre><code>
+     * JPopupMenu popup = SpellChecker.createCheckerPopup( null );
+     * text.addMouseListener( new PopupListener(popup) );
+     * </code></pre>
+     * @return the new JPopupMenu.
+     * @see #createCheckerMenu(SpellCheckerOptions)
+     */
+    public static JPopupMenu createCheckerPopup(SpellCheckerOptions options){
+        return new CheckerPopup(options);
     }
     
     /**
