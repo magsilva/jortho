@@ -111,15 +111,17 @@ public class SpellChecker {
      * Registers the available dictionaries. The dictionaries' URLs must have the form "dictionary_xx.xxxxx" and must be
      * relative to the baseURL. The available languages and extension of the dictionaries is load from a config file.
      * The config file must also relative to the baseURL and must be named dictionaries.cnf, dictionaries.properties or
-     * dictionaries.txt. If the dictionary of the active Locale does not exist, the first dictionary is loaded. The
-     * config file has a Java Properties format. Currently there are the follow options:
+     * dictionaries.txt. If the dictionary of the active Locale does not exist, the first dictionary is loaded. There is
+     * only one dictionary loaded in memory at a given time. The config file has a Java Properties format. Currently
+     * there are the follow options:
      * <ul>
      * <li>languages</li>
      * <li>extension</li>
      * </ul>
      * 
      * @param baseURL
-     *            the base URL where the dictionaries and config file can be found. If null then URL("file", null, "") is used.
+     *            the base URL where the dictionaries and config file can be found. If null then URL("file", null, "")
+     *            is used.
      * @param activeLocale
      *            the locale that should be loaded and made active. If null or empty then the default locale is used.
      */
@@ -165,6 +167,7 @@ public class SpellChecker {
     /**
      * Registers the available dictionaries. The dictionaries' URLs must have the form "dictionary_xx.ortho" and must be
      * relative to the baseURL. If the dictionary of the active Locale does not exist, the first dictionary is loaded.
+     * There is only one dictionary loaded in memory at a given time.
      * 
      * @param baseURL
      *            the base URL where the dictionaries can be found. If null then URL("file", null, "") is used.
@@ -182,6 +185,7 @@ public class SpellChecker {
      * Registers the available dictionaries. The dictionaries' URLs must have the form "dictionary_xx.xxxxx" and must be
      * relative to the baseURL. The extension can be set via parameter.
      * If the dictionary of the active Locale does not exist, the first dictionary is loaded.
+     * There is only one dictionary loaded in memory at a given time.
      * 
      * @param baseURL
      *            the base URL where the dictionaries can be found. If null then URL("file", null, "") is used.
