@@ -28,6 +28,7 @@
 			<fileset dir="." includes="doc/**/*.*"/>
 			<fileset dir="." includes="src/**/*.*" excludes="src/**/*Test*.java"/>
 			<fileset dir="." includes="license.txt"/>
+			<fileset dir="www" includes="readme.html"/>
 		</zip>
 		<delete dir="temp"/>
 	</target>
