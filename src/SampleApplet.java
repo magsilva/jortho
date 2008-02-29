@@ -29,11 +29,16 @@ public class SampleApplet extends JApplet {
 
     @Override
     public void start() {
+        // Build the test frame for the sample
         JEditorPane text = new JTextPane();
         text.setText( "This is a simppler textt with spellingg errors." );
         add( text );
 
-        SpellChecker.registerDictionaries( getCodeBase(), "en,de", "en" );
+        // Load the configuration from the file dictionaries.cnf and 
+        // use the english dictionary as default 
+        SpellChecker.registerDictionaries( getCodeBase(), "en" );
+
+        // enable the spell checking on the text component with all features
         SpellChecker.register( text );
     }
 
