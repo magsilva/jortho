@@ -52,8 +52,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
 
 /**
- * This class is the major class of the spellchecker JOrtho (Java Orthography Checker). 
- * In the most cases this is the only class that you need to add spellchecking to your application.
+ * This class is the major class of the spell checker JOrtho (Java Orthography Checker). 
+ * In the most cases this is the only class that you need to add spell checking to your application.
  * First you need to do a one-time registration of your dictionaries. In standalone applications this can
  * look like:
  * <code><pre>
@@ -109,10 +109,10 @@ public class SpellChecker {
     
     /**
      * Registers the available dictionaries. The dictionaries' URLs must have the form "dictionary_xx.xxxxx" and must be
-     * relative to the baseURL. The available languages and extension of the dictionaries is load from a config file.
-     * The config file must also relative to the baseURL and must be named dictionaries.cnf, dictionaries.properties or
+     * relative to the baseURL. The available languages and extension of the dictionaries is load from a configuration file.
+     * The configuration file must also relative to the baseURL and must be named dictionaries.cnf, dictionaries.properties or
      * dictionaries.txt. If the dictionary of the active Locale does not exist, the first dictionary is loaded. There is
-     * only one dictionary loaded in memory at a given time. The config file has a Java Properties format. Currently
+     * only one dictionary loaded in memory at a given time. The configuration file has a Java Properties format. Currently
      * there are the follow options:
      * <ul>
      * <li>languages</li>
@@ -120,7 +120,7 @@ public class SpellChecker {
      * </ul>
      * 
      * @param baseURL
-     *            the base URL where the dictionaries and config file can be found. If null then URL("file", null, "")
+     *            the base URL where the dictionaries and configuration file can be found. If null then URL("file", null, "")
      *            is used.
      * @param activeLocale
      *            the locale that should be loaded and made active. If null or empty then the default locale is used.
