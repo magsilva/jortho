@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-us" xml:lang="en-us">
 	<head>
 		<!-- Meta  mendatory -->
@@ -10,8 +10,6 @@
 		<meta content="jortho,orthography,spell check,java,open source,jtextcomponent,jstring" name="keywords"/>
 		<meta content="JOrtho is an Open Source spell checker programmed in Java and attachable to any JTextComponent." name="description"/>
 
-		<link href="style/style.css" media="screen" rel="stylesheet" type="text/css"/>
-		
 		<meta content="i-net software" name="author"/>
 		<meta content="i-net software" name="copyright"/>
 		<meta content="1 week" name="revisit-after"/>
@@ -19,6 +17,7 @@
 		<meta content="no" http-equiv="imagetoolbar"/>
 		
 		<style type="text/css">
+
 body {
 	font-size: 10pt;
 }
@@ -34,44 +33,66 @@ a {
 	color: #143965;   
 }
 
-h2 {
-	font-size: 10pt;
+h2, h3 {
+	font-size: 11pt;
 	font-weight: bold;
 	color: #143965; 
 	margin: 0px 0px 12px 0px;
+}
+
+h1, h2, h3, p, ul {
+	margin-left: 30px;
 }
 
 h3 {
 	font-size: 10pt;
-	font-weight: bold;
-	color: #143965; 
-	margin: 0px 0px 12px 0px;
+	margin-left: 50px;
 }
 
-
-h1, h2, p, ul {
-	margin-left: 30px;
-}
 
 img {
 	border: 0px;
 }
-</style>
+
+ul {
+	padding-left: 15px;
+}
+
+.level2 {
+	margin-left: 50px;
+}
+.level3 {
+	margin-left: 70px;
+}
+
+		</style>
 		
 	</head>
 
 	<body>
 
 				<h1>JOrtho - a Java spell-checking library</h1>
+				
 				<p>JOrtho (Java Orthography) is a Open Source spell-checker entirely written in Java. Its 
 				dictionaries are based on the free
 				<a href="http://wiktionary.org/">Wiktionary</a> project and 
 				can therefore be updated by virtually any language. The library 
 				works with any JTextComponent from the Swing framework. This 
 				includes JTextPane, JEditorPane and JTextArea.</p>
-				<h2>Features</h2>
-				<p>What does the library do when it is bound to a JTextCompontent?</p>
-				<ul>
+
+				<h2>Table of Contents</h2>
+				<ul class="TOC">
+					<li><a href="#features">Features</a></li>
+					<li><a href="#require">System Requirements</a></li>
+					<li><a href="#look">What it looks like</a></li>
+					<li><a href="#download">Download</a></li>
+					<li><a href="#license">Licensing</a></li>
+					<li><a href="#faq">FAQ</a></li>
+				</ul>
+
+				<h2><a name="features">Features</a></h2>
+				<p class="level2">What does the library do when it is bound to a JTextCompontent?</p>
+				<ul class="level2">
 					<li>highlight the potentially wrongly spelled word</li>
 					<li>offer a context menu with suggestions for a correct form 
 					of the word</li>
@@ -89,36 +110,36 @@ img {
 					<li>detect capitalization errors</li>
 					<li>enable or disable every feature separately</li>
 				</ul>
-				<h2>System Requirements</h2>
-				<p>JOrtho has the following requirements to run smoothly:</p>
-				<ul>
+				<h2><a name="require">System Requirements</a></h2>
+				<p class="level2">JOrtho has the following requirements to run smoothly:</p>
+				<ul class="level2">
 					<li>Java 5 or higher</li>
 					<li>1-2MB free memory in the JavaVM (depending on the 
 					dictionary)</li>
 				</ul>
-				<h2>What it looks like</h2>
-				<p>
+				<h2><a name="look">What it looks like</a></h2>
+				<p class="level2">
 				<a href="http://www.inetsoftware.de/products/tools/JOrtho/sample.htm">There is a small live sample applet of 
 				JOrtho </a>where you can test the spelling of a text. You can 
 				freely modify this text to get an impression of JOrtho in 
 				action.</p>
-				<h2>Download</h2>
-				<p>The free tool and the dictionaries can be downloaded at
+				<h2><a name="download">Download</a></h2>
+				<p class="level2">The free tool and the dictionaries can be downloaded at
 				<a title="Download JOrtho" href="http://sourceforge.net/project/showfiles.php?group_id=210885">
 				<img src="http://sflogo.sourceforge.net/sflogo.php?group_id=210885&amp;type=1" width="88" height="31" alt="SourceForge.net Logo" /></a>.</p>
-				<p>The API is available 
+				<p class="level2">The API is available 
 				<a href="http://www.inetsoftware.de/products/tools/JOrtho/API/">here</a>. You may also
 				<a href="http://www.inetsoftware.de/products/tools/JOrtho/sample.htm">view a live sample</a>.</p>
-                <h2>Licensing</h2>
-				<p>JOrtho is published under the <!-- google_ad_section_start -->
+                <h2><a name="license">Licensing</a></h2>
+				<p class="level2">JOrtho is published under the <!-- google_ad_section_start -->
 				GNU General Public License (GPL) for any non-commercial usage. 
 				If you want to use JOrtho in a commercial product then you can 
 				order it in our shop in the near future. Currently you need to 
 				contact our sales department at
 				<a href="mailto:sales&#64;inetsoftware.de">sales&#64;inetsoftware.de</a>.</p>
-				<p>If you have further questions on licensing, please contact:
+				<p class="level2">If you have further questions on licensing, please contact:
 				<a href="mailto:sales&#64;inetsoftware.de">sales&#64;inetsoftware.de</a></p>
-				<h2>FAQ</h2>
+				<h2><a name="faq">FAQ</a></h2>
                 <blockquote>
                   <p><strong>Which languages are supported by JOrtho?</strong></p>
 					<p class="style2">Please have look at the download area at
@@ -165,11 +186,11 @@ img {
 					<h2>Changes</h2>
 					
                   <h3>Changes in Version 0.1 (2007-12-13)</h3>
-<ul>
+<ul class="level3">
 	<li>This was the initial public version.</li>
 </ul>
 <h3>Changes in Version 0.2 (2008-01-02)</h3>
-				<ul>
+				<ul class="level3">
 					<li>Threading problems fixed.</li>
 					<li>Single characters are ignored.</li>
 					<li>The extension for the dictionaries can be set now. This 
@@ -182,7 +203,7 @@ img {
 					<li>Add an editor for the user dictionary.</li>
 				</ul>
 				<h3>Changes in Version 0.3</h3>
-				<ul>
+				<ul class="level3">
 					<li>Use mouse position and not cursor position in text for 
 					suggestions.</li>
 					<li>Add support for Escape key.</li>
@@ -197,8 +218,7 @@ img {
 					<li>Support Capitalization improved.</li>
 					<li>The class SpellCheckerOption added and add as optional 
 					parameter to many methods.</li>
-					<li>A JPopupMenu with suggestion was added.<br>
-&nbsp;</li>
+					<li>A JPopupMenu with suggestion was added.</li>
 				</ul>
                 
                 
