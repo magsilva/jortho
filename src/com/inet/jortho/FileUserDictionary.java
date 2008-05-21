@@ -54,7 +54,7 @@ public class FileUserDictionary implements UserDictionaryProvider{
             fileBase = "";
         }
         fileBase = fileBase.trim();
-        fileBase.replace( '\\', '/' );
+        fileBase = fileBase.replace( '\\', '/' );
         if( fileBase.length() > 0 && !fileBase.endsWith("/") ){
             fileBase += "/";
         }
