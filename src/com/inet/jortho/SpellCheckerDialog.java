@@ -29,6 +29,7 @@ import java.awt.event.KeyEvent;
 import java.util.*;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
@@ -87,6 +88,13 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
     }
 
     final private void init(){
+        try {
+            // setIconImage are first in Java 6.0
+            setIconImage( ImageIO.read( getClass().getResourceAsStream( "icon.png" ) ) );
+        } catch( Throwable e1 ) {
+            // can occur in Java 5 or if the icon was removed, then use the default
+        }
+
         setDefaultCloseOperation( WindowConstants.DISPOSE_ON_CLOSE );
         Container cont = getContentPane();
         cont.setLayout(new GridBagLayout());
