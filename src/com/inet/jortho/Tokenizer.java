@@ -124,7 +124,7 @@ class Tokenizer {
                         String lowerWord = word.substring( 0, 1 ).toLowerCase() + word.substring( 1 );
                         exist = dictionary.exist( lowerWord );
                     }
-                    if( !exist ) {
+                    if( !exist && !isWebAddress( word )) {
                         return word;
                     }
                     isFirstWordInSentence = false;
@@ -134,7 +134,47 @@ class Tokenizer {
     }
     
     /**
+     * Check if the word is a web address. This means a email address or web page address.
+     * 
+     * @param word
+     *            the word that should be check. It can not be null and can not include any whitespace.
+     * @return true if it is a web address.
+     */
+    private boolean isWebAddress( String word ){
+        if( startWord >= sentence.length() ){
+            return false;
+        }
+        if( sentence.charAt( startWord ) == '@' ){
+            word += '@';
+            startWord = endWord;
+            endWord = words.next();
+            String domaine = sentence.substring( startWord, endWord ).trim();
+            if( domaine.length()>3 && domaine.indexOf( '.' ) > 0 ){
+                startWord = endWord;
+                endWord = words.next();
+                return true;
+            }
+            return false;
+        }
+        if( startWord + 3 < sentence.length() && sentence.charAt( startWord ) == ':' && sentence.charAt( startWord + 1 ) == '/' && sentence.charAt( startWord + 2 ) == '/' ) {
+            while(true){
+                String next = sentence.substring( startWord, endWord ).trim();
+                if( next.length() > 0 ){
+                    word += next;
+                    startWord = endWord;
+                    endWord = words.next();
+                } else {
+                    break;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+    
+    /**
      * Was the last invalid word the first word in a sentence.
+     * 
      * @return true if it was the first word.
      */
     boolean isFirstWordInSentence(){
