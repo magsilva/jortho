@@ -77,10 +77,12 @@ class Utils {
     
     /**
      * Check if the first character is a uppcase letter
-     * @param word the word that should be check.
+     * 
+     * @param word
+     *            the word that should be check. It can not be null.
      * @return true if the first character is a uppercase letter
      */
-    static boolean isCapitalized( String word ){
+    static boolean isCapitalized( String word ) {
         return (word.length() > 0) && Character.isUpperCase( word.charAt( 0 ) );
     }
 }
