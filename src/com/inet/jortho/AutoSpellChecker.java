@@ -139,7 +139,7 @@ class AutoSpellChecker implements DocumentListener, LanguageChangeListener {
             }
             checkElement( element );
             offset = element.getEndOffset();
-        }while( offset < end && offset < document.getLength() );
+        }while( offset <= end && offset < document.getLength() );
     }
 
     /**
@@ -156,7 +156,10 @@ class AutoSpellChecker implements DocumentListener, LanguageChangeListener {
             Highlight[] highlights = highlighter.getHighlights();
             for( int k = highlights.length; --k >= 0; ) {
                 Highlight highlight = highlights[k];
-                if( highlight.getStartOffset() >= i && highlight.getEndOffset() <= j ) {
+                int hlStartOffset = highlight.getStartOffset();
+                int hlEndOffset = highlight.getEndOffset();
+                if( (i <= hlStartOffset && hlStartOffset <= j) || 
+                    (i <= hlEndOffset && hlEndOffset <= j) ) {
                     highlighter.removeHighlight( highlight );
                 }
             }
