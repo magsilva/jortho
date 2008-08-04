@@ -119,11 +119,20 @@ class Tokenizer {
                     if(!exist && !options.isCaseSensitive()){
                         exist = dictionary.exist( Utils.getInvertedCapitalizion( word ) );
                     }else
-                    if(isFirstWordInSentence && !exist && Character.isUpperCase( word.charAt( 0 ) )){
+                    if( !exist && (isFirstWordInSentence || options.getIgnoreCapitalization()) && Character.isUpperCase( word.charAt( 0 ) ) ) {
                         // Uppercase check on starting of sentence
-                        String lowerWord = word.substring( 0, 1 ).toLowerCase() + word.substring( 1 );
-                        exist = dictionary.exist( lowerWord );
+                        String capitalizeWord = word.substring( 0, 1 ).toLowerCase() + word.substring( 1 );
+                        exist = dictionary.exist( capitalizeWord );
                     }
+                    
+                    if( !exist && options.isIgnoreAllCapsWords() && Utils.isAllCapitalized( word ) ){
+                        exist = true;
+                    }
+                    
+                    if( !exist && options.isIgnoreWordsWithNumbers() && Utils.isIncludeNumbers( word ) ){
+                        exist = true;
+                    }
+                    
                     if( !exist && !isWebAddress( word )) {
                         return word;
                     }

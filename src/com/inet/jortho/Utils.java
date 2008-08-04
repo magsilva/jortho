@@ -30,22 +30,24 @@ import java.util.*;
 class Utils {
 
     private static final ResourceBundle resource;
-    static{
-        resource = ResourceBundle.getBundle("com.inet.jortho.i18n.resource");
+    static {
+        resource = ResourceBundle.getBundle( "com.inet.jortho.i18n.resource" );
     }
-    
-    static String getResource(String value){
+
+    static String getResource( String value ) {
         try {
-            return resource.getString(value);
-        } catch (Exception e) {
+            return resource.getString( value );
+        } catch( Exception e ) {
             e.printStackTrace();
         }
         return value;
     }
-    
+
     /**
      * Create a String where the first letter is written with a uppercase.
-     * @param word the word that should be change
+     * 
+     * @param word
+     *            the word that should be change
      * @return the new String if needed
      */
     static String getCapitalized( String word ) {
@@ -54,7 +56,7 @@ class Utils {
         }
         return word;
     }
-    
+
     /**
      * Create a String with inverted case for the first letter. If it is lowercase then it will change to uppercase and
      * vice versa.
@@ -74,7 +76,7 @@ class Utils {
         }
         return word;
     }
-    
+
     /**
      * Check if the first character is a uppcase letter
      * 
@@ -82,7 +84,42 @@ class Utils {
      *            the word that should be check. It can not be null.
      * @return true if the first character is a uppercase letter
      */
-    static boolean isCapitalized( String word ) {
+    static boolean isFirstCapitalized( String word ) {
         return (word.length() > 0) && Character.isUpperCase( word.charAt( 0 ) );
+    }
+
+    /**
+     * Check if all letter are uppercase. Character that are not letters are ignored.
+     * 
+     * @param word
+     *            the word that should be check. It can not be null or empty.
+     * @return if all character are a uppercase letter
+     */
+    static boolean isAllCapitalized( String word ) {
+        for( int i = 0; i < word.length(); i++ ) {
+            char ch = word.charAt( i );
+
+            if( Character.isLetter( ch ) && !Character.isUpperCase( ch ) ) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Check if the word include a digit.
+     * 
+     * @param word
+     *            the word that should be check. It can not be null.
+     * @return if there is any number in the word.
+     */
+    static boolean isIncludeNumbers( String word ) {
+        for( int i = 0; i < word.length(); i++ ) {
+            char ch = word.charAt( i );
+            if( Character.isDigit( ch ) ) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -124,7 +124,7 @@ public class CheckerListener implements PopupMenuListener, LanguageChangeListene
                 //Disable then menu item if there are no suggestions
                 menu.setEnabled( list.size() > 0 );
 
-                boolean needCapitalization = tokenizer.isFirstWordInSentence() && Utils.isCapitalized( word );
+                boolean needCapitalization = tokenizer.isFirstWordInSentence() && Utils.isFirstCapitalized( word );
 
                 for( int i = 0; i < list.size() && i < options.getSuggestionsLimitMenu(); i++ ) {
                     Suggestion sugestion = list.get( i );

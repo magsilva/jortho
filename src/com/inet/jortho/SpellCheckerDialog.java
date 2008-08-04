@@ -217,7 +217,7 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
 
         List<Suggestion> list = dictionary.searchSuggestions( wordStr );
         
-        boolean needCapitalization = tok.isFirstWordInSentence() && Utils.isCapitalized( wordStr );
+        boolean needCapitalization = tok.isFirstWordInSentence() && Utils.isFirstCapitalized( wordStr );
 
         Vector<String> suggestionsVector = new Vector<String>();
         for( int i = 0; i < list.size() && i < options.getSuggestionsLimitDialog(); i++ ) {
