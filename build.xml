@@ -15,7 +15,7 @@
 	<target name="build" depends="javadoc">
 		<delete dir="temp"/>
 		<mkdir dir="temp"/>
-		<javac srcdir="src" destdir="temp">
+		<javac srcdir="src" destdir="temp" target="1.5">
 			<include name="com/inet/jortho/**/*.java"/>
 			<exclude name="**/*Test*.java"/>
 		</javac>
