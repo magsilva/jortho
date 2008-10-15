@@ -8,14 +8,14 @@
 				version="true"
 				use="true"
 				windowtitle="JOrtho - Java Spell Checker">
-			<bottom><![CDATA[<i>Copyright &#169; 2005 - 2007 i-net software. All Rights Reserved.</i>]]></bottom>
+			<bottom><![CDATA[<i>Copyright &#169; 2005 - 2008 i-net software. All Rights Reserved.</i>]]></bottom>
 		</javadoc>
 	</target>
 	
 	<target name="build" depends="javadoc">
 		<delete dir="temp"/>
 		<mkdir dir="temp"/>
-		<javac srcdir="src" destdir="temp" target="1.5">
+		<javac srcdir="src" destdir="temp" target="1.5" encoding="UTF8">
 			<include name="com/inet/jortho/**/*.java"/>
 			<exclude name="**/*Test*.java"/>
 		</javac>
