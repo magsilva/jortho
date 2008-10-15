@@ -27,6 +27,7 @@
 			<fileset dir="temp" includes="jortho.jar"/>
 			<fileset dir="." includes="doc/**/*.*"/>
 			<fileset dir="." includes="src/**/*.*" excludes="src/**/*Test*.java"/>
+			<fileset dir="." includes="src/com/inet/jorthotests/**/*.*"/>
 			<fileset dir="." includes="license.txt"/>
 			<zipfileset dir="www" includes="index.html" fullpath="manual.html"/>
 		</zip>
