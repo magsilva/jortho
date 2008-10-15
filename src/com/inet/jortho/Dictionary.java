@@ -212,11 +212,10 @@ final class Dictionary extends DictionaryBase{
     
     
     /**
-     * Erzeugt einen neuen Knoten am Ende des Arrays. 
-     * An die aktuelle idx Position wird der Zeiger geschrieben.
-     * Der Zeiger an der aktuelle idx Position muss 0 sein auﬂer
-     * eventuellen Wortende Flags (0x8000 bei idx+1)
-     * @return Zeiger auf neuen Knoten
+     * Create a new node at end of the array.
+     * On the current idx position is writing the pointer.
+     * The pointer on the current idx position must be 0 without some word end flags (0x8000 on idx+1)
+     * @return Pointer on new node.
      */
     private final int createNewNode() {
         checkSize(size+1);
