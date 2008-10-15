@@ -26,6 +26,7 @@ import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
@@ -41,7 +42,6 @@ import java.util.WeakHashMap;
 
 import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
-import javax.swing.ButtonModel;
 import javax.swing.JMenu;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
@@ -80,6 +80,11 @@ public class SpellChecker {
     private final static java.util.Map<LanguageChangeListener, Object> listeners = Collections.synchronizedMap( new WeakHashMap<LanguageChangeListener, Object>() );
     private static String applicationName;
     private static final SpellCheckerOptions globalOptions = new SpellCheckerOptions();
+    
+    /**
+     * Duplicate of Action.SELECTED_KEY since 1.6
+     */
+    static final String SELECTED_KEY = "SwingSelectedKey";
     
     /**
      * There is no instance needed of SpellChecker. All methods are static.
@@ -222,7 +227,6 @@ public class SpellChecker {
                 languages.remove( action );
                 languages.add( action );
                 if( locale.equals( activeLocale ) ) {
-                    action.setSelected( true );
                     action.actionPerformed( null );
                     activeSelected = true;
                 }
@@ -231,7 +235,6 @@ public class SpellChecker {
         // if nothing selected then select the first entry
         if( !activeSelected && languages.size() > 0 ) {
             LanguageAction action = languages.get( 0 );
-            action.setSelected( true );
             action.actionPerformed( null );
         }
         
@@ -493,12 +496,59 @@ public class SpellChecker {
             JRadioButtonMenuItem item = new JRadioButtonMenuItem( action );
             //Hack that all items of the action have the same state.
             //http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4133141
-            item.setModel( action.getButtonModel() );
+            item.setModel( new ActionToggleButtonModel(action) );
             menu.add( item );
             group.add( item );
         }
         
         return menu;
+    }
+    
+    private static class ActionToggleButtonModel extends JToggleButton.ToggleButtonModel{
+        private final LanguageAction action;
+        
+        ActionToggleButtonModel(LanguageAction action){
+            this.action = action;
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isSelected() {
+            return Boolean.TRUE.equals(action.getValue(SELECTED_KEY));
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void setSelected( boolean b ) {
+            // copy from super.setSelected
+            ButtonGroup group = getGroup();
+            if (group != null) {
+                // use the group model instead
+                group.setSelected(this, b);
+                b = group.isSelected(this);
+            }
+
+            if (isSelected() == b) {
+                return;
+            }
+
+            action.setSelected( b );
+
+            // Send ChangeEvent
+            fireStateChanged();
+
+            // Send ItemEvent
+            fireItemStateChanged(
+                    new ItemEvent(this,
+                                  ItemEvent.ITEM_STATE_CHANGED,
+                                  this,
+                                  this.isSelected() ?  ItemEvent.SELECTED : ItemEvent.DESELECTED));
+
+        }
     }
 
     /**
@@ -508,7 +558,8 @@ public class SpellChecker {
         
         private final URL baseURL;
         private final Locale locale;
-        private final ButtonModel model = new JToggleButton.ToggleButtonModel();
+        // the current active (selected) LanguageAction
+        private static LanguageAction currentAction;
         private String extension;
         
         LanguageAction(URL baseURL, Locale locale, String extension){
@@ -519,20 +570,20 @@ public class SpellChecker {
         }
 
         /**
-         * Get the shared ButtonModel.
-         */
-        ButtonModel getButtonModel() {
-            return model;
-        }
-
-        /**
          * Selects or deselects the menu item.
          * 
          * @param b
          *            true selects the menu item, false deselects the menu item.
          */
         public void setSelected( boolean b ) {
-            model.setSelected( b );
+            if( b ) {
+                // because there are some problems with multiple ButtonGroups that we duplicate some of the logic here
+                if( currentAction != null && currentAction != this ) {
+                    currentAction.setSelected( false );
+                }
+                currentAction = this;
+            }
+            putValue( SELECTED_KEY, Boolean.valueOf( b ) );
         }
 
         public void actionPerformed( ActionEvent ev ) {
@@ -542,6 +593,7 @@ public class SpellChecker {
                 return;
             }
             setEnabled( false );
+            setSelected( true );
             
             Thread thread = new Thread( new Runnable() {
                 public void run() {
