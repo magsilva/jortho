@@ -12,7 +12,13 @@
 		</javadoc>
 	</target>
 	
-	<target name="build" depends="javadoc">
+	<target name="build">
+		<antcall target="createJar"/>
+		<antcall target="createZip"/>
+	</target>
+	
+	
+	<target name="createJar" depends="javadoc">
 		<delete dir="temp"/>
 		<mkdir dir="temp"/>
 		<javac srcdir="src" destdir="temp" target="1.5" encoding="UTF8">
@@ -23,6 +29,10 @@
 			<fileset dir="temp"/>
 			<fileset dir="src" includes="com/inet/jortho/**/*.properties"/>
 		</jar>	
+	</target>
+	
+	
+	<target name="createZip">
 		<zip destfile="JOrtho.zip">
 			<fileset dir="temp" includes="jortho.jar"/>
 			<fileset dir="." includes="doc/**/*.*"/>
@@ -33,4 +43,13 @@
 		</zip>
 		<delete dir="temp"/>
 	</target>
+	
+	
+	<target name="buildsign" depends="javadoc">
+		<antcall target="createJar"/>
+		<ant antfile="buildsign.xml" target="sign_jar" />
+		<antcall target="createZip"/>
+	</target>
+	
+	
 </project>
