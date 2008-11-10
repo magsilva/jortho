@@ -182,7 +182,24 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
         tok = new Tokenizer( jTextComponent, dic, loc, options );
         
         if( searchNext() ){
-            setLocationRelativeTo( jTextComponent );
+            // if the JTextComponent is large and has a scrollpane then Java use the bounds
+            // and not the visible rect. This is bad
+            Container parent = jTextComponent;
+            while( parent != null && !(parent instanceof JScrollPane) ) {
+                if( parent instanceof JComponent ) {
+                    JComponent jcomp = (JComponent)parent;
+                    if( jcomp.getVisibleRect().height == jcomp.getBounds().height ) {
+                        break;
+                    }
+                }
+                if( parent.getParent() != null ) {
+                    parent = parent.getParent();
+                } else {
+                    break;
+                }
+            }
+            
+            setLocationRelativeTo( parent );
             setVisible( true );
         }
     }
