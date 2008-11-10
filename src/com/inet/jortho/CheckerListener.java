@@ -94,6 +94,13 @@ public class CheckerListener implements PopupMenuListener, LanguageChangeListene
                     // if the next character is a white space then use the word on the left site
                     offs--;
                 }
+                
+                if( offs < 0 ) {
+                    // occur if there nothing under the mouse pointer
+                    menu.setEnabled( false );
+                    return;
+                }
+                
                 // get the word from current position
                 final int begOffs = Utilities.getWordStart( jText, offs );
                 final int endOffs = Utilities.getWordEnd( jText, offs );
