@@ -166,7 +166,7 @@ class Tokenizer {
             return false;
         }
         if( startWord + 3 < sentence.length() && sentence.charAt( startWord ) == ':' && sentence.charAt( startWord + 1 ) == '/' && sentence.charAt( startWord + 2 ) == '/' ) {
-            while(true){
+            while(startWord < endWord){
                 String next = sentence.substring( startWord, endWord ).trim();
                 if( next.length() > 0 ){
                     word += next;
