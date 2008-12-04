@@ -29,13 +29,16 @@ import java.util.*;
  */
 class Utils {
 
-    private static final ResourceBundle resource;
-    static {
-        resource = ResourceBundle.getBundle( "com.inet.jortho.i18n.resource" );
-    }
-
+    /**
+     * Translate a GUI string in one of the supported languages. If the value was not find then the key is returned.
+     * 
+     * @param value
+     *            the key of the language resource.
+     * @return the translation result
+     */
     static String getResource( String value ) {
         try {
+            ResourceBundle resource = ResourceBundle.getBundle( "com.inet.jortho.i18n.resource" );
             return resource.getString( value );
         } catch( Exception e ) {
             e.printStackTrace();
