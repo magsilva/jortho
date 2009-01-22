@@ -405,9 +405,11 @@ public class SpellChecker {
     }
     
     /**
-     * Adds the LanguageChangeListener. You do not need to remove if the
-     * LanguageChangeListener is not needed anymore.
-     * @param listener listener to add
+     * Adds a LanguageChangeListener. You do not need to remove it if the LanguageChangeListener is not needed
+     * anymore. You need a hard reference to the listener because the SpellChecker hold only a WeakReference.
+     * 
+     * @param listener
+     *            listener to add
      * @see LanguageChangeListener
      */
     public static void addLanguageChangeLister(LanguageChangeListener listener){
