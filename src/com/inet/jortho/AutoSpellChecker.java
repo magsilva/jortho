@@ -69,12 +69,22 @@ class AutoSpellChecker implements DocumentListener, LanguageChangeListener {
             if(listener instanceof AutoSpellChecker){
                 AutoSpellChecker autoSpell = (AutoSpellChecker)listener;
                 doc.removeDocumentListener( autoSpell );
-                Highlighter highlighter = text.getHighlighter();
-                for( Highlight highlight : highlighter.getHighlights() ) {
-                    if( highlight.getPainter() == painter ){
-                        highlighter.removeHighlight( highlight );
-                    }
-                }
+                removeHighlights(text);
+            }
+        }
+    }
+
+    /**
+     * Remove all SpellChecker highlights from the given JTextComponent.
+     * 
+     * @param text
+     *            the JTextComponent
+     */
+	private static void removeHighlights( JTextComponent text ) {
+        Highlighter highlighter = text.getHighlighter();
+        for( Highlight highlight : highlighter.getHighlights() ) {
+            if( highlight.getPainter() == painter ) {
+                highlighter.removeHighlight( highlight );
             }
         }
     }
@@ -192,10 +202,15 @@ class AutoSpellChecker implements DocumentListener, LanguageChangeListener {
      * in the background step by step.
      */
     private void checkAll() {
-        if( dictionary == null || jText == null ) {
+        if( jText == null ) {
             //the needed objects does not exists
             return;
         }
+        if( dictionary == null ) {
+            removeHighlights( jText );
+            return;
+        }
+
         Thread thread = new Thread( new Runnable() {
             public void run() {
                 Document document = jText.getDocument();
