@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.swing.JComponent;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.event.PopupMenuEvent;
@@ -71,6 +72,11 @@ public class CheckerListener implements PopupMenuListener, LanguageChangeListene
     }
 
     public void popupMenuWillBecomeVisible( PopupMenuEvent ev ) {
+        if( SpellChecker.getCurrentDictionary() == null) {
+            menu.setEnabled( false );
+            return;
+        }
+
         JPopupMenu popup = (JPopupMenu)ev.getSource();
 
         Component invoker = popup.getInvoker();
@@ -104,7 +110,7 @@ public class CheckerListener implements PopupMenuListener, LanguageChangeListene
                 // get the word from current position
                 final int begOffs = Utilities.getWordStart( jText, offs );
                 final int endOffs = Utilities.getWordEnd( jText, offs );
-                String word = jText.getText( begOffs, endOffs - begOffs );
+                final String word = jText.getText( begOffs, endOffs - begOffs );
 
                 //find the first invalid word from current position
                 Tokenizer tokenizer = new Tokenizer( jText, dictionary, locale, offs, options );
@@ -152,6 +158,35 @@ public class CheckerListener implements PopupMenuListener, LanguageChangeListene
 
                     } );
                 }
+                
+                // Add the menu item "Add to Dictionary"
+                UserDictionaryProvider provider = SpellChecker.getUserDictionaryProvider();
+                if( provider == null ) {
+                    return;
+                }
+                JMenuItem addToDic = new JMenuItem( Utils.getResource( "addToDictionary" ) );
+                addToDic.addActionListener( new ActionListener() {
+
+                    public void actionPerformed( ActionEvent e ) {
+                        UserDictionaryProvider provider = SpellChecker.getUserDictionaryProvider();
+                        if( provider != null ) {
+                            provider.addWord( word );
+                        }
+                        dictionary.add( word );
+                        dictionary.trimToSize();
+                        AutoSpellChecker.refresh( jText );
+                    }
+
+                } );
+                if( list.size() > 0 ) {
+                    if( menu instanceof JMenu ) {
+                        ((JMenu)menu).addSeparator();
+                    } else if( menu instanceof JPopupMenu ) {
+                        ((JPopupMenu)menu).addSeparator();
+                    }
+                }
+                menu.add( addToDic );
+                menu.setEnabled( true );
             } catch( BadLocationException ex ) {
                 ex.printStackTrace();
             }
