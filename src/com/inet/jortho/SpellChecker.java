@@ -490,6 +490,21 @@ public class SpellChecker {
      * @return the new menu.
      */
     public static JMenu createLanguagesMenu(){
+        return createLanguagesMenu( null );
+    }
+    
+    /**
+     * Creates a menu item "Languages" (or the equivalent depending on the user language) with a sub-menu
+     * that lists all available dictionary languages. 
+     * You can use this to add this menu item to your own popup or to your menu bar.
+     * <code><pre>
+     * JPopupMenu popup = new JPopupMenu();
+     * popup.add( SpellChecker.createLanguagesMenu() );
+     * </pre></code>
+     * @param options override the default options for this menu.
+     * @return the new menu.
+     */
+    public static JMenu createLanguagesMenu(SpellCheckerOptions options){
         JMenu menu = new JMenu(Utils.getResource("languages"));
         ButtonGroup group = new ButtonGroup();
         menu.setEnabled( languages.size() > 0 );
@@ -503,13 +518,25 @@ public class SpellChecker {
             group.add( item );
         }
         
+        if(options == null ){
+            options = SpellChecker.getOptions();
+        }
+        
+        if(languages.size() > 0 && options.isLanguageDisableVisible()){
+        	menu.addSeparator();
+            JRadioButtonMenuItem item = new JRadioButtonMenuItem( DisableLanguageAction.instance );
+            item.setModel( new ActionToggleButtonModel(DisableLanguageAction.instance) );
+            menu.add( item );
+            group.add( item );
+        }
+        
         return menu;
     }
     
     private static class ActionToggleButtonModel extends JToggleButton.ToggleButtonModel{
-        private final LanguageAction action;
+        private final AbtsractLanguageAction action;
         
-        ActionToggleButtonModel(LanguageAction action){
+        ActionToggleButtonModel(AbtsractLanguageAction action){
             this.action = action;
         }
         
@@ -552,23 +579,18 @@ public class SpellChecker {
 
         }
     }
-
+    
     /**
-     * Action for change the current dictionary language.
+     * Base class for languages change actions. This class has a static state to solv
+     * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4133141
      */
-    private static class LanguageAction extends AbstractAction implements Comparable<LanguageAction>{
+    private static abstract class AbtsractLanguageAction extends AbstractAction{
         
-        private final URL baseURL;
-        private final Locale locale;
         // the current active (selected) LanguageAction
-        private static LanguageAction currentAction;
-        private String extension;
+        private static AbtsractLanguageAction currentAction;
         
-        LanguageAction(URL baseURL, Locale locale, String extension){
-            super( locale.getDisplayLanguage() );
-            this.baseURL = baseURL;
-            this.locale = locale;
-            this.extension = extension;
+        public AbtsractLanguageAction( String name ) {
+            super(name);
         }
 
         /**
@@ -586,6 +608,53 @@ public class SpellChecker {
                 currentAction = this;
             }
             putValue( SELECTED_KEY, Boolean.valueOf( b ) );
+        }
+
+    }
+
+    /**
+     * Action for disable all dictionary language.
+     */
+    private static class DisableLanguageAction extends AbtsractLanguageAction{
+    	static DisableLanguageAction instance = new DisableLanguageAction();
+
+        private DisableLanguageAction() {
+            super(Utils.getResource("disable"));
+        }
+        
+        public void actionPerformed( ActionEvent ev ) {
+            if( !isEnabled() ) {
+                //because multiple MenuItems share the same action that
+                //also the event occur multiple time
+                return;
+            }
+            setEnabled( false );
+            setSelected( true );
+            try {
+                currentDictionary = null;
+                Locale oldLocale = currentLocale;
+                currentLocale = null;
+                fireLanguageChanged( oldLocale );
+            } finally {
+                setEnabled( true );
+            }
+        }
+    }
+    
+    /**
+     * Action for change the current dictionary language.
+     */
+    private static class LanguageAction extends AbtsractLanguageAction implements Comparable<LanguageAction>{
+        
+        private final URL baseURL;
+        private final Locale locale;
+        private String extension;
+        
+        LanguageAction(URL baseURL, Locale locale, String extension){
+            super( locale.getDisplayLanguage() );
+            this.baseURL = baseURL;
+            this.locale = locale;
+            this.extension = extension;
         }
 
         public void actionPerformed( ActionEvent ev ) {

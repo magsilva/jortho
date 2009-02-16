@@ -42,6 +42,8 @@ public class SpellCheckerOptions {
 
     private boolean ignoreNumbers          = false;
 
+    private boolean languageDisableVisible = false;
+
     /**
      * Create SpellCheckerOptions with default values.
      */
@@ -163,5 +165,24 @@ public class SpellCheckerOptions {
      */
     public boolean isIgnoreWordsWithNumbers() {
         return ignoreNumbers;
+    }
+    
+    /**
+     * Set if the disbale menu item visble in the language menu. The default is false.
+     * 
+     * @param visible
+     *            the new value
+     */
+    public void setLanguageDisableVisible( boolean visible ) {
+        languageDisableVisible = visible;
+    }
+
+    /**
+     * If in the language menu the menu item disable visible.
+     * 
+     * @return true, if visible
+     */
+    public boolean isLanguageDisableVisible() {
+        return languageDisableVisible;
     }
 }
