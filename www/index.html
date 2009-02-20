@@ -64,6 +64,14 @@ ul {
 	margin-left: 70px;
 }
 
+.red{
+	color: #FF0000;
+}
+
+		.style1 {
+	font-weight: normal;
+}
+
 		</style>
 		
 	</head>
@@ -87,6 +95,7 @@ ul {
 					<li><a href="#download">Download</a></li>
 					<li><a href="#license">Licensing</a></li>
 					<li><a href="#faq">FAQ</a></li>
+					<li><a href="#dictionaries">Creating Dictionaries</a></li>
 					<li><a href="#changes">Changes</a></li>
 				</ul>
 
@@ -183,6 +192,25 @@ ul {
 					<p class="style2">JOrtho is an Open Source project of <em>
 					<a href="http://www.inetsoftware.de">i-net software</a></em></p>
                 </blockquote>
+<h2><a name="dictionaries">Creating Dictionaries</a></h2>
+<p><strong>File Format</strong></p>
+<p>The dictionaries files are a list of words. Every word is saved in a separate line. The word list is saved in UTF8 encoding. The resulting file is compressed with gzip.</p>
+<p><strong>Generate dictionaries from Wiktionary</strong></p>
+<p>The dictionaries are based on the Wiktionary dictionaries. This is a step by step description how you can generate a new dictionary version.</p>
+<ol>
+	<li>Download the data from Wiktionary. The file for the English language is http://download.wikimedia.org/<span class="red"><strong>en</strong></span>wiktionary/latest/<span class="red"><strong>en</strong></span>wiktionary-latest-pages-articles.xml.bz2  
+	Replace the red part with your language. Some languages also require the data of the English Wiktionary (currently Polish and Arabic)</li>
+	<li>Extract the XML file from the archive</li>
+	<li>Download or check out the sources of JOrtho and compile it.</li>
+	<li>Execute the command<br />
+		<code>java -Xmx256M com.inet.jorthodictionaries.BookGenerator </code> <span class="red">
+	<strong class="style1"><code>en</code></strong></span><code> 
+	&lt;wiktionary folder&gt;</code><br />
+	Replace the red part with your language. </li>
+</ol>
+
+
+                
 					<h2><a name="changes">Changes</a></h2>
 					
                   <h3>Changes in Version 0.1 (2007-12-13)</h3>
