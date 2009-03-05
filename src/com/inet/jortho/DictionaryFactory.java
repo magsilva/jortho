@@ -112,6 +112,7 @@ class DictionaryFactory {
             }
             word = input.readLine();
         }
+        input.close();
     }
     
     

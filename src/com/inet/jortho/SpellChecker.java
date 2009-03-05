@@ -684,6 +684,7 @@ public class SpellChecker {
                         }
                         Locale oldLocale = locale;
                         currentDictionary = factory.create();
+                        factory = null; // make memory faster free
                         currentLocale = locale;
                         fireLanguageChanged( oldLocale );
                     } finally {
