@@ -78,7 +78,7 @@ public class BookGenerator_de extends BookGenerator {
         }
         while(idx > 0){
             //Flextionen der Verben ermitteln
-            String table = getTable( word, wikiText, "Verb-Tabelle", idx);
+            String table = getTable( wikiText, "Verb-Tabelle", idx );
             if(table.length() > 0 && searchWordAndAdd( word, table, "Gegenwart_ich=", 0)){
                 searchWordAndAdd( word, table, "Gegenwart_du=", 0);
                 searchWordAndAdd( word, table, "Gegenwart_er, sie, es=", 0);
@@ -121,8 +121,8 @@ public class BookGenerator_de extends BookGenerator {
             idx = wikiText.indexOf("{{Wortart|Adjektiv|Deutsch}}");
         }
         while(idx > 0){
-            // Konjugation der Substantive ermitteln 
-            String table = getTable( word, wikiText, "Adjektiv-Tabelle", idx);
+            // Konjugation der Adjektive ermitteln 
+            String table = getTable( wikiText, "Adjektiv-Tabelle", idx);
             if(table.length() > 0 && searchWordAndAdd( word, table, "Grundform=", 0)){
                 searchWordAndAdd( word, table, "1. Steigerung=", 0);
                 searchWordAndAdd( word, table, "2. Steigerung=", 0);
@@ -144,7 +144,7 @@ public class BookGenerator_de extends BookGenerator {
     /**
      * Liefert einen Substring mit der aktuellen Konjugation/Flektion Tabelle des Wikitextes
      */
-    private String getTable(String baseWord, String wikiText, String tableName, int fromIndex){
+    private String getTable( String wikiText, String tableName, int fromIndex ){
         int start = wikiText.indexOf( "{{" + tableName, fromIndex);
         if(start > 0){
             final int length = wikiText.length();
@@ -508,14 +508,14 @@ public class BookGenerator_de extends BookGenerator {
     }
 
     /**
-     * Implemantation of the template http://de.wiktionary.org/wiki/Vorlage:Deutsch_Substantiv_f_stark
+     * Implementation of the template http://de.wiktionary.org/wiki/Vorlage:Deutsch_Substantiv_f_stark
      */
     private boolean addDeklinationSubstFStark( String wikiText, int fromIndex ) {
         Properties props = parseRule( wikiText, "Deutsch Substantiv m schwach 1", fromIndex );
         if( props == null ) {
             return false;
         }
-        String singular = props.getProperty( "SINGULAR", "" );
+        //String singular = props.getProperty( "SINGULAR", "" );
         String plural = props.getProperty( "PLURAL", "" );
         String pluralN = props.getProperty( "PLURAL AUF N?", "" );
         if( plural.length() > 0 ) {
