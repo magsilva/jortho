@@ -31,7 +31,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
+import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -77,6 +77,7 @@ public class SpellChecker {
     private static Dictionary currentDictionary;
     private static Locale currentLocale;
     private static UserDictionaryProvider userDictionaryProvider;
+    private static CustomDictionaryProvider customDictionaryProvider;
     private final static java.util.Map<LanguageChangeListener, Object> listeners = Collections.synchronizedMap( new WeakHashMap<LanguageChangeListener, Object>() );
     private static String applicationName;
     private static final SpellCheckerOptions globalOptions = new SpellCheckerOptions();
@@ -96,6 +97,7 @@ public class SpellChecker {
      * This method must be called before {@link #registerDictionaries(URL, String, String)}.
      * 
      * @param userDictionaryProvider the new UserDictionaryProvider or null
+     * @see #setCustomDictionaryProvider(CustomDictionaryProvider)
      * @see #getUserDictionaryProvider()
      * @see #registerDictionaries(URL, String, String)
      */
@@ -108,8 +110,29 @@ public class SpellChecker {
      * 
      * @see #setUserDictionaryProvider(UserDictionaryProvider)
      */
-    static UserDictionaryProvider getUserDictionaryProvider() {
+    public static UserDictionaryProvider getUserDictionaryProvider() {
         return SpellChecker.userDictionaryProvider;
+    }
+    
+    /**
+     * Set a CustomDictionaryProvider. This can be used to add an expert dictionary
+     * like a medical dictionary or a chemical dictionary. 
+     * 
+     * @param customDictionaryProvider the new CustomDictionaryProvider or null
+     * @see #setUserDictionaryProvider(UserDictionaryProvider)
+     * @see #registerDictionaries(URL, String, String)
+     */
+    public static void setCustomDictionaryProvider( CustomDictionaryProvider customDictionaryProvider ) {
+        SpellChecker.customDictionaryProvider = customDictionaryProvider;
+    }
+    
+    /**
+     * Gets the currently set CustomDictionaryProvider. If none has been set then null is returned.
+     * 
+     * @see #setCustomDictionaryProvider(CustomDictionaryProvider)
+     */
+    public static CustomDictionaryProvider getCustomDictionaryProvider() {
+        return SpellChecker.customDictionaryProvider;
     }
     
     /**
@@ -672,11 +695,18 @@ public class SpellChecker {
                         DictionaryFactory factory = new DictionaryFactory();
                         try {
                             factory.loadWordList( new URL( baseURL, "dictionary_" + locale + extension ) );
-                            UserDictionaryProvider provider = userDictionaryProvider;
+                            CustomDictionaryProvider provider = userDictionaryProvider;
                             if( provider != null ) {
-                                String userWords = provider.getUserWords( locale );
+                                Reader userWords = provider.getWords( locale );
                                 if( userWords != null ) {
-                                    factory.loadPlainWordList( new StringReader( userWords ) );
+                                    factory.loadPlainWordList( userWords );
+                                }
+                            }
+                            provider = customDictionaryProvider;
+                            if( provider != null ) {
+                                Reader userWords = provider.getWords( locale );
+                                if( userWords != null ) {
+                                    factory.loadPlainWordList( userWords );
                                 }
                             }
                         } catch( Exception ex ) {

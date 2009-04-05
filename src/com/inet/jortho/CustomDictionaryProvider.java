@@ -1,7 +1,7 @@
 /*
  *  JOrtho
  *
- *  Copyright (C) 2005-2008 by i-net software
+ *  Copyright (C) 2005-2009 by i-net software
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License as 
@@ -18,31 +18,29 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
  *  USA.
  *  
- *  Created on 10.12.2007
+ * Created on 04.04.2009
  */
 package com.inet.jortho;
 
+import java.io.Reader;
+import java.util.Locale;
+
+
+
 /**
- * Interface to be implemented by a user dictionary. Adding a new word via {@link #addWord(String)} must
- * trigger a storing of the dictionary.
- * 
+ * Interface to be implemented by an additional dictionary. This can be used to add an expert
+ * dictionary like a medical dictionary or a chemical dictionary.
  * @author Volker Berlin
  */
-public interface UserDictionaryProvider extends CustomDictionaryProvider{
+public interface CustomDictionaryProvider{
 
     /**
-     * Adds a new word to the current user dictionary. The implementor must save this word in its own backend.
+     * Gets the list of custom words for this locale. The implementation can decide if there is a
+     * custom dictionary for each available language or only one. This method is called before the
+     * language change event is fired if the language is changed and the dictionary is loaded.
      * 
-     * @param word the new word.
+     * @param locale The locale of the selected language.
+     * @return A list of words delimited with line breaks. It can be null.
      */
-    void addWord( String word );
-
-    /**
-     * Set a completely new word list
-     * 
-     * @param wordList
-     *            the new word list. Can be empty but not null.
-     */
-    void setUserWords( String wordList );
-
+    Reader getWords(Locale locale);
 }

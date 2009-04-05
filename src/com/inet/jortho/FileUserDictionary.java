@@ -82,19 +82,11 @@ public class FileUserDictionary implements UserDictionaryProvider{
     /**
      * {@inheritDoc}
      */
-    public String getUserWords(Locale locale){
+    public Reader getWords(Locale locale){
         file = new File(fileBase + "UserDictionary_" + locale + ".txt" );
         try{
             FileInputStream input = new FileInputStream(file);
-            Reader reader = new InputStreamReader( input, "UTF8" );
-            StringBuilder builder = new StringBuilder();
-            char[] buffer = new char[4096];
-            int count;
-            while( (count = reader.read(buffer)) > 0 ){
-                builder.append( buffer, 0, count );
-            }
-            reader.close();
-            return builder.toString();
+            return new InputStreamReader( input, "UTF8" );
         }catch(IOException ex){
             /* ignore FileNotFound */
         }

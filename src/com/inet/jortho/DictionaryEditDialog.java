@@ -31,7 +31,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.Reader;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -104,9 +104,9 @@ class DictionaryEditDialog extends JDialog{
         try{
             UserDictionaryProvider provider = SpellChecker.getUserDictionaryProvider();
             if( provider != null ) {
-                String userWords = provider.getUserWords( SpellChecker.getCurrentLocale() );
+                Reader userWords = provider.getWords( SpellChecker.getCurrentLocale() );
                 if( userWords != null ) {
-                    BufferedReader input = new BufferedReader( new StringReader( userWords ) );
+                    BufferedReader input = new BufferedReader( userWords );
                     ArrayList<String> wordList = new ArrayList<String>();
                     String word = input.readLine();
                     while( word != null ) {
