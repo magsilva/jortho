@@ -23,6 +23,8 @@
 package com.inet.jorthodictionaries;
 
 import java.io.*;
+import java.lang.reflect.*;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.zip.*;
@@ -85,16 +87,6 @@ public abstract class BookGenerator {
         System.out.println("=== Start Parsing XML stream ===");
         new Parser(this, stream);
 
-        String statistics = "";
-        statistics += "Total Wiktionary Title count:"+book.getTitleCount()+"\n";
-        statistics += "Language Title count:"+book.getLanguageTitleCount()+"\n";
-        statistics += "Word count in dictionary:"+book.getWordCount()+"\n";
-        statistics += "Char count in dictionary:"+book.getCharCount()+"\n";
-        System.out.println(statistics);
-        FileOutputStream out = new FileOutputStream("statistics.txt");
-        out.write( statistics.getBytes() );
-        out.close();
-        
         stream.close();
     }
     
@@ -122,7 +114,42 @@ public abstract class BookGenerator {
         }
         //ps.close();
         dictPs.close();
-        System.out.println("Dictionary size on disk (bytes):" + dictFile.length());
+        saveStatistics(dictFile);
+    }
+    
+    /**
+     * Create statistics data and save it in statistics.txt
+     * @param dictFile the created ortho file.
+     * @throws Exception if an error occur
+     */
+    private final void saveStatistics(File dictFile) throws Exception{
+        String statistics = "";
+        statistics += "Total Wiktionary Title count: "+book.getTitleCount()+"\r\n";
+        statistics += "Language Title count: "+book.getLanguageTitleCount()+"\r\n";
+        statistics += "Word count in dictionary: "+book.getWordCount()+"\r\n";
+        statistics += "Char count in dictionary: "+book.getCharCount()+"\r\n";
+        statistics += "Dictionary size on disk (bytes): " + dictFile.length()+"\r\n";
+        
+        // we use reflection, because the methods are not public and should not be public
+        Class clazz = Class.forName("com.inet.jortho.DictionaryFactory");
+        Constructor constructor = clazz.getConstructor();
+        constructor.setAccessible(true);
+        Object factory = constructor.newInstance();
+        Method loadWordList = clazz.getDeclaredMethod( "loadWordList", URL.class );
+        loadWordList.setAccessible(true);
+        loadWordList.invoke(factory, dictFile.toURL());
+        Method create = clazz.getDeclaredMethod( "create" );
+        create.setAccessible(true);
+        Object dictionary = create.invoke( factory );
+        Method getDataSize = dictionary.getClass().getDeclaredMethod( "getDataSize" );
+        getDataSize.setAccessible(true);
+        Integer size = (Integer)getDataSize.invoke( dictionary );
+        statistics += "Dictionary size in memory (bytes): " + size+"\r\n";
+        
+        System.out.println(statistics);
+        FileOutputStream out = new FileOutputStream("statistics.txt");
+        out.write( statistics.getBytes() );
+        out.close();
     }
     
     /**
@@ -177,10 +204,10 @@ public abstract class BookGenerator {
     
     
     /**
-     * Prüft ob es sich um ein gültiges Word handelt. Damit können bestimmte Hilfsthemen 
+     * Prï¿½ft ob es sich um ein gï¿½ltiges Word handelt. Damit kï¿½nnen bestimmte Hilfsthemen 
      * und Phrasen ausgeschlossen werden.
-     * @param word zu prüfendes Wort, darf nicht null sein
-     * @return true wenn es ein gültiges Wort ist.
+     * @param word zu prï¿½fendes Wort, darf nicht null sein
+     * @return true wenn es ein gï¿½ltiges Wort ist.
      */
     protected boolean isValidWord(String word){
         final int length = word.length();
@@ -208,7 +235,7 @@ public abstract class BookGenerator {
     
     
     /**
-     * Fügt ein Wort zum Tree hinzu.
+     * Fï¿½gt ein Wort zum Tree hinzu.
      * @param word darf nicht null sein.
      */
     final protected void addWord(String word){
