@@ -158,7 +158,7 @@ class DictionaryFactory {
     
     /**
      * Check the size of the array and resize it if needed.
-     * @param newSize the requied size
+     * @param newSize the required size
      */
     final void checkSize(int newSize){
         if(newSize > tree.length){
@@ -225,7 +225,7 @@ class DictionaryFactory {
     }
     
     /**
-     * Descript a single charchter in the Dictionary tree.
+     * Described a single character in the Dictionary tree.
      */
     private final static class NodeEntry{
         final char c;
