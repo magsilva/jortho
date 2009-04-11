@@ -42,7 +42,9 @@ public class BookGenerator_de extends BookGenerator {
     
     @Override
     boolean isValidLanguage(String word, String wikiText) {       
-        if(wikiText.indexOf("{{Sprache|Deutsch}}") < 0){
+        wikiText = removeHtmlFormating(wikiText);
+        int idxGerman = wikiText.indexOf("{{Sprache|Deutsch}}");
+        if( idxGerman < 0){
             
             /*
             if(wikiText.indexOf("{{Sprache|") >= 0){
@@ -60,24 +62,32 @@ public class BookGenerator_de extends BookGenerator {
             if(wikiText.toUpperCase().indexOf("#REDIRECT") >= 0){
                 return false;
             }*/
-            int idx = findTemplate( wikiText, "Deklinationsseite Adjektiv", 0);
-            if(idx >= 0){
-                addDeklinationAdjektiv(wikiText, idx);
-                // Die Deklinations sind valid, das Lema (Wort) aber nicht.
+            Properties props = parseRule(wikiText,"Deklinationsseite Adjektiv", 0);
+            if(props != null){
+                addDeklinationAdjektiv(props);
+                // The declinations are valid, but the lemma (word) not.
                 return false;
             }
             
             return false;
         }
-
-        wikiText = removeHtmlFormating(wikiText);
-        
+        do{
+            String chapter = getChapter(wikiText, idxGerman);
+            searchFlexion( word, chapter );
+            idxGerman = wikiText.indexOf(chapter) + chapter.length();
+            //should not occur but it occur
+            idxGerman = wikiText.indexOf("{{Sprache|Deutsch}}", idxGerman );
+        }while(idxGerman > 0);
+        return true;
+    }
+    
+    private final void searchFlexion( String word, String wikiText ){
         int idx = wikiText.indexOf("{{Wortart|Verb}}");
         if(idx <0){
             idx = wikiText.indexOf("{{Wortart|Verb|Deutsch}}");
         }
         while(idx > 0){
-            //Flextionen der Verben ermitteln
+            //ascertain flexion of the verbs
             String table = getTable( wikiText, "Verb-Tabelle", idx );
             if(table.length() > 0 && searchWordAndAdd( word, table, "Gegenwart_ich=", 0)){
                 searchWordAndAdd( word, table, "Gegenwart_du=", 0);
@@ -101,11 +111,12 @@ public class BookGenerator_de extends BookGenerator {
             idx = wikiText.indexOf("{{Wortart|Substantiv|Deutsch}}");
         }
         while(idx > 0){
-            if( !addDeklinationSubstTable( wikiText, idx, word ) && 
-                            !addDeklinationSubstM_NStart( wikiText, idx ) &&
-                            !addDeklinationSubstMSchwach1( wikiText, idx ) &&
-                            !addDeklinationSubstMSchwach3( wikiText, idx ) &&
-                            !addDeklinationSubstFStark( wikiText, idx ) ){
+            String chapter = getChapter(wikiText, idx);
+            if( !addDeklinationSubstTable( chapter, 0, word ) && 
+                            !addDeklinationSubstM_NStart( chapter, 0 ) &&
+                            !addDeklinationSubstMSchwach1( chapter, 0 ) &&
+                            !addDeklinationSubstMSchwach3( chapter, 0 ) &&
+                            !addDeklinationSubstFStark( chapter, 0 ) ){
                 // no Deklination found
             }
             int lastIdx = idx+1;
@@ -121,11 +132,21 @@ public class BookGenerator_de extends BookGenerator {
             idx = wikiText.indexOf("{{Wortart|Adjektiv|Deutsch}}");
         }
         while(idx > 0){
-            // Konjugation der Adjektive ermitteln 
-            String table = getTable( wikiText, "Adjektiv-Tabelle", idx);
-            if(table.length() > 0 && searchWordAndAdd( word, table, "Grundform=", 0)){
-                searchWordAndAdd( word, table, "1. Steigerung=", 0);
-                searchWordAndAdd( word, table, "2. Steigerung=", 0);
+            // finding the conjugation of the Adjective 
+            Properties props = parseRule( wikiText, "Adjektiv-Tabelle", idx);
+            if(props == null){
+                props = parseRule( wikiText, "Adjektiv-Tabelle (Deklination)", idx);
+            }
+            if(props == null){
+                props = parseRule( wikiText, "Adjektiv-Tabelle (Bild)", idx);
+            }
+            if(props == null){
+                props = parseRule( wikiText, "Adjektiv-Tabelle (Bild) (Deklination)", idx);
+            }
+            if(props != null){                
+                addFormatedWordPhrase(word, "Grundform", props.getProperty( "Grundform" ) );
+                addFormatedWordPhrase(word, "1. Steigerung", props.getProperty( "1. Steigerung" ) );
+                addFormatedWordPhrase(word, "2. Steigerung", props.getProperty( "2. Steigerung" ) );
             }
             int lastIdx = idx+1;
             idx = wikiText.indexOf("{{Wortart|Adjektiv}}", lastIdx);
@@ -137,8 +158,46 @@ public class BookGenerator_de extends BookGenerator {
         searchExtendsWords( word, wikiText, "{{Synonyme}}" );
         searchExtendsWords( word, wikiText, "{{Unterbegriffe}}" );
         searchExtendsWords( word, wikiText, "{{Abgeleitete Begriffe}}" );
-        
-        return true;
+    }
+    
+    /**
+     * Get the chapter on the current position. If a next chapter line is not find
+     * then the completely wikiText is return.
+     * @param wikiText
+     * @param headerIdx position in the header line
+     * @return a chapter or all text.
+     */
+    private String getChapter(String wikiText, int headerIdx){
+        int startIdx = wikiText.lastIndexOf('\n', headerIdx) + 1;
+        int endIdx = wikiText.indexOf('\n', headerIdx);
+        if(endIdx == -1){
+            return wikiText.substring(startIdx);
+        }
+        String header = wikiText.substring(startIdx, endIdx).trim();
+        int prefixSize = 0;
+        while(header.length() > prefixSize && header.charAt(prefixSize) == '='){
+            prefixSize++;
+        }
+        if(prefixSize == 0){
+            return wikiText.substring(startIdx);
+        }
+        String marker = header.substring(0,prefixSize);
+        if(!header.endsWith(marker)){
+            return wikiText.substring(startIdx);
+        }
+
+        Pattern pattern = Pattern.compile( "^" + marker + "[^=].*[^=]" + marker + "\\s*$", Pattern.MULTILINE );
+        Matcher matcher = pattern.matcher( wikiText );
+
+        if( matcher.find( endIdx ) ) {
+            String chapter = wikiText.substring(startIdx, matcher.start() ).trim();
+            if(header.equals(chapter)){
+                return wikiText.substring(startIdx); //there is some things wrong in the structure
+            }
+            return chapter;
+        }
+            
+        return wikiText.substring(startIdx);
     }
     
     /**
@@ -181,32 +240,8 @@ public class BookGenerator_de extends BookGenerator {
             int idx2 = indexOf( wikiText, new char[]{'|', '<', '}'}, idx1);
             if(idx2>0){
                 String word = wikiText.substring( idx1, idx2).trim();
-                if(word.length() <= 1){
-                    //leerer Eintrag
-                    return false;
-                }
-                if(word.endsWith("!")){
-                    word = word.substring(0, word.length()-1);
-                }
-                int idx3 = word.indexOf("(");
-                int idx4 = word.indexOf( ")", idx3 );
-                if(idx3>=0 && idx4>0){
-                    String word1 = word.substring(0, idx3);
-                    String word2 = word.substring(idx4+1);
-                    String word3 = word1 + word2;
-                    if(addWordPhrase(word3)){
-                        addWordPhrase(word1 + word.substring( idx3+1, idx4) + word2);
-                        return true;
-                    }else{
-                        System.out.println("Invalid Word '" + word + "' for marker '" + marker + "' for base word '" + baseWord + "'");
-                    }
-                }else{
-                    if(addWordPhrase(word)){
-                        return true;
-                    }else{
-                        System.out.println("Invalid Word '" + word + "' for marker '" + marker + "' for base word '" + baseWord + "'");
-                    }
-                }
+                addFormatedWordPhrase( baseWord, marker, word );
+                return true;
             }else{
                 System.out.println("End not find for marker '" + marker + "' for base word '" + baseWord + "'");
             }
@@ -246,6 +281,48 @@ public class BookGenerator_de extends BookGenerator {
         return false;
     }
     
+    /**
+     * Add a formated word phrase like it used in some format tables.
+     * @param baseWord the lemma word, for debugging
+     * @param key the key of the format table, for debugging
+     * @param phrase the word or phrase, can also be null or empty
+     */
+    private final void addFormatedWordPhrase( String baseWord, String key, String phrase ){
+        if( phrase == null ) {
+            return;
+        }
+        if( phrase.endsWith( "!" ) ) {
+            phrase = phrase.substring( 0, phrase.length() - 1 );
+        }
+        if( phrase.length() <= 1 ) {
+            //empty Entry
+            return;
+        }
+        if( phrase.equals( "{{fehlend}}" ) || phrase.equals( "---" ) || phrase.equals( "--" ) ) {
+            return;
+        }
+        int idx3 = phrase.indexOf( "(" );
+        int idx4 = phrase.indexOf( ")", idx3 );
+        if( idx3 >= 0 && idx4 > 0 ) {
+            String word1 = phrase.substring( 0, idx3 );
+            String word2 = phrase.substring( idx4 + 1 );
+            String word3 = word1.length() + word2.length() > 0 ? word1 + word2 : phrase.substring( idx3 + 1, idx4 );
+            if( addWordPhrase( word3 ) ) {
+                addWordPhrase( word1 + phrase.substring( idx3 + 1, idx4 ) + word2 );
+                return;
+            } else {
+                System.out.println( "Invalid Word '" + phrase + "' for marker '" + key + "' for base word '"
+                                + baseWord + "'" );
+            }
+        } else {
+            if( addWordPhrase( phrase ) ) {
+                return;
+            } else {
+                System.out.println( "Invalid Word '" + phrase + "' for marker '" + key + "' for base word '"
+                                + baseWord + "'" );
+            }
+        }
+    }
     
     /**
      * Substantive sind alle mit Artikel abgelegt und einige Verben zerfallen bei der Konjugation 
@@ -267,63 +344,33 @@ public class BookGenerator_de extends BookGenerator {
     }
 
     /**
-     * Implemantation of the template http://de.wiktionary.org/wiki/Vorlage:Deklinationsseite_Adjektiv
+     * Implementation of the template http://de.wiktionary.org/wiki/Vorlage:Deklinationsseite_Adjektiv
      * A sample can see at http://de.wiktionary.org/w/index.php?title=hoch_%28Deklination%29&action=edit
      * @param wikiText
      * @param idx
      */
-    private void addDeklinationAdjektiv( String wikiText, int idx ) {
-        int idx1 = wikiText.indexOf( "Positiv-Stamm=", idx );
-        if( idx1 > 0 ) {
-            idx1 += "Positiv-Stamm=".length();
-            int idx2 = indexOf( wikiText, new char[] { '|', '<', '}' }, idx1 );
-            if( idx2 > 0 ) {
-                String word = wikiText.substring( idx1, idx2 ).trim();
-                if( word.length() > 1 ) {
-                    addWord( word + "e" );
-                    addWord( word + "er" );
-                    addWord( word + "es" );
-                    addWord( word + "en" );
-                    addWord( word + "em" );
-                }
-            }
-        }
-        
-        idx1 = wikiText.indexOf( "Komparativ-Stamm=", idx );
-        if( idx1 > 0 ) {
-            idx1 += "Komparativ-Stamm=".length();
-            int idx2 = indexOf( wikiText, new char[] { '|', '<', '}' }, idx1 );
-            if( idx2 > 0 ) {
-                String word = wikiText.substring( idx1, idx2 ).trim();
-                if( word.length() > 1 ) {
-                    addWord( word + "e" );
-                    addWord( word + "er" );
-                    addWord( word + "es" );
-                    addWord( word + "en" );
-                    addWord( word + "em" );
-                }
-            }
-        }
-        
-        idx1 = wikiText.indexOf( "Superlativ-Stamm=", idx );
-        if( idx1 > 0 ) {
-            idx1 += "Superlativ-Stamm=".length();
-            int idx2 = indexOf( wikiText, new char[] { '|', '<', '}' }, idx1 );
-            if( idx2 > 0 ) {
-                String word = wikiText.substring( idx1, idx2 ).trim();
-                if( word.length() > 1 ) {
-                    addWord( word + "e" );
-                    addWord( word + "er" );
-                    addWord( word + "es" );
-                    addWord( word + "en" );
-                    addWord( word + "em" );
-                }
-            }
+    private void addDeklinationAdjektiv( Properties props ) {
+        addDeklinationAdjektiv( props.getProperty("Positiv-Stamm") );
+        addDeklinationAdjektiv( props.getProperty("Komparativ-Stamm") );
+        addDeklinationAdjektiv( props.getProperty("Superlativ-Stamm") );
+    }
+    
+    /**
+     * Add the Adjective Declination for the given word root.
+     * @param wordStamm the word root, can be null
+     */
+    private void addDeklinationAdjektiv( String wordStamm ) {
+        if( wordStamm != null && wordStamm.length() > 1 ) {
+            addWord( wordStamm + "e" ); 
+            addWord( wordStamm + "er" );
+            addWord( wordStamm + "es" );
+            addWord( wordStamm + "en" );
+            addWord( wordStamm + "em" );
         }
     }
     
     /**
-     * Implemantation of the templates
+     * Implementation of the templates
      * http://de.wiktionary.org/wiki/Vorlage:Substantiv-Tabelle
      * http://de.wiktionary.org/wiki/Vorlage:Substantiv-Tabelle_(2_Pluralformen)
      * http://de.wiktionary.org/wiki/Vorlage:Substantiv-Tabelle_(2_Singularformen)
@@ -365,40 +412,7 @@ public class BookGenerator_de extends BookGenerator {
 
         for( String key : keyWords ) {
             String word = props.getProperty( key );
-            if( word == null ) {
-                continue;
-            }
-            if( word.endsWith( "!" ) ) {
-                word = word.substring( 0, word.length() - 1 );
-            }
-            if( word.length() <= 1 ) {
-                //leerer Eintrag
-                continue;
-            }
-            if( word.equals( "{{fehlend}}" ) || word.equals( "---" ) || word.equals( "--" ) ) {
-                continue;
-            }
-            int idx3 = word.indexOf( "(" );
-            int idx4 = word.indexOf( ")", idx3 );
-            if( idx3 >= 0 && idx4 > 0 ) {
-                String word1 = word.substring( 0, idx3 );
-                String word2 = word.substring( idx4 + 1 );
-                String word3 = word1.length() + word2.length() > 0 ? word1 + word2 : word.substring( idx3 + 1, idx4 );
-                if( addWordPhrase( word3 ) ) {
-                    addWordPhrase( word1 + word.substring( idx3 + 1, idx4 ) + word2 );
-                    continue;
-                } else {
-                    System.out.println( "Invalid Word '" + word + "' for marker '" + key + "' for base word '"
-                                    + baseWord + "'" );
-                }
-            } else {
-                if( addWordPhrase( word ) ) {
-                    continue;
-                } else {
-                    System.out.println( "Invalid Word '" + word + "' for marker '" + key + "' for base word '"
-                                    + baseWord + "'" );
-                }
-            }
+            addFormatedWordPhrase( baseWord, key, word );
         }
         return true;
     }
@@ -408,7 +422,13 @@ public class BookGenerator_de extends BookGenerator {
         while( idx1 >= 0 ) {
             int idx2 = word.indexOf( '>', idx1 );
             if( idx2 > 0 ) {
-                word = word.substring( 0, idx1 ) + word.substring( idx2 + 1 );
+                String html = word.substring(idx1+1, idx2).toLowerCase().trim();
+                if(html.equals("br") || html.equals("p")){
+                    html = " ";
+                }else{
+                    html = "";
+                }
+                word = word.substring( 0, idx1 ) + html + word.substring( idx2 + 1 );
                 idx1 = word.indexOf( '<' );
             } else {
                 idx1 = -1;
@@ -423,7 +443,7 @@ public class BookGenerator_de extends BookGenerator {
     }
 
     /**
-     * Implemantation of the template http://de.wiktionary.org/wiki/Vorlage:Deutsch_Substantiv_m_stark and
+     * Implementation of the template http://de.wiktionary.org/wiki/Vorlage:Deutsch_Substantiv_m_stark and
      * http://de.wiktionary.org/wiki/Vorlage:Deutsch_Substantiv_n_stark
      */
     private boolean addDeklinationSubstM_NStart( String wikiText, int fromIndex ) {
@@ -445,11 +465,11 @@ public class BookGenerator_de extends BookGenerator {
         String endung = props.getProperty( "ENDUNGS-N", "" );
         if( singular.length() > 0 ) {
             if( genetiv.length() == 0 || "0".equals( genetiv ) ) {
-                addWord( singular + "s" ); //Genetiv
+                addWord( singular + "s" ); //Genitive
             }
             if( genetiv.length() == 0 || "1".equals( genetiv ) ) {
-                addWord( singular + "es" ); //Genetiv
-                addWord( singular + "e" ); //Dativ
+                addWord( singular + "es" ); //Genitive
+                addWord( singular + "e" ); //Dative
             }
         }
         if( plural.length() > 0 ) {
@@ -462,7 +482,7 @@ public class BookGenerator_de extends BookGenerator {
     }
 
     /**
-     * Implemantation of the template http://de.wiktionary.org/wiki/Vorlage:Deutsch_Substantiv_m_schwach_1
+     * Implementation of the template http://de.wiktionary.org/wiki/Vorlage:Deutsch_Substantiv_m_schwach_1
      */
     private boolean addDeklinationSubstMSchwach1( String wikiText, int fromIndex ) {
         Properties props = parseRule( wikiText, "Deutsch Substantiv m schwach 1", fromIndex );
@@ -484,10 +504,10 @@ public class BookGenerator_de extends BookGenerator {
     }
 
     /**
-     * Implemantation of the template http://de.wiktionary.org/wiki/Vorlage:Deutsch_Substantiv_m_schwach_3
+     * Implementation of the template http://de.wiktionary.org/wiki/Vorlage:Deutsch_Substantiv_m_schwach_3
      */
     private boolean addDeklinationSubstMSchwach3( String wikiText, int fromIndex ) {
-        Properties props = parseRule( wikiText, "Deutsch Substantiv m schwach 1", fromIndex );
+        Properties props = parseRule( wikiText, "Deutsch Substantiv m schwach 3", fromIndex );
         if( props == null ) {
             return false;
         }
@@ -511,7 +531,7 @@ public class BookGenerator_de extends BookGenerator {
      * Implementation of the template http://de.wiktionary.org/wiki/Vorlage:Deutsch_Substantiv_f_stark
      */
     private boolean addDeklinationSubstFStark( String wikiText, int fromIndex ) {
-        Properties props = parseRule( wikiText, "Deutsch Substantiv m schwach 1", fromIndex );
+        Properties props = parseRule( wikiText, "Deutsch Substantiv f stark", fromIndex );
         if( props == null ) {
             return false;
         }
@@ -528,7 +548,7 @@ public class BookGenerator_de extends BookGenerator {
     }
 
     /**
-     * Read the inforamtions of the template placeholder
+     * Read the information of the template placeholder
      * 
      * @return null if nothing find
      */
@@ -545,7 +565,7 @@ public class BookGenerator_de extends BookGenerator {
                         break;
                     case '}':
                         if( --braces == 0 ) {
-                            return parseRule( wikiText, start, end - 2 );
+                            return parseRule( wikiText, start, end - 1 );
                         }
                         break;
                 }
@@ -555,7 +575,7 @@ public class BookGenerator_de extends BookGenerator {
     }
 
     /**
-     * Read the inforamtions of the template placeholder
+     * Read the information of the template placeholder
      */
     private Properties parseRule( String wikiText, int idxStart, int idxEnd ) {
         Properties props = new Properties();
