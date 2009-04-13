@@ -101,18 +101,18 @@ public abstract class BookGenerator {
         dict = new BufferedOutputStream(dict);
         PrintStream dictPs = new PrintStream(dict, false, "UTF8");
         
-        /*OutputStream txt = new FileOutputStream("words"+language+".txt");
+        OutputStream txt = new FileOutputStream("IncludedWords.txt");
         txt = new BufferedOutputStream(txt);
         PrintStream ps = new PrintStream(txt, false, "UTF8");
-        */
-        //Speichern als Wordliste
+        
+        //Save as word list
         String[] words = book.getWords();
         Arrays.sort( words );
         for(int i=0; i<words.length; i++){
-            //ps.print( (String)words[i] +'\n' );
+            ps.print( words[i] +'\n' );
             dictPs.print( words[i] +'\n' );
         }
-        //ps.close();
+        ps.close();
         dictPs.close();
         saveStatistics(dictFile);
     }
@@ -163,6 +163,7 @@ public abstract class BookGenerator {
         addFileToZip( out, "license.txt", false );
         addFileToZip( out, "dictionary_"+language+".ortho", true );
         addFileToZip( out, "statistics.txt", true );
+        addFileToZip( out, "IncludedWords.txt", true );
         
         out.close();
     }
