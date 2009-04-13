@@ -56,18 +56,23 @@ public abstract class BookGenerator {
 
     
     public static void main(String[] args) throws Exception {
-        String language = (args.length>0) ? args[0] : "en";
-        String filename  = (args.length>1) ? args[1].replace( '\\', '/' ) : "";
-        if(filename.length() > 0 && !filename.endsWith( "/" )){
-            filename += '/';
+        String languagesList = (args.length>0) ? args[0] : "en";
+        String dirName  = (args.length>1) ? args[1].replace( '\\', '/' ) : "";
+        if(dirName.length() > 0 && !dirName.endsWith( "/" )){
+            dirName += '/';
         }
-        filename += language+"wiktionary-latest-pages-articles.xml";
-        File file = new File(filename);
-        BookGenerator generator = (BookGenerator)Class.forName( BookGenerator.class.getName()+"_" + language ).newInstance();
-        generator.start(file);
-        generator.save(language);
-        
-        generator.createPackage( language );
+        String[] languages = languagesList.split(",");
+        for(int i = 0; i < languages.length; i++){
+            String language = languages[i];
+            
+            String filename = dirName + language+"wiktionary-latest-pages-articles.xml";
+            File file = new File(filename);
+            BookGenerator generator = (BookGenerator)Class.forName( BookGenerator.class.getName()+"_" + language ).newInstance();
+            generator.start(file);
+            generator.save(language);
+            
+            generator.createPackage( language );
+        }
     }
     
     BookGenerator(){
