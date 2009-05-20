@@ -1,7 +1,7 @@
 /*
  *  JOrtho
  *
- *  Copyright (C) 2005-2008 by i-net software
+ *  Copyright (C) 2005-2009 by i-net software
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License as 
@@ -170,7 +170,9 @@ class AutoSpellChecker implements DocumentListener, LanguageChangeListener {
                 int hlEndOffset = highlight.getEndOffset();
                 if( (i <= hlStartOffset && hlStartOffset <= j) || 
                     (i <= hlEndOffset && hlEndOffset <= j) ) {
-                    highlighter.removeHighlight( highlight );
+                    if( highlight.getPainter() == painter ) {
+                        highlighter.removeHighlight( highlight );
+                    }
                 }
             }
 
