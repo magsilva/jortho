@@ -1,7 +1,7 @@
 /*
  *  JOrtho
  *
- *  Copyright (C) 2005-2008 by i-net software
+ *  Copyright (C) 2005-2009 by i-net software
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License as 
@@ -22,16 +22,10 @@
  */
 package com.inet.jortho;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.zip.InflaterInputStream;
+import java.util.Iterator;
 
 /** 
  * With the DictionaryFactory you can create / load a Dictionary. A Dictionary is list of word with a API for searching. 
@@ -65,56 +59,17 @@ class DictionaryFactory {
      *             If filename is null.
      */
     public void loadWordList( URL filename ) throws IOException {
-        URLConnection conn = filename.openConnection();
-        conn.setReadTimeout( 5000 );
-        InputStream input = conn.getInputStream();
-        input = new InflaterInputStream( input );
-        input = new BufferedInputStream( input );
-
-        loadPlainWordList( input, "UTF8" );
+        loadWords( new WordIterator( filename ) );
     }
     
-    /**
-     * Load the directory from plain a list of words. The words must be delimmited with newlines. This method can be
-     * called multiple times.
-     * 
-     * @param stream
-     *            a InputStream with words
-     * @param charsetName
-     *            the name of a codepage for example "UTF8" or "Cp1252"
-     * @throws IOException
-     *             If an I/O error occurs.
-     * @throws NullPointerException
-     *             If stream or charsetName is null.
-     */
-    public void loadPlainWordList( InputStream stream, String charsetName ) throws IOException {
-        Reader reader = new InputStreamReader( stream, charsetName );
-        loadPlainWordList( reader );
-    }
-
-    /**
-     * Load the directory from plain a list of words. The words must be delimmited with newlines. This method can be
-     * called multiple times.
-     * 
-     * @param reader
-     *            a Reader with words
-     * @throws IOException
-     *             If an I/O error occurs.
-     * @throws NullPointerException
-     *             If reader is null.
-     */
-    public void loadPlainWordList( Reader reader ) throws IOException {
-        BufferedReader input = new BufferedReader( reader );
-        String word = input.readLine();
-        while( word != null ) {
-            if( word.length() > 1 ) {
+    public void loadWords( Iterator<String> words ) {
+        while( words.hasNext() ) {
+            String word = words.next();
+            if( word != null && word.length() > 1 ) {
                 add( word );
             }
-            word = input.readLine();
         }
-        input.close();
     }
-    
     
     /**
      * Add a word to the tree. If it already exist then it has no effect. 

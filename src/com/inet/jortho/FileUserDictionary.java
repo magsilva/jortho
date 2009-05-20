@@ -1,7 +1,7 @@
 /*
  *  JOrtho
  *
- *  Copyright (C) 2005-2008 by i-net software
+ *  Copyright (C) 2005-2009 by i-net software
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License as 
@@ -23,6 +23,7 @@
 package com.inet.jortho;
 
 import java.io.*;
+import java.util.Iterator;
 import java.util.Locale;
 
 
@@ -82,11 +83,11 @@ public class FileUserDictionary implements UserDictionaryProvider{
     /**
      * {@inheritDoc}
      */
-    public Reader getWords(Locale locale){
+    public Iterator<String> getWords(Locale locale){
         file = new File(fileBase + "UserDictionary_" + locale + ".txt" );
         try{
             FileInputStream input = new FileInputStream(file);
-            return new InputStreamReader( input, "UTF8" );
+            return new WordIterator( input, "UTF8" );
         }catch(IOException ex){
             /* ignore FileNotFound */
         }

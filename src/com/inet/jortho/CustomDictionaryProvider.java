@@ -22,7 +22,7 @@
  */
 package com.inet.jortho;
 
-import java.io.Reader;
+import java.util.Iterator;
 import java.util.Locale;
 
 
@@ -42,5 +42,5 @@ public interface CustomDictionaryProvider{
      * @param locale The locale of the selected language.
      * @return A list of words delimited with line breaks. It can be null.
      */
-    Reader getWords(Locale locale);
+    Iterator<String> getWords(Locale locale);
 }

@@ -1,7 +1,7 @@
 /*
  *  JOrtho
  *
- *  Copyright (C) 2005-2008 by i-net software
+ *  Copyright (C) 2005-2009 by i-net software
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License as 
@@ -31,11 +31,11 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.WeakHashMap;
@@ -697,16 +697,16 @@ public class SpellChecker {
                             factory.loadWordList( new URL( baseURL, "dictionary_" + locale + extension ) );
                             CustomDictionaryProvider provider = userDictionaryProvider;
                             if( provider != null ) {
-                                Reader userWords = provider.getWords( locale );
+                                Iterator<String> userWords = provider.getWords( locale );
                                 if( userWords != null ) {
-                                    factory.loadPlainWordList( userWords );
+                                    factory.loadWords( userWords );
                                 }
                             }
                             provider = customDictionaryProvider;
                             if( provider != null ) {
-                                Reader userWords = provider.getWords( locale );
+                                Iterator<String> userWords = provider.getWords( locale );
                                 if( userWords != null ) {
-                                    factory.loadPlainWordList( userWords );
+                                    factory.loadWords( userWords );
                                 }
                             }
                         } catch( Exception ex ) {

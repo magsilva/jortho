@@ -1,7 +1,7 @@
 /*
  *  JOrtho
  *
- *  Copyright (C) 2005-2008 by i-net software
+ *  Copyright (C) 2005-2009 by i-net software
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License as 
@@ -29,13 +29,11 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.Reader;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 
 import javax.swing.*;
 
@@ -101,30 +99,24 @@ class DictionaryEditDialog extends JDialog{
      * @param data
      */
     private void loadWordList( DefaultListModel data ){
-        try{
-            UserDictionaryProvider provider = SpellChecker.getUserDictionaryProvider();
-            if( provider != null ) {
-                Reader userWords = provider.getWords( SpellChecker.getCurrentLocale() );
-                if( userWords != null ) {
-                    BufferedReader input = new BufferedReader( userWords );
-                    ArrayList<String> wordList = new ArrayList<String>();
-                    String word = input.readLine();
-                    while( word != null ) {
-                        if( word.length() > 1 ) {
-                            wordList.add( word );
-                        }
-                        word = input.readLine();
-                    }
-                    // Liste alphabetical sorting with the user language
-                    Collections.sort( wordList, Collator.getInstance() );
-                    for(String str : wordList){
-                        data.addElement( str );
+        UserDictionaryProvider provider = SpellChecker.getUserDictionaryProvider();
+        if( provider != null ) {
+            Iterator<String> userWords = provider.getWords( SpellChecker.getCurrentLocale() );
+            if( userWords != null ) {
+                ArrayList<String> wordList = new ArrayList<String>();
+                while(userWords.hasNext()){
+                    String word = userWords.next();
+                    if( word != null && word.length() > 1 ) {
+                        wordList.add( word );
                     }
                 }
+                // Liste alphabetical sorting with the user language
+                Collections.sort( wordList, Collator.getInstance() );
+                for(String str : wordList){
+                    data.addElement( str );
+                }
             }
-        }catch(IOException ex){
-            ex.printStackTrace();
-        }    
+        }
     }
 
     private class DeleteAction extends AbstractAction{
