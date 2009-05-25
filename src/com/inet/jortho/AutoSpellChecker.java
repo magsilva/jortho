@@ -212,6 +212,10 @@ class AutoSpellChecker implements DocumentListener, LanguageChangeListener {
             removeHighlights( jText );
             return;
         }
+        if( jText.getDocument().getLength() == 0 ){
+            // no text, no highlights
+            return;
+        }
 
         Thread thread = new Thread( new Runnable() {
             public void run() {
