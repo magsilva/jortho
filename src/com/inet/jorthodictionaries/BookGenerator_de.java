@@ -62,7 +62,7 @@ public class BookGenerator_de extends BookGenerator {
             if(wikiText.toUpperCase().indexOf("#REDIRECT") >= 0){
                 return false;
             }*/
-            Properties props = parseRule(wikiText,"Deklinationsseite Adjektiv", 0);
+            Properties props = BookUtils.parseRule(wikiText,"Deklinationsseite Adjektiv", 0);
             if(props != null){
                 addDeklinationAdjektiv(props);
                 // The declinations are valid, but the lemma (word) not.
@@ -133,15 +133,15 @@ public class BookGenerator_de extends BookGenerator {
         }
         while(idx > 0){
             // finding the conjugation of the Adjective 
-            Properties props = parseRule( wikiText, "Adjektiv-Tabelle", idx);
+            Properties props = BookUtils.parseRule( wikiText, "Adjektiv-Tabelle", idx);
             if(props == null){
-                props = parseRule( wikiText, "Adjektiv-Tabelle (Deklination)", idx);
+                props = BookUtils.parseRule( wikiText, "Adjektiv-Tabelle (Deklination)", idx);
             }
             if(props == null){
-                props = parseRule( wikiText, "Adjektiv-Tabelle (Bild)", idx);
+                props = BookUtils.parseRule( wikiText, "Adjektiv-Tabelle (Bild)", idx);
             }
             if(props == null){
-                props = parseRule( wikiText, "Adjektiv-Tabelle (Bild) (Deklination)", idx);
+                props = BookUtils.parseRule( wikiText, "Adjektiv-Tabelle (Bild) (Deklination)", idx);
             }
             if(props != null){                
                 addFormatedWordPhrase(word, "Grundform", props.getProperty( "Grundform" ) );
@@ -393,7 +393,7 @@ public class BookGenerator_de extends BookGenerator {
         Properties props = null;
         for( int i = 0; i < templates.length; i++ ) {
             String template = templates[i];
-            props = parseRule( wikiText, template, fromIndex );
+            props = BookUtils.parseRule( wikiText, template, fromIndex );
             if( props != null ) {
                 break;
             }
@@ -447,11 +447,11 @@ public class BookGenerator_de extends BookGenerator {
      * http://de.wiktionary.org/wiki/Vorlage:Deutsch_Substantiv_n_stark
      */
     private boolean addDeklinationSubstM_NStart( String wikiText, int fromIndex ) {
-        Properties props = parseRule( wikiText, "Deutsch Substantiv m stark", fromIndex );
+        Properties props = BookUtils.parseRule( wikiText, "Deutsch Substantiv m stark", fromIndex );
         if( addDeklinationSubstM_NStart( props ) ) {
             return true;
         }
-        props = parseRule( wikiText, "Deutsch Substantiv n stark", fromIndex );
+        props = BookUtils.parseRule( wikiText, "Deutsch Substantiv n stark", fromIndex );
         return addDeklinationSubstM_NStart( props );
     }
 
@@ -485,7 +485,7 @@ public class BookGenerator_de extends BookGenerator {
      * Implementation of the template http://de.wiktionary.org/wiki/Vorlage:Deutsch_Substantiv_m_schwach_1
      */
     private boolean addDeklinationSubstMSchwach1( String wikiText, int fromIndex ) {
-        Properties props = parseRule( wikiText, "Deutsch Substantiv m schwach 1", fromIndex );
+        Properties props = BookUtils.parseRule( wikiText, "Deutsch Substantiv m schwach 1", fromIndex );
         if( props == null ) {
             return false;
         }
@@ -507,7 +507,7 @@ public class BookGenerator_de extends BookGenerator {
      * Implementation of the template http://de.wiktionary.org/wiki/Vorlage:Deutsch_Substantiv_m_schwach_3
      */
     private boolean addDeklinationSubstMSchwach3( String wikiText, int fromIndex ) {
-        Properties props = parseRule( wikiText, "Deutsch Substantiv m schwach 3", fromIndex );
+        Properties props = BookUtils.parseRule( wikiText, "Deutsch Substantiv m schwach 3", fromIndex );
         if( props == null ) {
             return false;
         }
@@ -531,7 +531,7 @@ public class BookGenerator_de extends BookGenerator {
      * Implementation of the template http://de.wiktionary.org/wiki/Vorlage:Deutsch_Substantiv_f_stark
      */
     private boolean addDeklinationSubstFStark( String wikiText, int fromIndex ) {
-        Properties props = parseRule( wikiText, "Deutsch Substantiv f stark", fromIndex );
+        Properties props = BookUtils.parseRule( wikiText, "Deutsch Substantiv f stark", fromIndex );
         if( props == null ) {
             return false;
         }
@@ -545,73 +545,6 @@ public class BookGenerator_de extends BookGenerator {
             }
         }
         return true;
-    }
-
-    /**
-     * Read the information of the template placeholder
-     * 
-     * @return null if nothing find
-     */
-    private Properties parseRule( String wikiText, String tempalateName, int fromIndex ) {
-        int start = findTemplate( wikiText, tempalateName, fromIndex );
-        if( start > 0 ) {
-            final int length = wikiText.length();
-            int braces = 2;
-            for( int end = start; end < length; end++ ) {
-
-                switch( wikiText.charAt( end ) ) {
-                    case '{':
-                        braces++;
-                        break;
-                    case '}':
-                        if( --braces == 0 ) {
-                            return parseRule( wikiText, start, end - 1 );
-                        }
-                        break;
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Read the information of the template placeholder
-     */
-    private Properties parseRule( String wikiText, int idxStart, int idxEnd ) {
-        Properties props = new Properties();
-
-        String[] tokens = wikiText.substring( idxStart, idxEnd ).split( "\\|" );
-        for( int i = 0; i < tokens.length; i++ ) {
-            String value = tokens[i].trim();
-            int idx = value.indexOf( '=' );
-            if( idx > 0 ) {
-                String name = value.substring( 0, idx );
-                value = value.substring( idx + 1 );
-                props.setProperty( name, value.trim() );
-            } else {
-                props.setProperty( String.valueOf( i ), value.trim() );
-            }
-        }
-        return props;
-    }
-
-    /**
-     * Find a template name in the wiki text. the problem are possible whitespaces.
-     * 
-     * @param wikiText
-     * @param tempalateName
-     * @return the index after the first | or -1.
-     */
-    private int findTemplate( String wikiText, String tempalateName, int fromIndex ) {
-        //find {{  tempalateName  |
-        Pattern pattern = Pattern.compile( "\\{\\{\\s*\\Q" + tempalateName.replace( " ", "\\E\\s+\\Q" ) + "\\E\\s*\\|" );
-        Matcher matcher = pattern.matcher( wikiText );
-
-        if( matcher.find( fromIndex ) ) {
-            return matcher.end();
-        }
-
-        return -1;
     }
 
 }
