@@ -143,10 +143,17 @@ public class BookGenerator_de extends BookGenerator {
             if(props == null){
                 props = BookUtils.parseRule( wikiText, "Adjektiv-Tabelle (Bild) (Deklination)", idx);
             }
-            if(props != null){                
-                addFormatedWordPhrase(word, "Grundform", props.getProperty( "Grundform" ) );
+            if(props != null){
+                String grundform = props.getProperty( "Grundform" );
+                addFormatedWordPhrase(word, "Grundform", grundform );
                 addFormatedWordPhrase(word, "1. Steigerung", props.getProperty( "1. Steigerung" ) );
                 addFormatedWordPhrase(word, "2. Steigerung", props.getProperty( "2. Steigerung" ) );
+                if(grundform == null || !isValidWord(grundform)){
+                    grundform = word;
+                }
+                if(!grundform.endsWith( "e" )){
+                    addDeklinationAdjektiv(grundform);
+                }
             }
             int lastIdx = idx+1;
             idx = wikiText.indexOf("{{Wortart|Adjektiv}}", lastIdx);
@@ -154,6 +161,16 @@ public class BookGenerator_de extends BookGenerator {
                 idx = wikiText.indexOf("{{Wortart|Adjektiv|Deutsch}}", lastIdx);
             }
         }
+        
+        
+        idx = wikiText.indexOf("{{Wortart|Partizip I}}");
+        if(idx <0){
+            idx = wikiText.indexOf("{{Wortart|Partizip I|Deutsch}}");
+        }
+        if(idx >= 0){
+            addDeklinationAdjektiv(word);
+        }
+        
         
         searchExtendsWords( word, wikiText, "{{Synonyme}}" );
         searchExtendsWords( word, wikiText, "{{Unterbegriffe}}" );
