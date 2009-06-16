@@ -1,7 +1,7 @@
 /*
  *  JOrtho
  *
- *  Copyright (C) 2005-2008 by i-net software
+ *  Copyright (C) 2005-2009 by i-net software
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License as 
@@ -22,16 +22,40 @@
  */
 package com.inet.jorthodictionaries;
 
+import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * 
  * @author Volker Berlin
  */
 public class BookGenerator_en extends BookGenerator {
 
+    private final Pattern english = Pattern.compile( "^==\\s*English\\s*==$", Pattern.MULTILINE );
+    private final Pattern languages = Pattern.compile( "^==[^=]*==$", Pattern.MULTILINE );
+    
     @Override
     boolean isValidLanguage( String word, String wikiText ) {
-        if( wikiText.indexOf( "==English==" ) < 0 ) {
+        Matcher engMatch = english.matcher( wikiText );
+        if( !engMatch.find() ) {
             return false;
+        }
+
+        Matcher matcher = languages.matcher( wikiText );
+        if( matcher.find( engMatch.end() ) ) {
+            wikiText = wikiText.substring( engMatch.end(), matcher.start() );
+        }
+
+        Properties props = BookUtils.parseRule( wikiText, "misspelling of", 0 );
+        if( props != null ) {
+            //we need to split between real misspelling words 
+            //and sometime is a misspelling word
+            //we use the diff and the size of the article
+            String correctWord = props.getProperty( "0" );
+            if(correctWord != null && BookUtils.calcDiff( word, correctWord ) <= 3 && wikiText.length() < 250){
+                return false;
+            }
         }
 
         if( wikiText.indexOf( "{{en-noun}}" ) > 0 || wikiText.indexOf( "{{en-proper noun}}" ) > 0 ) {
