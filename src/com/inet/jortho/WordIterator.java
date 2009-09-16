@@ -124,6 +124,7 @@ public class WordIterator implements Iterator<String> {
                 input.close();
             }
         } catch( IOException e ) {
+            word = null;
             e.printStackTrace();
         }
         return next;
