@@ -41,6 +41,7 @@ import java.util.zip.*;
  * <li>http://download.wikimedia.org/eswiktionary/latest/eswiktionary-latest-pages-articles.xml.bz2
  * <li>http://download.wikimedia.org/frwiktionary/latest/frwiktionary-latest-pages-articles.xml.bz2
  * <li>http://download.wikimedia.org/itwiktionary/latest/itwiktionary-latest-pages-articles.xml.bz2
+ * <li>http://download.wikimedia.org/nlwiktionary/latest/nlwiktionary-latest-pages-articles.xml.bz2
  * <li>http://download.wikimedia.org/plwiktionary/latest/plwiktionary-latest-pages-articles.xml.bz2
  * <li>http://download.wikimedia.org/ruwiktionary/latest/ruwiktionary-latest-pages-articles.xml.bz2
  * </ul>
