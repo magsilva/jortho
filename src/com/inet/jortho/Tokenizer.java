@@ -263,7 +263,7 @@ class Tokenizer {
         sentence = phrase.substring( startSentence, endSentence );
         
         words.setText( sentence );
-        startWord = words.following( wordOffset );
+        startWord = words.following( wordOffset - startSentence );
         endWord = words.next();
     }
 }
