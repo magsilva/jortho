@@ -1,7 +1,7 @@
 /*
  *  JOrtho
  *
- *  Copyright (C) 2005-2008 by i-net software
+ *  Copyright (C) 2005-2010 by i-net software
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License as 
@@ -55,6 +55,14 @@ public class CheckerListener implements PopupMenuListener, LanguageChangeListene
 
     private final SpellCheckerOptions options;
 
+    /**
+     * Create a PopupMenuListener
+     * 
+     * @param menu
+     *            a JMenu or JPopuup
+     * @param options
+     *            current spell checker options
+     */
     CheckerListener( JComponent menu, SpellCheckerOptions options ) {
         this.menu = menu;
         this.options = options == null ? SpellChecker.getOptions() : options;
@@ -63,16 +71,25 @@ public class CheckerListener implements PopupMenuListener, LanguageChangeListene
         locale = SpellChecker.getCurrentLocale();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void popupMenuCanceled( PopupMenuEvent e ) {
         /* empty */
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void popupMenuWillBecomeInvisible( PopupMenuEvent e ) {
         /* empty */
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void popupMenuWillBecomeVisible( PopupMenuEvent ev ) {
-        if( SpellChecker.getCurrentDictionary() == null) {
+        if( dictionary == null) {
             menu.setEnabled( false );
             return;
         }
@@ -87,20 +104,8 @@ public class CheckerListener implements PopupMenuListener, LanguageChangeListene
                 menu.setEnabled( false );
                 return;
             }
-            Caret caret = jText.getCaret();
-            int offs = Math.min( caret.getDot(), caret.getMark() );
-            Point p = jText.getMousePosition();
-            if( p != null ) {
-                // use position from mouse click and not from editor cursor position 
-                offs = jText.viewToModel( p );
-            }
             try {
-                Document doc = jText.getDocument();
-                if( offs > 0 && (offs >= doc.getLength() || Character.isWhitespace( doc.getText( offs, 1 ).charAt( 0 ) )) ) {
-                    // if the next character is a white space then use the word on the left site
-                    offs--;
-                }
-                
+                int offs = getCursorPosition( jText );
                 if( offs < 0 ) {
                     // occur if there nothing under the mouse pointer
                     menu.setEnabled( false );
@@ -112,7 +117,7 @@ public class CheckerListener implements PopupMenuListener, LanguageChangeListene
                 final int endOffs = Utilities.getWordEnd( jText, offs );
                 final String word = jText.getText( begOffs, endOffs - begOffs );
 
-                //find the first invalid word from current position
+                //find the first invalid word from current position, use the Tokenizer that it is ever compatible with the red zigzag line
                 Tokenizer tokenizer = new Tokenizer( jText, dictionary, locale, offs, options );
                 String invalidWord;
                 do {
@@ -126,12 +131,6 @@ public class CheckerListener implements PopupMenuListener, LanguageChangeListene
                     return;
                 }
 
-                if( dictionary == null ) {
-                    // without dictionary it is disabled
-                    menu.setEnabled( false );
-                    return;
-                }
-
                 List<Suggestion> list = dictionary.searchSuggestions( word );
 
                 //Disable then menu item if there are no suggestions
@@ -139,60 +138,105 @@ public class CheckerListener implements PopupMenuListener, LanguageChangeListene
 
                 boolean needCapitalization = tokenizer.isFirstWordInSentence() && Utils.isFirstCapitalized( word );
 
-                for( int i = 0; i < list.size() && i < options.getSuggestionsLimitMenu(); i++ ) {
-                    Suggestion sugestion = list.get( i );
-                    String sugestionWord = sugestion.getWord();
-                    if( needCapitalization ) {
-                        sugestionWord = Utils.getCapitalized( sugestionWord );
-                    }
-                    JMenuItem item = new JMenuItem( sugestionWord );
-                    menu.add( item );
-                    final String newWord = sugestionWord;
-                    item.addActionListener( new ActionListener() {
-
-                        public void actionPerformed( ActionEvent e ) {
-                            jText.setSelectionStart( begOffs );
-                            jText.setSelectionEnd( endOffs );
-                            jText.replaceSelection( newWord );
-                        }
-
-                    } );
-                }
-                
-                // Add the menu item "Add to Dictionary"
-                UserDictionaryProvider provider = SpellChecker.getUserDictionaryProvider();
-                if( provider == null ) {
-                    return;
-                }
-                JMenuItem addToDic = new JMenuItem( Utils.getResource( "addToDictionary" ) );
-                addToDic.addActionListener( new ActionListener() {
-
-                    public void actionPerformed( ActionEvent e ) {
-                        UserDictionaryProvider provider = SpellChecker.getUserDictionaryProvider();
-                        if( provider != null ) {
-                            provider.addWord( word );
-                        }
-                        dictionary.add( word );
-                        dictionary.trimToSize();
-                        AutoSpellChecker.refresh( jText );
-                    }
-
-                } );
-                if( list.size() > 0 ) {
-                    if( menu instanceof JMenu ) {
-                        ((JMenu)menu).addSeparator();
-                    } else if( menu instanceof JPopupMenu ) {
-                        ((JPopupMenu)menu).addSeparator();
-                    }
-                }
-                menu.add( addToDic );
-                menu.setEnabled( true );
+                addSuggestionMenuItem( jText, begOffs, endOffs, list, needCapitalization );
+                addMenuItemAddToDictionary( jText, word, list.size() > 0 );
             } catch( BadLocationException ex ) {
                 ex.printStackTrace();
             }
         }
     }
+    
+    /**
+     * Get the cursor position for the popup menu
+     * 
+     * @param jText
+     *            current JTextComponent
+     * @return the current position
+     * @throws BadLocationException
+     *             should never occur
+     */
+    protected int getCursorPosition( JTextComponent jText ) throws BadLocationException {
+        Caret caret = jText.getCaret();
+        int offs = Math.min( caret.getDot(), caret.getMark() );
+        Point p = jText.getMousePosition();
+        if( p != null ) {
+            // use position from mouse click and not from editor cursor position 
+            offs = jText.viewToModel( p );
+        }
+        Document doc = jText.getDocument();
+        if( offs > 0 && (offs >= doc.getLength() || Character.isWhitespace( doc.getText( offs, 1 ).charAt( 0 ) )) ) {
+            // if the next character is a white space then use the word on the left site
+            offs--;
+        }
+        return offs;
+    }
+    
+    /**
+     * Add menu items to the with suggestions to the menu.
+     * 
+     * @param jText
+     *            current JTextComponent
+     * @param begOffs
+     *            offset of the current word in the JTextComponent, need for replacement
+     * @param endOffs
+     *            end of the current word in the JTextComponent, need for replacement
+     * @param list
+     *            a list with suggestions
+     * @param needCapitalization
+     *            if the first letter of the suggestion should capitalized
+     */
+    protected void addSuggestionMenuItem( final JTextComponent jText, final int begOffs, final int endOffs, List<Suggestion> list, boolean needCapitalization ) {
+        for( int i = 0; i < list.size() && i < options.getSuggestionsLimitMenu(); i++ ) {
+            Suggestion sugestion = list.get( i );
+            String sugestionWord = sugestion.getWord();
+            if( needCapitalization ) {
+                sugestionWord = Utils.getCapitalized( sugestionWord );
+            }
+            JMenuItem item = new JMenuItem( sugestionWord );
+            menu.add( item );
+            final String newWord = sugestionWord;
+            item.addActionListener( new ActionListener() {
 
+                public void actionPerformed( ActionEvent e ) {
+                    jText.setSelectionStart( begOffs );
+                    jText.setSelectionEnd( endOffs );
+                    jText.replaceSelection( newWord );
+                }
+
+            } );
+        }
+    }
+    
+    /**
+     * Add the menu item "Add to Dictionary" at the end of the menu if a user dictionary is available.
+     * 
+     * @param jText
+     *            current JTextComponent
+     * @param word
+     *            current word, which can be add
+     * @param addSeparator
+     *            true, add a separator before the menu item
+     */
+    protected void addMenuItemAddToDictionary( JTextComponent jText, String word, boolean addSeparator ) {
+        UserDictionaryProvider provider = SpellChecker.getUserDictionaryProvider();
+        if( provider == null ) {
+            return;
+        }
+        JMenuItem addToDic = new JMenuItem( new AddWordAction( jText, word ) );
+        if( addSeparator ) {
+            if( menu instanceof JMenu ) {
+                ((JMenu)menu).addSeparator();
+            } else if( menu instanceof JPopupMenu ) {
+                ((JPopupMenu)menu).addSeparator();
+            }
+        }
+        menu.add( addToDic );
+        menu.setEnabled( true );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public void languageChanged( LanguageChangeEvent ev ) {
         dictionary = SpellChecker.getCurrentDictionary();
         locale = SpellChecker.getCurrentLocale();
