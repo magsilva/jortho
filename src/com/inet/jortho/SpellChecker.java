@@ -695,6 +695,10 @@ public class SpellChecker {
                         DictionaryFactory factory = new DictionaryFactory();
                         try {
                             factory.loadWordList( new URL( baseURL, "dictionary_" + locale + extension ) );
+                        } catch( Exception ex ) {
+                            JOptionPane.showMessageDialog( null, ex.toString(), "Error", JOptionPane.ERROR_MESSAGE );
+                        }
+                         try {
                             CustomDictionaryProvider provider = userDictionaryProvider;
                             if( provider != null ) {
                                 Iterator<String> userWords = provider.getWords( locale );
