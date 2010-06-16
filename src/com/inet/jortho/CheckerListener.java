@@ -63,7 +63,7 @@ public class CheckerListener implements PopupMenuListener, LanguageChangeListene
      * @param options
      *            current spell checker options
      */
-    CheckerListener( JComponent menu, SpellCheckerOptions options ) {
+    public CheckerListener( JComponent menu, SpellCheckerOptions options ) {
         this.menu = menu;
         this.options = options == null ? SpellChecker.getOptions() : options;
         SpellChecker.addLanguageChangeLister( this );
