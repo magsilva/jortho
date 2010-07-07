@@ -211,10 +211,10 @@ public abstract class BookGenerator {
     
     
     /**
-     * Pr�ft ob es sich um ein g�ltiges Word handelt. Damit k�nnen bestimmte Hilfsthemen 
-     * und Phrasen ausgeschlossen werden.
-     * @param word zu pr�fendes Wort, darf nicht null sein
-     * @return true wenn es ein g�ltiges Wort ist.
+     * Check if the word is valid word. This exclude help pages and some phrases.
+     * It should be call ever before addWord(String)
+     * @param word the to check
+     * @return true, if the word is valid
      */
     protected boolean isValidWord(String word){
         final int length = word.length();
@@ -242,8 +242,8 @@ public abstract class BookGenerator {
     
     
     /**
-     * F�gt ein Wort zum Tree hinzu.
-     * @param word darf nicht null sein.
+     * Add a word to the tree.
+     * @param word can not be null
      */
     final protected void addWord(String word){
         book.addWord( word );
