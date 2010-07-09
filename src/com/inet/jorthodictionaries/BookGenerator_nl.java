@@ -82,7 +82,7 @@ public class BookGenerator_nl extends BookGenerator {
      * @param count the maximum count of words in the template
      */
     private void addDeclination( String root, Properties props, int count ) {
-        for( int i = 0; i < count; i++ ) {
+        for( int i = 1; i <= count; i++ ) {
             String declination = props.getProperty( String.valueOf( i ) );
             if( declination == null ) {
                 return;

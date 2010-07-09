@@ -70,7 +70,7 @@ public class BookUtils {
                 value = value.substring( idx + 1 );
                 props.setProperty( name, value.trim() );
             } else {
-                props.setProperty( String.valueOf( i ), value.trim() );
+                props.setProperty( String.valueOf( i+1 ), value.trim() );
             }
         }
         return props;

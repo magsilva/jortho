@@ -52,7 +52,7 @@ public class BookGenerator_en extends BookGenerator {
             //we need to split between real misspelling words 
             //and sometime is a misspelling word
             //we use the diff and the size of the article
-            String correctWord = props.getProperty( "0" );
+            String correctWord = props.getProperty( "1" );
             if(correctWord != null && BookUtils.calcDiff( word, correctWord ) <= 3 && wikiText.length() < 250){
                 return false;
             }
