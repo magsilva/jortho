@@ -219,27 +219,36 @@ public abstract class BookGenerator {
     protected boolean isValidWord(String word){
         final int length = word.length();
         if(length <= 1) return false;
-        for(int i=length-1; i>=0; i--){
-            char ch = word.charAt(i);
-            if(Character.isLetter( ch ) || ch == '\''){
+        int last = length - 1;
+        for( int i = last; i >= 0; i-- ) {
+            char ch = word.charAt( i );
+            if( Character.isLetter( ch ) ) {
                 continue;
             }
-            
+            if( ch == '\'' ) {
+                if( i == last && word.charAt( 0 ) == '\'' ) {
+                    return false;
+                }
+                if( i > 0 && word.charAt( i - 1 ) == '\'' ) {
+                    return false;
+                }
+                continue;
+            }
+
             //Bei Abkürzungen einen Punkt am Ende
-            if(ch == '.' && i == length-1){
+            if( ch == '.' && i == last ) {
                 continue;
             }
-            
+
             //Bindestriche nur in der Wortmitte
-            if(ch == '-' && i != 0 && i != length-1){
+            if( ch == '-' && i != 0 && i != last ) {
                 continue;
             }
 
             return false;
         }
         return true;
-    }
-    
+    }    
     
     /**
      * Add a word to the tree.
