@@ -766,9 +766,18 @@ public class SpellChecker {
      * one, or when calling <ode>registerDictionaries</code>.
      * @return the current <code>Locale</code> or null if none is set.
      * @see #registerDictionaries(URL, String, String)
+     * @see #isDictionaryLoaded()
      */
     public static Locale getCurrentLocale() {
         return currentLocale;
+    }
+    
+    /**
+     * If currently a Dictionary is loaded.
+     * @return true, if a dictionary is loaded and include at minimum one word. 
+     */
+    public static boolean isDictionaryLoaded(){
+        return currentDictionary != null && currentDictionary.getDataSize() > 1;
     }
     
     /**
