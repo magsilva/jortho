@@ -35,7 +35,7 @@ public class SampleApplet extends JApplet {
         add( text );
 
         // Load the configuration from the file dictionaries.cnf and 
-        // use the english dictionary as default 
+        // use the English dictionary as default 
         SpellChecker.registerDictionaries( getCodeBase(), "en" );
 
         // enable the spell checking on the text component with all features

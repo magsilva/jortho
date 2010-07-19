@@ -146,12 +146,32 @@ public class SpellChecker {
      * <li>languages</li>
      * <li>extension</li>
      * </ul>
+     * <b>Samples:</b> <code><pre>
+     * // Load the configuration and dictionaries from the current working directory and use the current locale or the first language as default 
+     * SpellChecker.registerDictionaries( null, null );
+     * 
+     * // Load the configuration and dictionaries from the sub directory "dict"
+     * SpellChecker.registerDictionaries( new URL( "file", null, "dict" ), null );
+     * 
+     * // Load the configuration and dictionaries from a web server and activate English as language 
+     * SpellChecker.registerDictionaries( new URL( "http://MyWebServer/dictionries/" ), "en" );
+     * 
+     * // Load the configuration and dictionaries from the same web location like the applet and use the German dictionary as default 
+     * SpellChecker.registerDictionaries( myApplet.getCodeBase(), "de" );
+     * 
+     * // Sample content from a file dictionaries.cnf
+     * extension=.ortho
+     * languages=de,en,it,fr,es,ru
+     * </pre></code>
      * 
      * @param baseURL
      *            the base URL where the dictionaries and configuration file can be found. If null then URL("file", null, "")
-     *            is used.
+     *            is used which is equals to the current working directory.
      * @param activeLocale
      *            the locale that should be loaded and made active. If null or empty then the default locale is used.
+     * @see #setUserDictionaryProvider(UserDictionaryProvider)
+     * @see #registerDictionaries(URL, String, String)
+     * @see #registerDictionaries(URL, String, String, String)           
      */
     public static void registerDictionaries( URL baseURL, String activeLocale ) {
         if( baseURL == null ){
@@ -197,6 +217,21 @@ public class SpellChecker {
      * relative to the baseURL. If the dictionary of the active Locale does not exist, the first dictionary is loaded.
      * There is only one dictionary loaded in memory at a given time.
      * 
+     * <p><b>Samples:</b> <code><pre>
+     * // Load the dictionaries from the current working directory and use the current locale or the first language as default 
+     * SpellChecker.registerDictionaries( null, "de,en", null );
+     * 
+     * // Load the dictionaries from the sub directory "dict"
+     * SpellChecker.registerDictionaries( new URL( "file", null, "dict" ), "de,en", null );
+     * 
+     * // Load the dictionaries from a web server and activate English as language 
+     * SpellChecker.registerDictionaries( new URL( "http://MyWebServer/dictionries/" ), "de,en", "en" );
+     * 
+     * // Load the dictionaries from the same web location like the applet and use the German dictionary as default 
+     * SpellChecker.registerDictionaries( myApplet.getCodeBase(), "de,en", "de" );
+     * 
+     * </pre></code>
+     * 
      * @param baseURL
      *            the base URL where the dictionaries can be found. If null then URL("file", null, "") is used.
      * @param availableLocales
@@ -204,6 +239,8 @@ public class SpellChecker {
      * @param activeLocale
      *            the locale that should be loaded and made active. If null or empty then the default locale is used.
      * @see #setUserDictionaryProvider(UserDictionaryProvider)
+     * @see #registerDictionaries(URL, String)
+     * @see #registerDictionaries(URL, String, String, String)
      */
     public static void registerDictionaries( URL baseURL, String availableLocales, String activeLocale ) {
         registerDictionaries( baseURL, availableLocales, activeLocale, ".ortho" );
@@ -215,6 +252,27 @@ public class SpellChecker {
      * If the dictionary of the active Locale does not exist, the first dictionary is loaded.
      * There is only one dictionary loaded in memory at a given time.
      * 
+     * <p><b>Samples:</b> <code><pre>
+     * // Load the dictionaries from the current working directory 
+     * // and use the current locale or the first language as default.
+     * // The dictionaries must be named dictionary_de.ortho and dictionary_en.ortho
+     * SpellChecker.registerDictionaries( null, "de,en", null, ".ortho" );
+     * 
+     * // Load the dictionaries from the sub directory "dict"
+     * // and use the current locale or the first language as default.
+     * // The dictionaries must be named dict/dictionary_de.ortho and dict/dictionary_en.ortho
+     * SpellChecker.registerDictionaries( new URL( "file", null, "dict" ), "de,en", null, ".ortho" );
+     * 
+     * // Load the dictionaries from a web server and activate English as language 
+     * // The dictionaries must be named http://MyWebServer/dictionries/dictionary_de.bin and http://MyWebServer/dictionries/dictionary_en.bin
+     * SpellChecker.registerDictionaries( new URL( "http://MyWebServer/dictionries/" ), "de,en", "en", ".bin" );
+     * 
+     * // Load the configuration from the same web location like the applet and use the German dictionary as default 
+     * // The dictionaries must be named dictionary_de.bin and dictionary_en.bin in the codebase
+     * SpellChecker.registerDictionaries( myApplet.getCodeBase(), "de,en", "de", ".bin" );
+     * 
+     * </pre></code>
+     * 
      * @param baseURL
      *            the base URL where the dictionaries can be found. If null then URL("file", null, "") is used.
      * @param availableLocales
@@ -224,6 +282,8 @@ public class SpellChecker {
      * @param extension
      *            the file extension of the dictionaries. Some web server like the IIS6 does not support the default ".ortho".
      * @see #setUserDictionaryProvider(UserDictionaryProvider)
+     * @see #registerDictionaries(URL, String)
+     * @see #registerDictionaries(URL, String, String)
      */
     public static void registerDictionaries( URL baseURL, String availableLocales, String activeLocale, String extension ) {
         if( baseURL == null ){
