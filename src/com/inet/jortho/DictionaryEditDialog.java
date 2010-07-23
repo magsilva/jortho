@@ -22,6 +22,7 @@
  */
 package com.inet.jortho;
 
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -139,7 +140,8 @@ class DictionaryEditDialog extends JDialog{
     @Override
     public void dispose(){
         super.dispose();
-        if( isModify ){
+        if( isModify ) {
+            // save the user dictionary
             UserDictionaryProvider provider = SpellChecker.getUserDictionaryProvider();
             if( provider != null ) {
                 ListModel model = list.getModel();
@@ -151,6 +153,17 @@ class DictionaryEditDialog extends JDialog{
                     builder.append( model.getElementAt(i) );
                 }
                 provider.setUserWords( builder.toString() );
+            }
+            // reload the dictionary
+            JMenu menu = SpellChecker.createLanguagesMenu( null );
+            Component[] comps = menu.getMenuComponents();
+            for( Component comp : comps ) {
+                if( comp instanceof JRadioButtonMenuItem ){
+                    JRadioButtonMenuItem item = (JRadioButtonMenuItem)comp;
+                    if( item.isSelected() ){
+                        item.doClick();
+                    }
+                }
             }
         }
     }
