@@ -1,7 +1,7 @@
 /*
  *  JOrtho
  *
- *  Copyright (C) 2005-2008 by i-net software
+ *  Copyright (C) 2005-2010 by i-net software
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License as 
@@ -276,7 +276,7 @@ public class BookGenerator_de extends BookGenerator {
     }
     
     /**
-     * Liefert einen Substring mit der aktuellen Konjugation/Flektion Tabelle des Wikitextes
+     * Liefert einen Substring mit der aktuellen Konjugation/Flexion Tabelle des Wikitextes
      */
     private String getTable( String wikiText, String tableName, int fromIndex ){
         int start = wikiText.indexOf( "{{" + tableName, fromIndex);
@@ -301,7 +301,7 @@ public class BookGenerator_de extends BookGenerator {
     }
     
     /**
-     * Die Flextionen und Konjugationen eines Wortes sind durch bestimmte Phrasen gemarked.
+     * Die Flexionen und Konjugationen eines Wortes sind durch bestimmte Phrasen gemarked.
      * @param baseWord Hauptwort, Name des Artikels
      * @param wikiText der gesamte Wikiartikel in Wikisyntax 
      * @param marker die Phrase, die eine bestimmte Konjugation markiert
@@ -312,16 +312,16 @@ public class BookGenerator_de extends BookGenerator {
         int idx1 = wikiText.indexOf( marker, fromIndex);
         if(idx1>0){
             idx1 += marker.length();
-            int idx2 = indexOf( wikiText, new char[]{'|', '<', '}'}, idx1);
+            int idx2 = indexOf( wikiText, new char[]{'|', '<', '}', '{'}, idx1);
             if(idx2>0){
                 String word = wikiText.substring( idx1, idx2).trim();
                 addFormatedWordPhrase( baseWord, marker, word );
                 return true;
             }else{
-                System.out.println("End not find for marker '" + marker + "' for base word '" + baseWord + "'");
+                System.out.println("End not found for marker '" + marker + "' for base word '" + baseWord + "'");
             }
         }else{
-            System.out.println("Marker '" + marker + "' was not find for base word '" + baseWord + "'");
+            System.out.println("Marker '" + marker + "' was not found for base word '" + baseWord + "'");
         }
         return false;
     }
@@ -342,6 +342,12 @@ public class BookGenerator_de extends BookGenerator {
                 if(idx4 > 0){
                     if(idx3+2 < idx4){//leere Werte die vom Template entstehen, aus Performance gleich skippen 
                         String word = extendsWords.substring( idx3+2, idx4 );
+                        if (word.startsWith("WikiSaurus:")) {
+                        	word = word.substring(11).trim();
+                        }
+                        if (word.startsWith("Thesaurus:")) {
+                        	word = word.substring(10).trim();
+                        }
                         if(!addWordPhrase(word)){
                             System.out.println("Invalid Extend Word '" + word + "' for marker '" + marker + "' for base word '" + baseWord + "'");
                         }
@@ -366,14 +372,14 @@ public class BookGenerator_de extends BookGenerator {
         if( phrase == null ) {
             return;
         }
-        if( phrase.endsWith( "!" ) ) {
+        if( phrase.endsWith( "!" ) || phrase.endsWith("’")) {
             phrase = phrase.substring( 0, phrase.length() - 1 );
         }
         if( phrase.length() <= 1 ) {
             //empty Entry
             return;
         }
-        if( phrase.equals( "{{fehlend}}" ) || phrase.equals( "---" ) || phrase.equals( "--" ) ) {
+        if( phrase.equals( "{{fehlend}}" ) || phrase.equals( "---" ) || phrase.equals( "--" ) || phrase.equals("{{center")) {
             return;
         }
         int idx3 = phrase.indexOf( "(" );
@@ -403,18 +409,27 @@ public class BookGenerator_de extends BookGenerator {
      * Substantive sind alle mit Artikel abgelegt und einige Verben zerfallen bei der Konjugation 
      */
     private final boolean addWordPhrase(String phrase){
-        boolean isValid = true;
-        String[] words = phrase.split( "\\s+" );
-        for( int i = 0; i < words.length; i++ ) {
-            String word = words[i];
-            if(word.length()>0){
-                if(isValidWord(word)){
-                    addWord(word);                
-                }else{
-                    isValid = false;
-                }
-            }
-        }        
+    	boolean isValid = true;
+    	// recognize optional [e] or (e) and add both variants
+    	int index = phrase.indexOf("[e]");
+    	if (index > 0 && Character.isLetter(phrase.charAt(index-1))) {
+    		for (int i = 0; i < 2; i++) {
+        		addWordPhrase(phrase.substring(0, index) + (i==0?"e":"") + phrase.substring(index + 3));
+			}
+    	}
+    	else {
+	        String[] words = phrase.split( "(\\s|/|,|!)+" );
+	        for( int i = 0; i < words.length; i++ ) {
+	            String word = words[i];
+	            if(word.length()>0){
+	                if(isValidWord(word)){
+	                    addWord(word);
+	                }else{
+	                    isValid = false;
+	                }
+	            }
+	        }
+    	}
         return isValid;
     }
 
@@ -509,10 +524,12 @@ public class BookGenerator_de extends BookGenerator {
                 idx1 = -1;
             }
         }
-        idx1 = word.indexOf( "&nbsp;" );
-        while( idx1 >= 0 ) {
-            word = word.substring( 0, idx1 ) + " " + word.substring( idx1 + 6 );
-            idx1 = word.indexOf( "&nbsp;" );
+        for (String blank : new String[]{"&nbsp;", "&#32;"}) {
+        	idx1 = word.indexOf( blank );
+        	while( idx1 >= 0 ) {
+        		word = word.substring( 0, idx1 ) + " " + word.substring( idx1 + blank.length() );
+        		idx1 = word.indexOf( blank );
+        	}
         }
         return word;
     }
