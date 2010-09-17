@@ -174,7 +174,8 @@ public class BookGenerator_de extends BookGenerator {
                             !addDeklinationSubstM_NStart( chapter, 0 ) &&
                             !addDeklinationSubstMSchwach1( chapter, 0 ) &&
                             !addDeklinationSubstMSchwach3( chapter, 0 ) &&
-                            !addDeklinationSubstFStark( chapter, 0 ) ){
+                            !addDeklinationSubstFStark( chapter, 0 ) && 
+                            !addDeklinationSubstFSchwach( chapter, 0 ) ){
                 // no Deklination found
             }
             int lastIdx = idx+1;
@@ -635,6 +636,22 @@ public class BookGenerator_de extends BookGenerator {
             if( !"ja".equals( pluralN ) ) {
                 addWord( plural + "n" );
             }
+        }
+        return true;
+    }
+
+    /**
+     * Implementation of the template http://de.wiktionary.org/wiki/Vorlage:Deutsch_Substantiv_f_schwach
+     */
+    private boolean addDeklinationSubstFSchwach( String wikiText, int fromIndex ) {
+        Properties props = BookUtils.parseRule( wikiText, "Deutsch Substantiv f schwach", fromIndex );
+        if( props == null ) {
+            return false;
+        }
+        //String singular = props.getProperty( "SINGULAR", "" );
+        String plural = props.getProperty( "PLURAL", "" );
+        if( super.isValidWord( plural ) ) {
+            addWord( plural );
         }
         return true;
     }
