@@ -1,7 +1,7 @@
 /*
  *  JOrtho
  *
- *  Copyright (C) 2005-2009 by i-net software
+ *  Copyright (C) 2005-2010 by i-net software
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License as 
@@ -24,7 +24,6 @@ package com.inet.jortho;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Iterator;
 
 /** 
@@ -126,10 +125,10 @@ class DictionaryFactory {
     /**
      * A node in the search tree. Every Node can include a list of NodeEnties
      */
-    private final static class Node extends ArrayList<NodeEntry>{
+    private final static class Node extends LowMemoryArrayList<NodeEntry>{
 
         Node(){
-            super(1);
+            //super(1);
         }
                 
         NodeEntry searchCharOrAdd( char c ) {
@@ -143,12 +142,12 @@ class DictionaryFactory {
                 }
                 entry = new NodeEntry(c);
                 add( i, entry );
-                trimToSize(); //reduce the memory consume, there is a very large count of this Nodes.
+                //trimToSize(); //reduce the memory consume, there is a very large count of this Nodes.
                 return entry;
             }
             NodeEntry entry = new NodeEntry(c);
             add( entry );
-            trimToSize(); //reduce the memory consume, there is a very large count of this Nodes.
+            //trimToSize(); //reduce the memory consume, there is a very large count of this Nodes.
             return entry;
         }
         
