@@ -28,7 +28,7 @@ package com.inet.jortho;
  * 
  * @author Volker Berlin
  */
-public class LowMemoryArrayList<E> {
+class LowMemoryArrayList<E> {
 
     /**
      * The array buffer into which the elements of the ArrayList are stored. The capacity of the ArrayList is the length
@@ -52,7 +52,7 @@ public class LowMemoryArrayList<E> {
      *            index of the element to return
      * @return the element at the specified position in this list
      * @throws IndexOutOfBoundsException
-     *             {@inheritDoc}
+     *             if the index is out of range
      */
     public E get( int index ) {
         return elementData[index];
@@ -63,7 +63,6 @@ public class LowMemoryArrayList<E> {
      * 
      * @param o
      *            element to be appended to this list.
-     * @return <tt>true</tt> (as per the general contract of Collection.add).
      */
     public void add( E o ) {
         int size = size();
@@ -84,7 +83,7 @@ public class LowMemoryArrayList<E> {
      * @param element
      *            element to be inserted
      * @throws IndexOutOfBoundsException
-     *             {@inheritDoc}
+     *             if the index is out of range
      */
     public void add( int index, E element ) {
         int size = size();
