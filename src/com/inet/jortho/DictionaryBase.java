@@ -125,15 +125,14 @@ abstract class DictionaryBase {
                 }
             }
             idx = readIndex();
-            if( idx <= 0 ) {
-                // no more characters in the tree
-                return;
+            if( idx > 0 ) {
+                // more characters in the tree
+                if(charPosition+1 == chars.length()){
+                    searchSuggestionsLonger( list, chars, idx, diff + 5);
+                } else {
+                    searchSuggestions( list, chars, charPosition + 1, idx, diff );
+                }
             }
-            if(charPosition+1 == chars.length()){
-                searchSuggestionsLonger( list, chars, chars.length(), idx, diff + 5);
-                return;
-            }
-            searchSuggestions( list, chars, charPosition + 1, idx, diff );
         }
 
         
@@ -202,13 +201,14 @@ abstract class DictionaryBase {
         }
     }
     
-    private void searchSuggestionsLonger( Suggestions list, CharSequence chars, int originalLength, int lastIdx, int diff){
-        idx = lastIdx;
+    private void searchSuggestionsLonger( Suggestions list, CharSequence chars, int lastIdx, int diff){
+        int tempIdx = idx = lastIdx;
         while(idx<size && tree[idx] < LAST_CHAR){
-            if( isWordMatch() ){
-                list.add( new Suggestion( chars.toString() + tree[idx], diff ) );
-            }
-            idx += 3;
+            StringBuilder buffer = new StringBuilder();
+            buffer.append( chars );
+            buffer.append( tree[idx] );
+                searchSuggestions( list, buffer, chars.length(), idx, diff );
+            idx = tempIdx += 3;
         }
     }
     
