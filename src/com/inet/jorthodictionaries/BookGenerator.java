@@ -217,6 +217,9 @@ public abstract class BookGenerator {
      * @return true, if the word is valid
      */
     protected boolean isValidWord(String word){
+        if( word == null ){
+            return false;
+        }
         final int length = word.length();
         if(length <= 1) return false;
         int last = length - 1;
