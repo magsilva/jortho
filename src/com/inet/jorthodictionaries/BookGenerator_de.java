@@ -211,7 +211,7 @@ public class BookGenerator_de extends BookGenerator {
                 addFormatedWordPhrase(word, "Grundform", grundform );
                 addFormatedWordPhrase(word, "1. Steigerung", props.getProperty( "1. Steigerung" ) );
                 addFormatedWordPhrase(word, "2. Steigerung", props.getProperty( "2. Steigerung" ) );
-                if(grundform == null || !isValidWord(grundform)){
+                if(grundform == null || !super.isValidWord(grundform)){
                     grundform = word;
                 }
                 if(!grundform.endsWith( "e" )){
@@ -427,7 +427,7 @@ public class BookGenerator_de extends BookGenerator {
 	        for( int i = 0; i < words.length; i++ ) {
 	            String word = words[i];
 	            if(word.length()>0){
-	                if(isValidWord(word)){
+	                if(super.isValidWord(word)){
 	                    addWord(word);
 	                }else{
 	                    isValid = false;
@@ -455,7 +455,7 @@ public class BookGenerator_de extends BookGenerator {
      * @param wordStamm the word root, can be null
      */
     private void addDeklinationAdjektiv( String wordStamm ) {
-        if( wordStamm != null && isValidWord( wordStamm )) {
+        if( wordStamm != null && super.isValidWord( wordStamm )) {
             addWord( wordStamm + "e" ); 
             addWord( wordStamm + "er" );
             addWord( wordStamm + "es" );
