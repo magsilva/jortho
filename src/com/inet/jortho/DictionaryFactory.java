@@ -47,7 +47,7 @@ class DictionaryFactory {
     
     
     /**
-     * Load the directory from a compressed list of words with UTF8 encoding. The words must be delimmited with
+     * Load the directory from a compressed list of words with UTF8 encoding. The words must be delimited with
      * newlines. This method can be called multiple times.
      * 
      * @param filename
