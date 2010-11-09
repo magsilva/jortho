@@ -47,12 +47,16 @@ public class BookGenerator_de extends BookGenerator {
         if(super.isValidWord( word )){
             return true;
         }
-        return word.endsWith( "(Deklination)" ) || word.endsWith( "(Konjugation)" );
+        return word.endsWith( "(Deklination)" ) || word.endsWith( "(Konjugation)" ) || word.equals( "Wiktionary:Wunschliste" );
     }
     
     @Override
     boolean isValidLanguage(String word, String wikiText) {   
         wikiText = removeHtmlFormating(wikiText);
+        if( word.equals( "Wiktionary:Wunschliste" ) ) {
+            addLinkWords( word, wikiText, "Wunschliste" );
+            return false;
+        }
         int idxGerman = wikiText.indexOf("{{Sprache|Deutsch}}");
         if( idxGerman < 0 || word.endsWith( "(Deklination)" ) || word.endsWith( "(Konjugation)" )){
             /*
@@ -341,30 +345,43 @@ public class BookGenerator_de extends BookGenerator {
                 idx2 = wikiText.length();
             }
             String extendsWords = wikiText.substring( idx1, idx2 ); 
-            int idx3 = extendsWords.indexOf( "[[" );
-            while(idx3 > 0){
-                int idx4 = extendsWords.indexOf( "]]", idx3 );
-                if(idx4 > 0){
-                    if(idx3+2 < idx4){//leere Werte die vom Template entstehen, aus Performance gleich skippen 
-                        String word = extendsWords.substring( idx3+2, idx4 );
-                        if (word.startsWith("WikiSaurus:")) {
-                        	word = word.substring(11).trim();
-                        }
-                        if (word.startsWith("Thesaurus:")) {
-                        	word = word.substring(10).trim();
-                        }
-                        if(!addWordPhrase(word)){
-                            System.out.println("Invalid Extend Word '" + word + "' for marker '" + marker + "' for base word '" + baseWord + "'");
-                        }
-                    }
-                    idx3 = extendsWords.indexOf( "[[", idx4 );
-                }else{
-                    idx3 = -1;
-                }
-            }
+            addLinkWords( baseWord, extendsWords, marker );
             return true;
         }
         return false;
+    }
+    
+    /**
+     * Add all valid word that are in links (double brackets like [[word]]).
+     * @param baseWord
+     * @param wikiText the searching text
+     * @param marker
+     */
+    private void addLinkWords( String baseWord, String wikiText, String marker ){
+        int idx3 = wikiText.indexOf( "[[" );
+        while(idx3 > 0){
+            int idx4 = wikiText.indexOf( "]]", idx3 );
+            if(idx4 > 0){
+                if(idx3+2 < idx4){//leere Werte die vom Template entstehen, aus Performance gleich skippen 
+                    String word = wikiText.substring( idx3+2, idx4 );
+                    if (word.startsWith("WikiSaurus:")) {
+                        word = word.substring(11).trim();
+                    }
+                    if (word.startsWith("Thesaurus:")) {
+                        word = word.substring(10).trim();
+                    }
+                    if( word.indexOf( '|' ) > 0){
+                        word = word.substring( 0, word.indexOf( '|' ) );
+                    }
+                    if(!addWordPhrase(word)){
+                        System.out.println("Invalid Extend Word '" + word + "' for marker '" + marker + "' for base word '" + baseWord + "'");
+                    }
+                }
+                idx3 = wikiText.indexOf( "[[", idx4 );
+            }else{
+                idx3 = -1;
+            }
+        }
     }
     
     /**
