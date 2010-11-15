@@ -38,6 +38,7 @@ public class BookGenerator_de extends BookGenerator {
         addWord( "Ihre" );
         addWord( "Ihres" );
         addWord( "Ihrem" );
+        addWord( "Ihren" );
         addWord( "Sie" );
         addWord( "Du" );
     }
