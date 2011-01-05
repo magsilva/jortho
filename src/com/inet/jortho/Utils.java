@@ -152,15 +152,6 @@ class Utils {
                     }
                     newWord[i] = '\'';
                     break;
-                case '\u201c': // LEFT DOUBLE QUOTATION MARK
-                case '\u201d': // RIGHT DOUBLE QUOTATION MARK
-                case '\u201e': // DOUBLE LOW-9 QUOTATION MARK
-                case '\u201f': // DOUBLE HIGH-REVERSED-9 QUOTATION MARK
-                    if( newWord == null ){
-                        newWord = word.toCharArray();
-                    }
-                    newWord[i] = '\"';
-                    break;
                 case '\u2011': // NON-BREAKING HYPHEN
                 case '\u2012': // FIGURE DASH
                 case '\u2013': // EN DASH
