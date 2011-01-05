@@ -228,6 +228,7 @@ class Tokenizer {
         }
         try {
             phrase = doc.getText( paragraphOffset, end-paragraphOffset );
+            phrase = Utils.removeUnicodeQuotation( phrase );
         } catch( BadLocationException e ) {
             e.printStackTrace();
         }

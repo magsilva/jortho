@@ -125,4 +125,54 @@ class Utils {
         }
         return false;
     }
+    
+    /**
+     * Check and replace Unicode variants of quotation marks and hyphens. Unicode characters for general punctuation can
+     * be seen here: http://www.unicodemap.org/range/40/General_Punctuation/
+     * 
+     * @param word
+     *            the word that should be check. It can not be null.
+     * @return A new string of the same length as the original.
+     */
+    static String removeUnicodeQuotation( String word ) {
+        char[] newWord = null;
+
+        for( int i = 0; i < word.length(); i++ ) {
+            char ch = word.charAt( i );
+
+            switch( ch ) {
+                case '\u2018': // LEFT SINGLE QUOTATION MARK
+                case '\u2019': // RIGHT SINGLE QUOTATION MARK
+                case '\u201a': // SINGLE LOW-9 QUOTATION MARK
+                case '\u201b': // SINGLE HIGH-REVERSED-9 QUOTATION MARK
+                case '´': // These last two should probably not be included,
+                case '`': // they are not really quotation marks.
+                    if( newWord == null ){
+                        newWord = word.toCharArray();
+                    }
+                    newWord[i] = '\'';
+                    break;
+                case '\u201c': // LEFT DOUBLE QUOTATION MARK
+                case '\u201d': // RIGHT DOUBLE QUOTATION MARK
+                case '\u201e': // DOUBLE LOW-9 QUOTATION MARK
+                case '\u201f': // DOUBLE HIGH-REVERSED-9 QUOTATION MARK
+                    if( newWord == null ){
+                        newWord = word.toCharArray();
+                    }
+                    newWord[i] = '\"';
+                    break;
+                case '\u2011': // NON-BREAKING HYPHEN
+                case '\u2012': // FIGURE DASH
+                case '\u2013': // EN DASH
+                case '\u2014': // EM DASH
+                case '\u2015': // HORIZONTAL BAR
+                    if( newWord == null ){
+                        newWord = word.toCharArray();
+                    }
+                    newWord[i] = '-';
+                    break;
+            }
+        }
+        return ( newWord == null ) ? word : new String( newWord );
+    }
 }
