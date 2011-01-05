@@ -20,22 +20,16 @@
  *  
  * Created on 16.06.2009
  */
-package com.inet.jorthotests;
-
-import com.inet.jorthodictionaries.BookUtils;
+package com.inet.jortho;
 
 import junit.framework.TestCase;
 
 public class UtilsTest  extends TestCase{
     
-    public void testCalcDiff(){
-        assertEquals( 3, BookUtils.calcDiff( "", "abc" ) );
-        assertEquals( 3, BookUtils.calcDiff( "abc", "" ) );
-        assertEquals( 3, BookUtils.calcDiff( "abc", "def" ) );
-        
-        assertEquals( 1, BookUtils.calcDiff( "abcd", "abzd" ) );
-        assertEquals( 1, BookUtils.calcDiff( "abcd", "abd" ) );
-        assertEquals( 1, BookUtils.calcDiff( "abd", "abcd" ) );
+    public void testRemoveUnicodeQuotation(){
+        assertSame( "abc", Utils.removeUnicodeQuotation( "abc" ));
+        assertEquals( "ab'c", Utils.removeUnicodeQuotation( "ab´c" ));
+        assertEquals( "ab\"c", Utils.removeUnicodeQuotation( "ab\u201fc" ));
+        assertEquals( "ab-c", Utils.removeUnicodeQuotation( "ab\u2015c" ));
     }
-
 }

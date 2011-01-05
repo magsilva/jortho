@@ -20,11 +20,9 @@
  *  
  * Created on 14.10.2008
  */
-package com.inet.jorthotests;
+package com.inet.jortho;
 
 import javax.swing.*;
-
-import com.inet.jortho.*;
 
 import junit.framework.TestCase;
 

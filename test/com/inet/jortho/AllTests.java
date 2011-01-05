@@ -1,3 +1,4 @@
+package com.inet.jortho;
 /*
  *  JOrtho
  *
@@ -20,12 +21,12 @@
  *  
  * Created on 14.10.2008
  */
-package com.inet.jorthotests;
+
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import com.inet.jortho.*;
+import com.inet.jorthodictionaries.BookUtilsTest;
 
 public class AllTests {
 
@@ -59,6 +60,7 @@ public class AllTests {
         suite.addTestSuite( EventTest.class );
         suite.addTestSuite( MemoryTest.class );
         suite.addTestSuite( UtilsTest.class );
+        suite.addTestSuite( BookUtilsTest.class );
         return suite;
     }
 }
