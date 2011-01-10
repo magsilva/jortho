@@ -148,7 +148,8 @@ class AutoSpellChecker implements DocumentListener, LanguageChangeListener {
                 return;
             }
             checkElement( element );
-            offset = element.getEndOffset();
+            int endOffset = element.getEndOffset();
+            offset = endOffset > offset ? endOffset : offset + 1;
         }while( offset <= end && offset < document.getLength() );
     }
 
