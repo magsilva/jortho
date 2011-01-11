@@ -512,8 +512,13 @@ public class SpellChecker {
      */
     private static void fireLanguageChanged( Locale oldLocale ) {
         LanguageChangeEvent ev = new LanguageChangeEvent( currentLocale, oldLocale );
-        for( LanguageChangeListener listener : listeners.keySet() ) {
-            listener.languageChanged( ev );
+        
+        Object[] list;
+        synchronized( listeners ) {
+            list = listeners.keySet().toArray();
+        }
+        for( Object listener : list ) {
+            ((LanguageChangeListener)listener).languageChanged( ev );
         }
     }
     
