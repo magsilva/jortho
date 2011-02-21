@@ -96,14 +96,14 @@ abstract class DictionaryBase {
     
     
     /**
-     * Es wird nach verschiedenen Regeln nach �hnlichen W�rtern gesucht.
-     * Je nach Regel gibt es einen anderen diff. Jekleiner der diff desto �hnlicher.
-     * Diese Methode ruft sich rekursiv auf.
-     * @param list Kontainer f�r die gefundenen W�rter
-     * @param chars bis zur charPosition bereits gemappte Buchstaben, danach noch zu mappende des orignal Wortes
-     * @param charPosition Zeichenposition im char array
-     * @param lastIdx Position im Suchindex der zur aktuellen Zeichenposition zeigt.
-     * @param diff Die Un�hnlichkeit bis zur aktuellen Zeichenposition
+     * It will search with different rules for similar words.
+     * For every rule there are a different difference. The smaller the difference that so similarer.
+     * This method is calling recursive it self.
+     * @param list Container for found words
+     * @param chars until charPosition already map characters, after the part of the original word that still need to map.
+     * @param charPosition character position in char array
+     * @param lastIdx position in the index (dictionary) to the current character position
+     * @param diff the dissimilar up to the current character position
      */
     private void searchSuggestions( Suggestions list, CharSequence chars, int charPosition, int lastIdx, int diff){
         if(diff > list.getMaxDissimilarity()){
