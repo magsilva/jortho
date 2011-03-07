@@ -233,16 +233,15 @@ public class BookGenerator_de extends BookGenerator {
         }
         
         
-        idx = wikiText.indexOf("{{Wortart|Partizip I}}");
-        if(idx <0){
-            idx = wikiText.indexOf("{{Wortart|Partizip I|Deutsch}}");
+        if( wikiText.indexOf( "{{Wortart|Partizip I|Deutsch}}" ) >= 0 ) {
+            addDeklinationAdjektiv( word );
         }
-        if(idx >= 0){
-            addDeklinationAdjektiv(word);
+
+        if( wikiText.indexOf( "{{Wortart|Partizip II|Deutsch}}" ) >= 0 ) {
+            addDeklinationAdjektiv( word );
         }
-        
-        idx = wikiText.indexOf("{{Wortart|Indefinitpronomen|Deutsch}}");
-        if(idx >= 0){
+
+        if( wikiText.indexOf( "{{Wortart|Indefinitpronomen|Deutsch}}" ) >= 0 ) {
             addIndefinitpronomen( word, wikiText );
         }
         
