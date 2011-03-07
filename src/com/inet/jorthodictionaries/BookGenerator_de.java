@@ -714,9 +714,15 @@ public class BookGenerator_de extends BookGenerator {
             addWord( stamm + "et" );
         }
 
+        // Partizip Perfect / Partizip 2
         stamm = props.getProperty( "5" );
         if( stamm != null && super.isValidWord( stamm ) ) {
             addWord( stamm );
+            addWord( stamm + "er" );
+            addWord( stamm + "e" );
+            addWord( stamm + "es" );
+            addWord( stamm + "en" );
+            addWord( stamm + "em" );
         }
     }
     
@@ -725,9 +731,15 @@ public class BookGenerator_de extends BookGenerator {
      * Implementation of the template http://de.wiktionary.org/wiki/Vorlage:Deutsch_Verb_schwach_untrennbar_reflexiv
      */
     private void addKonjugationVerbSchwachUntrennbar( Properties props, boolean reflexiv ) {
+        // Partizip Perfect / Partizip 2
         String partizip2 = props.getProperty( "6" );
         if( partizip2 != null && super.isValidWord( partizip2 ) ) {
             addWord( partizip2 );
+            addWord( partizip2 + "er" );
+            addWord( partizip2 + "e" );
+            addWord( partizip2 + "es" );
+            addWord( partizip2 + "en" );
+            addWord( partizip2 + "em" );
         }
 
         String stamm4 = props.getProperty( "1" ) + props.getProperty( "2" ) + props.getProperty( "3" ) + props.getProperty( "4" );
@@ -763,9 +775,15 @@ public class BookGenerator_de extends BookGenerator {
      * Implementation of the template http://de.wiktionary.org/wiki/Vorlage:Deutsch_Verb_schwach_trennbar_reflexiv
      */
     private void addKonjugationVerbSchwachTrennbar( Properties props, boolean reflexiv ) {
+        // Partizip Perfect / Partizip 2
         String partizip2 = props.getProperty( "7" );
         if( partizip2 != null && super.isValidWord( partizip2 ) ) {
             addWord( partizip2 );
+            addWord( partizip2 + "er" );
+            addWord( partizip2 + "e" );
+            addWord( partizip2 + "es" );
+            addWord( partizip2 + "en" );
+            addWord( partizip2 + "em" );
         }
         
         String vorsilbe = props.getProperty( "1" );
@@ -814,9 +832,15 @@ public class BookGenerator_de extends BookGenerator {
      * Implementation of the template http://de.wiktionary.org/wiki/Vorlage:Deutsch_Verb_schwach_doppelt_trennbar
      */
     private void addKonjugationVerbSchwachDoppeltTrennbar( Properties props ) {
+        // Partizip Perfect / Partizip 2
         String partizip2 = props.getProperty( "8" );
         if( partizip2 != null && super.isValidWord( partizip2 ) ) {
             addWord( partizip2 );
+            addWord( partizip2 + "er" );
+            addWord( partizip2 + "e" );
+            addWord( partizip2 + "es" );
+            addWord( partizip2 + "en" );
+            addWord( partizip2 + "em" );
         }
         
         String vorsilbe = props.getProperty( "1" ) + props.getProperty( "2" );;
@@ -863,9 +887,15 @@ public class BookGenerator_de extends BookGenerator {
      * Implementation of the template http://de.wiktionary.org/wiki/Vorlage:Konjugation_Hilfsverb_haben
      */
     private void addKonjugationHilfsverbHaben( Properties props ) {
+        // Partizip Perfect / Partizip 2
         String partizip2 = props.getProperty( "3" );
         if( partizip2 != null && super.isValidWord( partizip2 ) ) {
             addWord( partizip2 );
+            addWord( partizip2 + "er" );
+            addWord( partizip2 + "e" );
+            addWord( partizip2 + "es" );
+            addWord( partizip2 + "en" );
+            addWord( partizip2 + "em" );
         }
         String stamm1 = props.getProperty( "1" );
         String stamm2 = props.getProperty( "2" );
