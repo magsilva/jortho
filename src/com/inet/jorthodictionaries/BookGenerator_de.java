@@ -682,9 +682,19 @@ public class BookGenerator_de extends BookGenerator {
      * Implementation of the template http://de.wiktionary.org/wiki/Vorlage:Deutsch_Verb_unregelm%C3%A4%C3%9Fig
      */
     private void addKonjugationVerbUnregular( Properties props ) {
+        String vorsilbe = props.getProperty( "1" );
         String stamm = props.getProperty( "2" );
+        
         // Partizipien
-        addWord( stamm + "end" );
+        addWord( vorsilbe + stamm + "end" );        
+        if( "ja".equals( props.getProperty( "gerund" ) ) ){
+            String gerund = vorsilbe.length() > 0 ? vorsilbe + "zu" + stamm : stamm;
+            addWord( gerund + "nder" );
+            addWord( gerund + "nde" );
+            addWord( gerund + "ndes" );
+            addWord( gerund + "nden" );
+            addWord( gerund + "ndem" );            
+        }
         
         //Präsens
         if( stamm != null && super.isValidWord( stamm ) ) {
@@ -694,6 +704,16 @@ public class BookGenerator_de extends BookGenerator {
             addWord( stamm + "en" );
             addWord( stamm + "est" );
             addWord( stamm + "et" );
+            if( vorsilbe.length() > 0 ){
+                //Nebensatz
+                addWord( vorsilbe + stamm );
+                addWord( vorsilbe + stamm + "e" );
+                addWord( vorsilbe + stamm + "st" );
+                addWord( vorsilbe + stamm + "t" );
+                addWord( vorsilbe + stamm + "en" );
+                addWord( vorsilbe + stamm + "est" );
+                addWord( vorsilbe + stamm + "et" );
+            }
         }
 
         //Präteritum
@@ -703,6 +723,13 @@ public class BookGenerator_de extends BookGenerator {
             addWord( stamm + "st" );
             addWord( stamm + "en" );
             addWord( stamm + "t" );
+            if( vorsilbe.length() > 0 ){
+                //Nebensatz
+                addWord( vorsilbe + stamm );
+                addWord( vorsilbe + stamm + "st" );
+                addWord( vorsilbe + stamm + "en" );
+                addWord( vorsilbe + stamm + "t" );
+            }
         }
 
         //Präteritum Konjunktiv
@@ -712,17 +739,24 @@ public class BookGenerator_de extends BookGenerator {
             addWord( stamm + "est" );
             addWord( stamm + "en" );
             addWord( stamm + "et" );
+            if( vorsilbe.length() > 0 ){
+                //Nebensatz
+                addWord( vorsilbe + stamm );
+                addWord( vorsilbe + stamm + "est" );
+                addWord( vorsilbe + stamm + "en" );
+                addWord( vorsilbe + stamm + "et" );
+            }
         }
 
         // Partizip Perfect / Partizip 2
         stamm = props.getProperty( "5" );
         if( stamm != null && super.isValidWord( stamm ) ) {
-            addWord( stamm );
-            addWord( stamm + "er" );
-            addWord( stamm + "e" );
-            addWord( stamm + "es" );
-            addWord( stamm + "en" );
-            addWord( stamm + "em" );
+            addWord( vorsilbe + stamm );
+            addWord( vorsilbe + stamm + "er" );
+            addWord( vorsilbe + stamm + "e" );
+            addWord( vorsilbe + stamm + "es" );
+            addWord( vorsilbe + stamm + "en" );
+            addWord( vorsilbe + stamm + "em" );
         }
     }
     
