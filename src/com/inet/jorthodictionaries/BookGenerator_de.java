@@ -22,7 +22,9 @@
  */
 package com.inet.jorthodictionaries;
 
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -239,6 +241,10 @@ public class BookGenerator_de extends BookGenerator {
             addDeklinationAdjektiv(word);
         }
         
+        idx = wikiText.indexOf("{{Wortart|Indefinitpronomen|Deutsch}}");
+        if(idx >= 0){
+            addIndefinitpronomen( word, wikiText );
+        }
         
         searchExtendsWords( word, wikiText, "{{Synonyme}}" );
         searchExtendsWords( word, wikiText, "{{Unterbegriffe}}" );
@@ -479,6 +485,21 @@ public class BookGenerator_de extends BookGenerator {
             addWord( wordStamm + "es" );
             addWord( wordStamm + "en" );
             addWord( wordStamm + "em" );
+        }
+    }
+    
+    /**
+     * Add the declination of pronomen
+     * @param word the lemma word
+     * @param wikiText the wiki text
+     */
+    private void addIndefinitpronomen( String word, String wikiText ) {
+        Properties props = BookUtils.parseRule( wikiText, "Pronomina-Tabelle", 0 );
+        if( props != null ){
+            Set<Map.Entry<Object,Object>> entries = props.entrySet();
+            for( Map.Entry<Object,Object> entry : entries ) {
+                addFormatedWordPhrase( word, (String)entry.getKey(), (String)entry.getValue() );
+            }
         }
     }
     
@@ -752,11 +773,7 @@ public class BookGenerator_de extends BookGenerator {
         stamm = props.getProperty( "5" );
         if( stamm != null && super.isValidWord( stamm ) ) {
             addWord( vorsilbe + stamm );
-            addWord( vorsilbe + stamm + "er" );
-            addWord( vorsilbe + stamm + "e" );
-            addWord( vorsilbe + stamm + "es" );
-            addWord( vorsilbe + stamm + "en" );
-            addWord( vorsilbe + stamm + "em" );
+            addDeklinationAdjektiv( vorsilbe + stamm );
         }
     }
     
@@ -769,11 +786,7 @@ public class BookGenerator_de extends BookGenerator {
         String partizip2 = props.getProperty( "6" );
         if( partizip2 != null && super.isValidWord( partizip2 ) ) {
             addWord( partizip2 );
-            addWord( partizip2 + "er" );
-            addWord( partizip2 + "e" );
-            addWord( partizip2 + "es" );
-            addWord( partizip2 + "en" );
-            addWord( partizip2 + "em" );
+            addDeklinationAdjektiv( partizip2);
         }
 
         String stamm4 = props.getProperty( "1" ) + props.getProperty( "2" ) + props.getProperty( "3" ) + props.getProperty( "4" );
@@ -813,11 +826,7 @@ public class BookGenerator_de extends BookGenerator {
         String partizip2 = props.getProperty( "7" );
         if( partizip2 != null && super.isValidWord( partizip2 ) ) {
             addWord( partizip2 );
-            addWord( partizip2 + "er" );
-            addWord( partizip2 + "e" );
-            addWord( partizip2 + "es" );
-            addWord( partizip2 + "en" );
-            addWord( partizip2 + "em" );
+            addDeklinationAdjektiv( partizip2);
         }
         
         String vorsilbe = props.getProperty( "1" );
@@ -870,11 +879,7 @@ public class BookGenerator_de extends BookGenerator {
         String partizip2 = props.getProperty( "8" );
         if( partizip2 != null && super.isValidWord( partizip2 ) ) {
             addWord( partizip2 );
-            addWord( partizip2 + "er" );
-            addWord( partizip2 + "e" );
-            addWord( partizip2 + "es" );
-            addWord( partizip2 + "en" );
-            addWord( partizip2 + "em" );
+            addDeklinationAdjektiv( partizip2);
         }
         
         String vorsilbe = props.getProperty( "1" ) + props.getProperty( "2" );;
@@ -925,11 +930,7 @@ public class BookGenerator_de extends BookGenerator {
         String partizip2 = props.getProperty( "3" );
         if( partizip2 != null && super.isValidWord( partizip2 ) ) {
             addWord( partizip2 );
-            addWord( partizip2 + "er" );
-            addWord( partizip2 + "e" );
-            addWord( partizip2 + "es" );
-            addWord( partizip2 + "en" );
-            addWord( partizip2 + "em" );
+            addDeklinationAdjektiv( partizip2);
         }
         String stamm1 = props.getProperty( "1" );
         String stamm2 = props.getProperty( "2" );
