@@ -142,7 +142,7 @@ public class CheckerListener implements PopupMenuListener, LanguageChangeListene
                 addSuggestionMenuItem( jText, begOffs, endOffs, list, needCapitalization );
                 addMenuItemAddToDictionary( jText, word, list.size() > 0 );
             } catch( BadLocationException ex ) {
-                ex.printStackTrace();
+            	SpellChecker.getMessageHandler().handleException( ex );
             }
         }
     }
@@ -159,7 +159,12 @@ public class CheckerListener implements PopupMenuListener, LanguageChangeListene
     protected int getCursorPosition( JTextComponent jText ) throws BadLocationException {
         Caret caret = jText.getCaret();
         int offs;
-        Point p = jText.getMousePosition();
+        Point p = null;
+        try {
+            p = jText.getMousePosition();
+        } catch( RuntimeException e ) { // hack for http://bugs.sun.com/view_bug.do?bug_id=8012026
+            SpellChecker.getMessageHandler().handleException( e );
+        }
         if( p != null ) {
             // use position from mouse click and not from editor cursor position 
             offs = jText.viewToModel( p );

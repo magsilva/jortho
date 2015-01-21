@@ -125,7 +125,7 @@ public class WordIterator implements Iterator<String> {
             }
         } catch( IOException e ) {
             word = null;
-            e.printStackTrace();
+        	SpellChecker.getMessageHandler().handleException( e );
         }
         return next;
     }

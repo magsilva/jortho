@@ -33,17 +33,18 @@ import java.util.zip.*;
 /**
  * How to use
  * <li>Download the latest Wiktionary file "pages_articles.xml".
- * It is typical compressed. The position changed. I found it last at:
+ * It is typical compressed. The position changed. We found it last at:
  * <ul>
- * <li>http://download.wikimedia.org/arwiktionary/latest/arwiktionary-latest-pages-articles.xml.bz2
- * <li>http://download.wikimedia.org/dewiktionary/latest/dewiktionary-latest-pages-articles.xml.bz2
- * <li>http://download.wikimedia.org/enwiktionary/latest/enwiktionary-latest-pages-articles.xml.bz2
- * <li>http://download.wikimedia.org/eswiktionary/latest/eswiktionary-latest-pages-articles.xml.bz2
- * <li>http://download.wikimedia.org/frwiktionary/latest/frwiktionary-latest-pages-articles.xml.bz2
- * <li>http://download.wikimedia.org/itwiktionary/latest/itwiktionary-latest-pages-articles.xml.bz2
- * <li>http://download.wikimedia.org/nlwiktionary/latest/nlwiktionary-latest-pages-articles.xml.bz2
- * <li>http://download.wikimedia.org/plwiktionary/latest/plwiktionary-latest-pages-articles.xml.bz2
- * <li>http://download.wikimedia.org/ruwiktionary/latest/ruwiktionary-latest-pages-articles.xml.bz2
+ * <li>http://dumps.wikimedia.org/arwiktionary/latest/arwiktionary-latest-pages-articles.xml.bz2
+ * <li>http://dumps.wikimedia.org/dewiktionary/latest/dewiktionary-latest-pages-articles.xml.bz2
+ * <li>http://dumps.wikimedia.org/elwiktionary/latest/elwiktionary-latest-pages-articles.xml.bz2
+ * <li>http://dumps.wikimedia.org/enwiktionary/latest/enwiktionary-latest-pages-articles.xml.bz2
+ * <li>http://dumps.wikimedia.org/eswiktionary/latest/eswiktionary-latest-pages-articles.xml.bz2
+ * <li>http://dumps.wikimedia.org/frwiktionary/latest/frwiktionary-latest-pages-articles.xml.bz2
+ * <li>http://dumps.wikimedia.org/itwiktionary/latest/itwiktionary-latest-pages-articles.xml.bz2
+ * <li>http://dumps.wikimedia.org/nlwiktionary/latest/nlwiktionary-latest-pages-articles.xml.bz2
+ * <li>http://dumps.wikimedia.org/plwiktionary/latest/plwiktionary-latest-pages-articles.xml.bz2
+ * <li>http://dumps.wikimedia.org/ruwiktionary/latest/ruwiktionary-latest-pages-articles.xml.bz2
  * </ul>
  * </li>
  * 

@@ -23,6 +23,7 @@
 package com.inet.jorthodictionaries;
 
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -126,13 +127,6 @@ public class BookGenerator_de extends BookGenerator {
                 // The declinations are valid, but the lemma (word) not.
                 return false;
             }
-            
-            props = BookUtils.parseRule( wikiText, "Konjugation Hilfsverb haben", 0 );
-            if(props != null){
-                addKonjugationHilfsverbHaben( props );
-                // The declinations are valid, but the lemma (word) not.
-                return false;
-            }
 
 //            if( word.endsWith( "(Konjugation)" ) && wikiText.indexOf( "Deutsch" ) > 0 ){
 //                System.err.println();
@@ -151,10 +145,7 @@ public class BookGenerator_de extends BookGenerator {
     }
     
     private final void searchFlexion( String word, String wikiText ){
-        int idx = wikiText.indexOf("{{Wortart|Verb}}");
-        if(idx <0){
-            idx = wikiText.indexOf("{{Wortart|Verb|Deutsch}}");
-        }
+        int idx = wikiText.indexOf("{{Wortart|Verb|Deutsch}}");
         while(idx > 0){
             //ascertain flexion of the verbs
             String table = getTable( wikiText, "Verb-Tabelle", idx );
@@ -168,10 +159,7 @@ public class BookGenerator_de extends BookGenerator {
                 searchWordAndAdd( word, table, "Befehl_ihr=", 0);
             }
             int lastIdx = idx+1;
-            idx = wikiText.indexOf("{{Wortart|Verb}}", lastIdx);
-            if(idx <0){
-                idx = wikiText.indexOf("{{Wortart|Verb|Deutsch}}", lastIdx);
-            }
+            idx = wikiText.indexOf("{{Wortart|Verb|Deutsch}}", lastIdx);
         }
         
         
@@ -181,12 +169,7 @@ public class BookGenerator_de extends BookGenerator {
         }
         while(idx > 0){
             String chapter = getChapter(wikiText, idx);
-            if( !addDeklinationSubstTable( chapter, 0, word ) && 
-                            !addDeklinationSubstM_NStart( chapter, 0 ) &&
-                            !addDeklinationSubstMSchwach1( chapter, 0 ) &&
-                            !addDeklinationSubstMSchwach3( chapter, 0 ) &&
-                            !addDeklinationSubstFStark( chapter, 0 ) && 
-                            !addDeklinationSubstFSchwach( chapter, 0 ) ){
+            if( !addDeklinationSubstTable( chapter, 0, word ) ){
                 // no Deklination found
             }
             int lastIdx = idx+1;
@@ -197,27 +180,15 @@ public class BookGenerator_de extends BookGenerator {
         }
         
         
-        idx = wikiText.indexOf("{{Wortart|Adjektiv}}");
-        if(idx <0){
-            idx = wikiText.indexOf("{{Wortart|Adjektiv|Deutsch}}");
-        }
+        idx = wikiText.indexOf("{{Wortart|Adjektiv|Deutsch}}");
         while(idx > 0){
             // finding the conjugation of the Adjective 
-            Properties props = BookUtils.parseRule( wikiText, "Adjektiv-Tabelle", idx);
-            if(props == null){
-                props = BookUtils.parseRule( wikiText, "Adjektiv-Tabelle (Deklination)", idx);
-            }
-            if(props == null){
-                props = BookUtils.parseRule( wikiText, "Adjektiv-Tabelle (Bild)", idx);
-            }
-            if(props == null){
-                props = BookUtils.parseRule( wikiText, "Adjektiv-Tabelle (Bild) (Deklination)", idx);
-            }
+            Properties props = BookUtils.parseRule( wikiText, "Deutsch Adjektiv Übersicht", idx);
             if(props != null){
-                String grundform = props.getProperty( "Grundform" );
-                addFormatedWordPhrase(word, "Grundform", grundform );
-                addFormatedWordPhrase(word, "1. Steigerung", props.getProperty( "1. Steigerung" ) );
-                addFormatedWordPhrase(word, "2. Steigerung", props.getProperty( "2. Steigerung" ) );
+                String grundform = props.getProperty( "Positiv" );
+                addFormatedWordPhrase(word, "Positiv", grundform );
+                addFormatedWordPhrase(word, "Komparativ", props.getProperty( "Komparativ" ) );
+                addFormatedWordPhrase(word, "Superlativ", props.getProperty( "Superlativ" ) );
                 if(grundform == null || !super.isValidWord(grundform)){
                     grundform = word;
                 }
@@ -226,10 +197,7 @@ public class BookGenerator_de extends BookGenerator {
                 }
             }
             int lastIdx = idx+1;
-            idx = wikiText.indexOf("{{Wortart|Adjektiv}}", lastIdx);
-            if(idx <0){
-                idx = wikiText.indexOf("{{Wortart|Adjektiv|Deutsch}}", lastIdx);
-            }
+            idx = wikiText.indexOf("{{Wortart|Adjektiv|Deutsch}}", lastIdx);
         }
         
         
@@ -504,50 +472,45 @@ public class BookGenerator_de extends BookGenerator {
     
     /**
      * Implementation of the templates
-     * http://de.wiktionary.org/wiki/Vorlage:Substantiv-Tabelle
-     * http://de.wiktionary.org/wiki/Vorlage:Substantiv-Tabelle_(2_Pluralformen)
-     * http://de.wiktionary.org/wiki/Vorlage:Substantiv-Tabelle_(2_Singularformen)
-     * http://de.wiktionary.org/wiki/Vorlage:Substantiv-Tabelle_(3_Singularformen)
-     * http://de.wiktionary.org/wiki/Vorlage:Substantiv-Tabelle_(Bild)
-     * http://de.wiktionary.org/wiki/Vorlage:Substantiv-Tabelle_(2_Bilder)
+     * http://de.wiktionary.org/wiki/Vorlage:Deutsch_Substantiv_Übersicht
      */
     private boolean addDeklinationSubstTable( String wikiText, int fromIndex, String baseWord ) {
-        String[] templates =
-                        { "Substantiv-Tabelle", "Substantiv-Tabelle (2 Pluralformen)",
-                                        "Substantiv-Tabelle (2 Singularformen)",
-                                        "Substantiv-Tabelle (3 Singularformen)", 
-                                        "Substantiv-Tabelle (Bild)",
-                                        "Substantiv-Tabelle (2 Bilder)", 
-                                        "Substantiv-Tabelle (2 Pluralformen) (Bild)",
-                                        "Substantiv-Tabelle (2 Pluralformen) (2 Bilder)",
-                                        "Substantiv-Tabelle (3 Bilder)", 
-                                        "Substantiv-Tabelle (3 Pluralformen)", 
-                                        "Substantiv-Tabelle-Singular"};
-        Properties props = null;
-        for( int i = 0; i < templates.length; i++ ) {
-            String template = templates[i];
-            props = BookUtils.parseRule( wikiText, template, fromIndex );
-            if( props != null ) {
-                break;
+        Properties props = BookUtils.parseRule( wikiText, "Deutsch Substantiv Übersicht", fromIndex );
+        if( props != null ) {
+            if( props.remove( "Bild" ) != null || props.remove( "Bild 1" ) != null ) {
+                props.remove( "1" );
+                props.remove( "2" );
+                props.remove( "3" );
             }
-        }
-        if( props == null ) {
-            return false;
+            if( props.remove( "Bild 2" ) != null ) {
+                props.remove( "4" );
+                props.remove( "5" );
+                props.remove( "6" );
+            }
+            if( props.remove( "Bild 3" ) != null ) {
+                props.remove( "7" );
+                props.remove( "8" );
+                props.remove( "9" );
+            }
+            if( props.remove( "Bild 4" ) != null ) {
+                props.remove( "10" );
+                props.remove( "11" );
+                props.remove( "12" );
+            }
+            if( props.remove( "Bild 5" ) != null ) {
+                props.remove( "13" );
+                props.remove( "14" );
+                props.remove( "15" );
+            }
+            for( Entry entry : props.entrySet() ) {
+                String word = (String)entry.getValue();
+                addFormatedWordPhrase( baseWord, (String)entry.getKey(), word );
+            }
+
+            return true;
         }
 
-        String[] keyWords =
-                        { "Wer oder was? (Einzahl)", "Wessen? (Einzahl)", "Wem? (Einzahl)", "Wen? (Einzahl)",
-                                        "(Mehrzahl 1)", "Wer oder was? (Mehrzahl)", "Wessen? (Mehrzahl)",
-                                        "Wem? (Mehrzahl)", "Wen? (Mehrzahl)", "Wer oder was? (Mehrzahl 1)",
-                                        "Wer oder was? (Mehrzahl 2)", "Wessen? (Mehrzahl 1)", "Wessen? (Mehrzahl 2)",
-                                        "Wem? (Mehrzahl 1)", "Wem? (Mehrzahl 2)", "Wen? (Mehrzahl 1)",
-                                        "Wen? (Mehrzahl 2)" };
-
-        for( String key : keyWords ) {
-            String word = props.getProperty( key );
-            addFormatedWordPhrase( baseWord, key, word );
-        }
-        return true;
+        return false;
     }
 
     private String removeHtmlFormating( String word ) {
@@ -556,7 +519,7 @@ public class BookGenerator_de extends BookGenerator {
             int idx2 = word.indexOf( '>', idx1 );
             if( idx2 > 0 ) {
                 String html = word.substring(idx1+1, idx2).toLowerCase().trim();
-                if(html.equals("br") || html.equals("p")){
+                if(html.equals("br") || html.equals("p") || html.startsWith( "br " ) || html.startsWith( "p " ) ){
                     html = " ";
                 }else{
                     html = "";
@@ -578,131 +541,10 @@ public class BookGenerator_de extends BookGenerator {
     }
 
     /**
-     * Implementation of the template http://de.wiktionary.org/wiki/Vorlage:Deutsch_Substantiv_m_stark and
-     * http://de.wiktionary.org/wiki/Vorlage:Deutsch_Substantiv_n_stark
-     */
-    private boolean addDeklinationSubstM_NStart( String wikiText, int fromIndex ) {
-        Properties props = BookUtils.parseRule( wikiText, "Deutsch Substantiv m stark", fromIndex );
-        if( addDeklinationSubstM_NStart( props ) ) {
-            return true;
-        }
-        props = BookUtils.parseRule( wikiText, "Deutsch Substantiv n stark", fromIndex );
-        return addDeklinationSubstM_NStart( props );
-    }
-
-    private boolean addDeklinationSubstM_NStart( Properties props ) {
-        if( props == null ) {
-            return false;
-        }
-        String singular = props.getProperty( "SINGULAR", "" );
-        String plural = props.getProperty( "PLURAL", "" );
-        String genetiv = props.getProperty( "GENITIV-E", "" );
-        String endung = props.getProperty( "ENDUNGS-N", "" );
-        if( super.isValidWord( singular ) ) {
-            if( genetiv.length() == 0 || "0".equals( genetiv ) ) {
-                addWord( singular + "s" ); //Genitive
-            }
-            if( genetiv.length() == 0 || "1".equals( genetiv ) ) {
-                addWord( singular + "es" ); //Genitive
-                addWord( singular + "e" ); //Dative
-            }
-        }
-        if( super.isValidWord( plural ) ) {
-            addWord( plural );
-            if( endung.length() == 0 || "0".equals( endung ) ) {
-                addWord( plural + "n" );
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Implementation of the template http://de.wiktionary.org/wiki/Vorlage:Deutsch_Substantiv_m_schwach_1
-     */
-    private boolean addDeklinationSubstMSchwach1( String wikiText, int fromIndex ) {
-        Properties props = BookUtils.parseRule( wikiText, "Deutsch Substantiv m schwach 1", fromIndex );
-        if( props == null ) {
-            return false;
-        }
-        String singular = props.getProperty( "SINGULAR", "" );
-        String plural = props.getProperty( "PLURAL", "" );
-        String genetiv = props.getProperty( "GENITIV-E", "" );
-        if( super.isValidWord( singular ) ) {
-            if( "1".equals( genetiv ) ) {
-                addWord( singular + "n" );
-            }
-        }
-        if( super.isValidWord( plural ) ) {
-            addWord( plural );
-        }
-        return true;
-    }
-
-    /**
-     * Implementation of the template http://de.wiktionary.org/wiki/Vorlage:Deutsch_Substantiv_m_schwach_3
-     */
-    private boolean addDeklinationSubstMSchwach3( String wikiText, int fromIndex ) {
-        Properties props = BookUtils.parseRule( wikiText, "Deutsch Substantiv m schwach 3", fromIndex );
-        if( props == null ) {
-            return false;
-        }
-        String singular = props.getProperty( "SINGULAR", "" );
-        String plural = props.getProperty( "PLURAL", "" );
-        String genetiv = props.getProperty( "GENITIV-E", "" );
-        if( super.isValidWord( singular ) ) {
-            if( "1".equals( genetiv ) ) {
-                addWord( singular + "es" );
-            } else {
-                addWord( singular + "s" );
-            }
-        }
-        if( super.isValidWord( plural ) ) {
-            addWord( plural );
-        }
-        return true;
-    }
-
-    /**
-     * Implementation of the template http://de.wiktionary.org/wiki/Vorlage:Deutsch_Substantiv_f_stark
-     */
-    private boolean addDeklinationSubstFStark( String wikiText, int fromIndex ) {
-        Properties props = BookUtils.parseRule( wikiText, "Deutsch Substantiv f stark", fromIndex );
-        if( props == null ) {
-            return false;
-        }
-        //String singular = props.getProperty( "SINGULAR", "" );
-        String plural = props.getProperty( "PLURAL", "" );
-        String pluralN = props.getProperty( "PLURAL AUF N?", "" );
-        if( super.isValidWord( plural ) ) {
-            addWord( plural );
-            if( !"ja".equals( pluralN ) ) {
-                addWord( plural + "n" );
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Implementation of the template http://de.wiktionary.org/wiki/Vorlage:Deutsch_Substantiv_f_schwach
-     */
-    private boolean addDeklinationSubstFSchwach( String wikiText, int fromIndex ) {
-        Properties props = BookUtils.parseRule( wikiText, "Deutsch Substantiv f schwach", fromIndex );
-        if( props == null ) {
-            return false;
-        }
-        //String singular = props.getProperty( "SINGULAR", "" );
-        String plural = props.getProperty( "PLURAL", "" );
-        if( super.isValidWord( plural ) ) {
-            addWord( plural );
-        }
-        return true;
-    }
-
-    /**
      * Implementation of the template http://de.wiktionary.org/wiki/Vorlage:Deutsch_Verb_unregelm%C3%A4%C3%9Fig
      */
     private void addKonjugationVerbUnregular( Properties props ) {
-        String vorsilbe = props.getProperty( "1" );
+        String vorsilbe = props.getProperty( "1", "" );
         String stamm = props.getProperty( "2" );
         
         // Partizipien
@@ -726,7 +568,6 @@ public class BookGenerator_de extends BookGenerator {
             addWord( stamm + "et" );
             if( vorsilbe.length() > 0 ){
                 //Nebensatz
-                addWord( vorsilbe + stamm );
                 addWord( vorsilbe + stamm + "e" );
                 addWord( vorsilbe + stamm + "st" );
                 addWord( vorsilbe + stamm + "t" );
@@ -919,36 +760,5 @@ public class BookGenerator_de extends BookGenerator {
         addWord( all5 + "test" );
         addWord( all5 + "ten" );
         addWord( all5 + "tet" );
-    }
-    
-    /**
-     * Implementation of the template http://de.wiktionary.org/wiki/Vorlage:Konjugation_Hilfsverb_haben
-     */
-    private void addKonjugationHilfsverbHaben( Properties props ) {
-        // Partizip Perfect / Partizip 2
-        String partizip2 = props.getProperty( "3" );
-        if( partizip2 != null && super.isValidWord( partizip2 ) ) {
-            addWord( partizip2 );
-            addDeklinationAdjektiv( partizip2);
-        }
-        String stamm1 = props.getProperty( "1" );
-        String stamm2 = props.getProperty( "2" );
-        if( super.isValidWord( stamm1 ) && super.isValidWord( stamm2 ) ) {
-            // Partizipien
-            addWord( stamm1 + "end" );
-            //Präsens
-            addWord( stamm1 + "e" );
-            addWord( stamm2 + "st" );
-            addWord( stamm2 + "t" );
-            //Präterium
-            addWord( stamm2 + "te" );
-            addWord( stamm2 + "test" );
-            addWord( stamm2 + "ten" );
-            addWord( stamm2 + "tet" );
-            //Konjunktiv I
-            //addWord( stamm1 + "e" );
-            addWord( stamm1 + "est" );
-            addWord( stamm2 + "et" );
-        }
     }
 }

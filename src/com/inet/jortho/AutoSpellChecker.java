@@ -196,7 +196,7 @@ class AutoSpellChecker implements DocumentListener, LanguageChangeListener {
                 highlighter.addHighlight( wordOffset, wordOffset + word.length(), painter );
             }
         } catch( BadLocationException e ) {
-            e.printStackTrace();
+        	SpellChecker.getMessageHandler().handleException( e );
         }
     }
 

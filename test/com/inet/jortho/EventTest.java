@@ -22,23 +22,21 @@
  */
 package com.inet.jortho;
 
+import javax.swing.*;
 
-import javax.swing.JMenu;
-import javax.swing.JRadioButtonMenuItem;
+import junit.framework.TestCase;
 
-import static org.junit.Assert.*;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.Ignore;
+public class EventTest extends TestCase {
 
-public class EventTest  {
+    static {
+        AllTests.init();
+    }
 
-	@Ignore
-	@Test
     public void testChangeLanguage() throws Exception{
         JMenu menu1 = SpellChecker.createLanguagesMenu();
         JMenu menu2 = SpellChecker.createLanguagesMenu();
 
+        assertEquals( "Menucount", menu1.getItemCount(), menu2.getItemCount() );
         assertTrue( "2 languages requied:" + menu1.getItemCount(), menu1.getItemCount() >= 2 );
 
         JRadioButtonMenuItem item1_1 = (JRadioButtonMenuItem)menu1.getItem( 0 );
@@ -77,5 +75,13 @@ public class EventTest  {
         
         Thread.sleep( 10 ); // for loading thread
         
+    }
+
+    /**
+     * Compare 2 JRadioButtonMenuItem
+     */
+    private void assertEquals( String description, JRadioButtonMenuItem item1, JRadioButtonMenuItem item2 ) {
+        assertEquals( description + ": Name", item1.getName(), item2.getName() );
+        assertEquals( description + ": Selected", item1.isSelected(), item2.isSelected() );
     }
 }

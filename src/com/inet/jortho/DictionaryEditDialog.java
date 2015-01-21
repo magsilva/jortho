@@ -30,10 +30,14 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.text.Collator;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 
 import javax.swing.*;
@@ -48,6 +52,9 @@ class DictionaryEditDialog extends JDialog{
     
     private final JList list;
     private final JButton delete;
+    private final JButton export;
+    private final JButton importBtn;
+    final private JButton close;
     private boolean isModify;
 
     DictionaryEditDialog( JDialog parent ){
@@ -58,23 +65,38 @@ class DictionaryEditDialog extends JDialog{
         DefaultListModel data = new DefaultListModel();
         loadWordList( data );
         list = new JList( data );
-        content.add( new JScrollPane(list), new GridBagConstraints( 1, 1, 1, 1, 1.0, 1.0, GridBagConstraints.NORTH ,GridBagConstraints.BOTH, new Insets( 8,8,8,8 ), 0, 0) );
+        content.add( new JScrollPane(list), new GridBagConstraints( 1, 1, 1, 5, 1.0, 1.0, GridBagConstraints.NORTH ,GridBagConstraints.BOTH, new Insets( 8,8,8,8 ), 0, 0) );
         
-        delete = new JButton( Utils.getResource("delete") );
-        content.add( delete, new GridBagConstraints( 1, 2, 1, 1, 1.0, 0.0, GridBagConstraints.NORTH ,GridBagConstraints.BOTH, new Insets( 0,8,8,8 ), 0, 0) );
+        delete = Utils.getButton( "delete" );
+        content.add( delete, new GridBagConstraints( 2, 1, 1, 1, 0, 0, GridBagConstraints.NORTH ,GridBagConstraints.BOTH, new Insets( 8,0,0,8 ), 0, 0) );
         DeleteAction deleteAction = new DeleteAction();
         delete.addActionListener( deleteAction );
         // DELETE Key
         getRootPane().getInputMap( JComponent.WHEN_IN_FOCUSED_WINDOW ).put( KeyStroke.getKeyStroke( KeyEvent.VK_DELETE, 0, false ), "DELETE" );
         getRootPane().getActionMap().put( "DELETE", deleteAction );
-        
-        //ESCAPE Key
-        getRootPane().getInputMap( JComponent.WHEN_IN_FOCUSED_WINDOW ).put( KeyStroke.getKeyStroke( KeyEvent.VK_ESCAPE, 0, false ), "ESCAPE" );
-        getRootPane().getActionMap().put( "ESCAPE", new AbstractAction() {
+
+        export = Utils.getButton( "export" );
+        content.add( export, new GridBagConstraints( 2, 2, 1, 1, 0, 0, GridBagConstraints.NORTH ,GridBagConstraints.BOTH, new Insets( 8,0,0,8 ), 0, 0) );
+        export.addActionListener( new ExportAction() );
+
+        importBtn = Utils.getButton( "import" );
+        content.add( importBtn, new GridBagConstraints( 2, 3, 1, 1, 0, 0, GridBagConstraints.NORTH ,GridBagConstraints.BOTH, new Insets( 8,0,0,8 ), 0, 0) );
+        importBtn.addActionListener( new ImportAction() );
+
+        close       = Utils.getButton( "close" );
+        content.add( close, new GridBagConstraints( 2, 4, 1, 1, 0, 0, GridBagConstraints.NORTH ,GridBagConstraints.BOTH, new Insets( 8,0,0,8 ), 0, 0) );
+        AbstractAction closeAction = new AbstractAction() {
             public void actionPerformed( ActionEvent e ) {
                 dispose();
             }
-        } );
+        };
+        close.addActionListener( closeAction );
+
+        content.add( Utils.getLabel( null ), new GridBagConstraints( 2, 5, 1, 1, 0.0, 1.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.HORIZONTAL, new Insets(8,0,0,8), 0, 0));
+
+        //ESCAPE Key
+        getRootPane().getInputMap( JComponent.WHEN_IN_FOCUSED_WINDOW ).put( KeyStroke.getKeyStroke( KeyEvent.VK_ESCAPE, 0, false ), "ESCAPE" );
+        getRootPane().getActionMap().put( "ESCAPE", closeAction );
 
         pack();
         setLocationRelativeTo( parent );
@@ -94,29 +116,42 @@ class DictionaryEditDialog extends JDialog{
         }
         return dim;
     }
-    
+
     /**
      * Load all words from the user dictionary if available
-     * @param data
+     * @param data the target of the words
      */
     private void loadWordList( DefaultListModel data ){
         UserDictionaryProvider provider = SpellChecker.getUserDictionaryProvider();
         if( provider != null ) {
             Iterator<String> userWords = provider.getWords( SpellChecker.getCurrentLocale() );
             if( userWords != null ) {
-                ArrayList<String> wordList = new ArrayList<String>();
-                while(userWords.hasNext()){
-                    String word = userWords.next();
-                    if( word != null && word.length() > 1 ) {
-                        wordList.add( word );
-                    }
-                }
-                // Liste alphabetical sorting with the user language
-                Collections.sort( wordList, Collator.getInstance() );
-                for(String str : wordList){
-                    data.addElement( str );
-                }
+                HashSet<String> wordList = new HashSet<String>();
+                loadWordList( data, wordList, userWords );
             }
+        }
+    }
+
+    /**
+     * Load all words from wordList and the userWords in the ModelList. The list will be clear before.
+     * @param model the target of the words
+     * @param wordSet set with words, can be empty
+     * @param wordIterator iterator with words
+     */
+    private void loadWordList( DefaultListModel model, HashSet<String> wordSet, Iterator<String> wordIterator ){
+        while(wordIterator.hasNext()){
+            String word = wordIterator.next();
+            if( word != null && word.length() > 1 ) {
+                wordSet.add( word );
+            }
+        }
+
+        // List alphabetical sorting with the user language
+        Object[] wordArray = wordSet.toArray();
+        Arrays.sort( wordArray, Collator.getInstance() );
+        model.clear();
+        for(Object str : wordArray){
+            model.addElement( str );
         }
     }
 
@@ -133,7 +168,72 @@ class DictionaryEditDialog extends JDialog{
             }
         }
     }
+
+    /**
+     * The suggested file name for export and import.
+     * @return a file without path
+     */
+    private static File getSuggestedFile() {
+        return new File( Utils.getResource( "userDictionary" ) + "_" + SpellChecker.getCurrentLocale() + ".txt" );
+    }
     
+    private class ExportAction extends AbstractAction{
+        /**
+         * Export the list. The "Export" Button it the only Listener.
+         */
+        public void actionPerformed(ActionEvent e){
+            JFileChooser chooser = new JFileChooser();
+            chooser.setSelectedFile( getSuggestedFile() );
+            int returnVal = chooser.showSaveDialog( DictionaryEditDialog.this );
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = chooser.getSelectedFile();
+                if( selectedFile == null ){
+                    return;
+                }
+                try {
+                    Writer writer = new OutputStreamWriter(  new FileOutputStream( selectedFile ), "UTF8" );
+                    writer.write( getWordList() );
+                    writer.close();
+                } catch( Exception ex ) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog( DictionaryEditDialog.this, ex.toString(), "Error", JOptionPane.ERROR_MESSAGE );
+                }
+            }
+        }
+    }
+
+    private class ImportAction extends AbstractAction{
+        /**
+         * Import a word list. The "Import" Button it the only Listener.
+         */
+        public void actionPerformed(ActionEvent e){
+            JFileChooser chooser = new JFileChooser();
+            chooser.setSelectedFile( getSuggestedFile() );
+            int returnVal = chooser.showOpenDialog( DictionaryEditDialog.this );
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = chooser.getSelectedFile();
+                if( selectedFile == null ){
+                    return;
+                }
+                try {
+                    HashSet<String> wordSet = new HashSet<String>();
+                    DefaultListModel<String> model = (DefaultListModel<String>)list.getModel();
+                    for( int i=0; i<model.getSize(); i++){
+                        wordSet.add( model.getElementAt(i) );
+                    }
+
+                    FileInputStream input = new FileInputStream( selectedFile );
+                    Iterator<String> words = new WordIterator( input, "UTF8" );
+
+                    loadWordList( model, wordSet, words );
+                } catch( Exception ex ) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog( DictionaryEditDialog.this, ex.toString(), "Error", JOptionPane.ERROR_MESSAGE );
+                }
+            }
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -144,15 +244,7 @@ class DictionaryEditDialog extends JDialog{
             // save the user dictionary
             UserDictionaryProvider provider = SpellChecker.getUserDictionaryProvider();
             if( provider != null ) {
-                ListModel model = list.getModel();
-                StringBuilder builder = new StringBuilder();
-                for( int i=0; i<model.getSize(); i++){
-                    if( builder.length() != 0 ){
-                        builder.append( '\n' );
-                    }
-                    builder.append( model.getElementAt(i) );
-                }
-                provider.setUserWords( builder.toString() );
+                provider.setUserWords( getWordList() );
             }
             // reload the dictionary
             JMenu menu = SpellChecker.createLanguagesMenu( null );
@@ -166,5 +258,21 @@ class DictionaryEditDialog extends JDialog{
                 }
             }
         }
+    }
+    
+    /**
+     * Get a List of all words as String
+     * @return the word list.
+     */
+    private String getWordList() {
+        ListModel model = list.getModel();
+        StringBuilder builder = new StringBuilder();
+        for( int i=0; i<model.getSize(); i++){
+            if( builder.length() != 0 ){
+                builder.append( '\n' );
+            }
+            builder.append( model.getElementAt(i) );
+        }
+        return builder.toString();
     }
 }

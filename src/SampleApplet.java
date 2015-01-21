@@ -18,39 +18,29 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
  *  USA.
  *  
- * Created on 13.12.2007
- */
-package com.inet.jorthodictionaries;
+ *  Created on 13.12.2007
+ */  
 
-/**
- * 
- * @author Volker Berlin
- */
-public class BookGenerator_fr extends BookGenerator {
+import javax.swing.*;
 
-    /**
-     * Create a new BookGenerator and add some special words.
-     */
-    public BookGenerator_fr() {
-        // Compound words with a single character
-        addWord( "m'a" );
-        addWord( "m'y" );
-        addWord( "n'a" );
-        addWord( "n'y" );
-        addWord( "l'a" );
-        addWord( "l'y" );
-        addWord( "qu'a" );
-        addWord( "qu'y" );
-        addWord( "s'y" );
-    }
-    
+import com.inet.jortho.SpellChecker;
+
+public class SampleApplet extends JApplet {
+
     @Override
-    boolean isValidLanguage( String word, String wikiText ) {
-        if( wikiText.indexOf( "{{langue|fr}}" ) < 0 && wikiText.indexOf("{{=fr=}}") < 0){
-            return false;
-        }
+    public void start() {
+        // Build the test frame for the sample
+        JEditorPane text = new JTextPane();
+        text.setText( "This is a simppler textt with spellingg errors.\n\nPressing the F7 key will display the spell check dialog." );
+        add( text );
 
-        return true;
+        // Load the configuration from the file dictionaries.cnf and 
+        // use the English dictionary as default 
+        // You can download the dictionary files from http://sourceforge.net/projects/jortho/files/Dictionaries/
+        SpellChecker.registerDictionaries( getCodeBase(), "en" );
+
+        // enable the spell checking on the text component with all features
+        SpellChecker.register( text );
     }
 
 }

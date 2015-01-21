@@ -26,6 +26,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.*;
 import java.util.List;
 
@@ -47,17 +49,18 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
     private final SpellCheckerOptions options;
     
 
-    final private JLabel notFound = new JLabel();
-    final private JTextField word = new JTextField(); 
-    final private JList suggestionsList = new JList();
+    final private JLabel notFound = Utils.getLabel( null );
+    final private JTextField word = Utils.getTextField(); 
+    final private JList suggestionsList = Utils.getList();
     
-    final private JButton ignore      = new JButton(Utils.getResource("ignore"));
-    final private JButton ignoreAll   = new JButton(Utils.getResource("ignoreAll"));
-    final private JButton addToDic    = new JButton(Utils.getResource("addToDictionary"));
-    final private JButton editDic     = new JButton(Utils.getResource("editDictionary"));
-    final private JButton change      = new JButton(Utils.getResource("change"));
-    final private JButton changeAll   = new JButton(Utils.getResource("changeAll"));
-    final private JButton close       = new JButton(Utils.getResource("close"));
+    final private JButton ignore      = Utils.getButton( "ignore" );
+    final private JButton ignoreAll   = Utils.getButton( "ignoreAll" );
+    final private JButton addToDic    = Utils.getButton( "addToDictionary" );
+    final private JButton editDic     = Utils.getButton( "editDictionary" );
+    final private JButton change      = Utils.getButton( "change" );
+    final private JButton changeAll   = Utils.getButton( "changeAll" );
+    final private JButton about       = Utils.getButton( "about" );
+    final private JButton close       = Utils.getButton( "close" );
     
     /** List of ignore all words */  
     final private ArrayList<String> ignoreWords = new ArrayList<String>();
@@ -88,23 +91,14 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
     }
 
     final private void init(){
-        try {
-            Image image = ImageIO.read( getClass().getResourceAsStream( "icon.png" ) );
-            // setIconImage appeared in Java 6.0 so use reflection to be compatible
-            // with earlier JVMs. Equivalent to calling setIcomImage(image);
-            Class cls = Dialog.class;
-            java.lang.reflect.Method m = cls.getMethod( "setIconImage", new Class[] { Image.class } );
-            m.invoke( this, new Object[] { image } );
-        } catch( Throwable e1 ) {
-            // can occur in Java 5 or if the icon was removed, then use the default
-        }
+        Utils.setDialogIcon( this );
         setDefaultCloseOperation( WindowConstants.DISPOSE_ON_CLOSE );
         Container cont = getContentPane();
         cont.setLayout(new GridBagLayout());
         Insets insetL = new Insets(8,8,0,8);
         Insets insetR = new Insets(8,0,0,8);
         
-        cont.add( new JLabel(Utils.getResource("notInDictionary")+":"), new GridBagConstraints( 1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.SOUTHWEST ,GridBagConstraints.NONE, insetL, 0, 0));
+        cont.add( Utils.getLabel(Utils.getResource("notInDictionary")+":"), new GridBagConstraints( 1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.SOUTHWEST ,GridBagConstraints.NONE, insetL, 0, 0));
         
         notFound.setForeground(Color.RED);
         notFound.setText("xxxxxxxxxx");
@@ -112,9 +106,9 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
         
         cont.add( word, new GridBagConstraints( 1, 2, 2, 1, 1.0, 0.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.HORIZONTAL, insetL, 0, 0));
         
-        cont.add( new JLabel(Utils.getResource("suggestions")+":"), new GridBagConstraints( 1, 3, 2, 1, 0.0, 0.0, GridBagConstraints.SOUTHWEST ,GridBagConstraints.NONE, insetL, 0, 0));
+        cont.add( Utils.getLabel(Utils.getResource("suggestions")+":"), new GridBagConstraints( 1, 3, 2, 1, 0.0, 0.0, GridBagConstraints.SOUTHWEST ,GridBagConstraints.NONE, insetL, 0, 0));
         JScrollPane scrollPane = new JScrollPane(suggestionsList);
-        cont.add( scrollPane, new GridBagConstraints( 1, 4, 2, 5, 1.0, 1.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.BOTH, new Insets(8,8,8,8), 0, 0));
+        cont.add( scrollPane, new GridBagConstraints( 1, 4, 2, 6, 1.0, 1.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.BOTH, new Insets(8,8,8,8), 0, 0));
         
         cont.add( ignore,       new GridBagConstraints( 3, 1, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.HORIZONTAL, insetR, 0, 0));
         cont.add( ignoreAll,    new GridBagConstraints( 3, 2, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.HORIZONTAL, insetR, 0, 0));
@@ -122,8 +116,9 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
         cont.add( editDic,      new GridBagConstraints( 3, 4, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.HORIZONTAL, insetR, 0, 0));
         cont.add( change,       new GridBagConstraints( 3, 5, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.HORIZONTAL, insetR, 0, 0));
         cont.add( changeAll,    new GridBagConstraints( 3, 6, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.HORIZONTAL, insetR, 0, 0));
-        cont.add( close,       new GridBagConstraints( 3, 7, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.HORIZONTAL, insetR, 0, 0));
-        cont.add( new JLabel(), new GridBagConstraints( 3, 8, 1, 1, 0.0, 1.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.HORIZONTAL, insetR, 0, 0));
+        cont.add( about,        new GridBagConstraints( 3, 7, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.HORIZONTAL, insetR, 0, 0));
+        cont.add( close,        new GridBagConstraints( 3, 8, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.HORIZONTAL, insetR, 0, 0));
+        cont.add( Utils.getLabel( null ), new GridBagConstraints( 3, 9, 1, 1, 0.0, 1.0, GridBagConstraints.NORTHWEST ,GridBagConstraints.HORIZONTAL, insetR, 0, 0));
         
         ignore.addActionListener(this);
         ignoreAll.addActionListener(this);
@@ -131,6 +126,7 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
         editDic.addActionListener(this);
         change.addActionListener(this);
         changeAll.addActionListener(this);
+        about.addActionListener(this);
         close.addActionListener(this);
         
         //ESCAPE Taste
@@ -166,6 +162,19 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
             }
         });
         
+        suggestionsList.addMouseListener( new MouseAdapter() {
+            @Override
+            public void mouseClicked( MouseEvent e ) {
+                if( e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1 ) {
+                    // Change the word on a double click
+                    if( suggestionsList.getSelectedIndex() >= 0 ) {
+                        word.setText( (String)suggestionsList.getSelectedValue() );
+                        actionPerformed( new ActionEvent( suggestionsList, 0, null ) );
+                    }
+                }
+            }
+        } );
+
         boolean isUserDictionary = SpellChecker.getUserDictionaryProvider() != null;
         addToDic.setEnabled( isUserDictionary );
         editDic.setEnabled( isUserDictionary );
@@ -219,7 +228,7 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
                 if(title == null){
                     title = this.getTitle();
                 }
-                JOptionPane.showMessageDialog( getParent(), Utils.getResource( "msgFinish" ), title, JOptionPane.INFORMATION_MESSAGE );
+                SpellChecker.getMessageHandler().handleInformation( getParent(), title, Utils.getResource( "msgFinish" ) );
                 return false;
             }
             if( ignoreWords.contains( wordStr ) ) {
@@ -261,6 +270,8 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
         Object source = ev.getSource();
         if( source == ignore ) {
             searchNext();
+        } else if( source == about ) {
+            new AboutDialog( this ).setVisible( true );
         } else if( source == close ) {
             dispose();
         } else{
@@ -280,7 +291,7 @@ class SpellCheckerDialog extends JDialog implements ActionListener {
                 searchNext();
             } else if( source == editDic ) {
                 new DictionaryEditDialog( this ).setVisible( true );
-            } else if( source == change ) {
+            } else if( source == change || source == suggestionsList ) {
                 replaceWord( oldWord, newWord );
                 searchNext();
             } else if( source == changeAll ) {

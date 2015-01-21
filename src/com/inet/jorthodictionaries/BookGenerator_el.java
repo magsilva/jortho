@@ -1,7 +1,7 @@
 /*
  *  JOrtho
  *
- *  Copyright (C) 2005-2008 by i-net software
+ *  Copyright (C) 2005-2013 by i-net software
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License as 
@@ -23,30 +23,14 @@
 package com.inet.jorthodictionaries;
 
 /**
- * 
+ * A book generator for Greek
  * @author Volker Berlin
  */
-public class BookGenerator_fr extends BookGenerator {
+public class BookGenerator_el extends BookGenerator {
 
-    /**
-     * Create a new BookGenerator and add some special words.
-     */
-    public BookGenerator_fr() {
-        // Compound words with a single character
-        addWord( "m'a" );
-        addWord( "m'y" );
-        addWord( "n'a" );
-        addWord( "n'y" );
-        addWord( "l'a" );
-        addWord( "l'y" );
-        addWord( "qu'a" );
-        addWord( "qu'y" );
-        addWord( "s'y" );
-    }
-    
     @Override
     boolean isValidLanguage( String word, String wikiText ) {
-        if( wikiText.indexOf( "{{langue|fr}}" ) < 0 && wikiText.indexOf("{{=fr=}}") < 0){
+        if( wikiText.indexOf( "{{-el-}}" ) < 0 ) {
             return false;
         }
 

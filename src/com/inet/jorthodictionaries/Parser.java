@@ -23,12 +23,15 @@
 package com.inet.jorthodictionaries;
 
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
+
+import com.inet.jortho.Utils;
 
 
 /**
@@ -55,7 +58,8 @@ public class Parser extends DefaultHandler{
         this.generator = generator;
         
         System.setProperty("entityExpansionLimit", "100000000");
-        InputSource input = new InputSource(stream); 
+        //InputSource input = new InputSource(stream); 
+        InputSource input = new InputSource( new InputStreamReader(stream, "utf8") ); // hack for bug http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=7156085
         SAXParserFactory spf = SAXParserFactory.newInstance();
         SAXParser sp = spf.newSAXParser();
         ParserAdapter pa = new ParserAdapter(sp.getParser());
@@ -93,6 +97,7 @@ public class Parser extends DefaultHandler{
         switch(currentTag){
             case TITLE:
                 word = data.toString();
+                word = Utils.replaceUnicodeQuotation( word );
                 if(!generator.isValidWord(word)){
                     word = null;
                 }
@@ -105,6 +110,7 @@ public class Parser extends DefaultHandler{
                     if(word != null){
                         try{
                             generator.getBook().incTitleCount();
+                            text = Utils.replaceUnicodeQuotation( text );
                             if(generator.isValidLanguage(word, text)){
                                 generator.getBook().incLanguageTitleCount();
                                 generator.addWord(word);

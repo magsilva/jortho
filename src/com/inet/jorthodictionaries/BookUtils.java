@@ -60,18 +60,42 @@ public class BookUtils {
      */
     static Properties parseRule( String wikiText, int idxStart, int idxEnd ) {
         Properties props = new Properties();
-    
-        String[] tokens = wikiText.substring( idxStart, idxEnd ).split( "\\|" );
-        for( int i = 0; i < tokens.length; i++ ) {
-            String value = tokens[i].trim();
-            int idx = value.indexOf( '=' );
-            if( idx > 0 ) {
-                String name = value.substring( 0, idx );
-                value = value.substring( idx + 1 );
-                props.setProperty( name, value.trim() );
-            } else {
-                props.setProperty( String.valueOf( i+1 ), value.trim() );
+        int idxName = 1;
+        
+        int bracket = 0;
+        int valueStart = idxStart;
+        for( ; idxStart < idxEnd; idxStart++ ) {
+            char ch = wikiText.charAt( idxStart );
+            switch( ch ) {
+                case '[':
+                    bracket++;
+                    break;
+                case ']':
+                    bracket--;
+                    break;
+                case '|':
+                    if( bracket == 0 ) {
+                        String value = wikiText.substring( valueStart, idxStart ).trim();
+                        int idx = value.indexOf( '=' );
+                        if( idx > 0 ) {
+                            String name = value.substring( 0, idx );
+                            value = value.substring( idx + 1 );
+                            props.setProperty( name.trim(), value.trim() );
+                        } else {
+                            props.setProperty( Integer.toString( idxName++ ), value.trim() );
+                        }
+                        valueStart = idxStart + 1;
+                    }
             }
+        }
+        String value = wikiText.substring( valueStart, idxEnd ).trim();
+        int idx = value.indexOf( '=' );
+        if( idx > 0 ) {
+            String name = value.substring( 0, idx );
+            value = value.substring( idx + 1 );
+            props.setProperty( name.trim(), value.trim() );
+        } else {
+            props.setProperty( Integer.toString( idxName++ ), value.trim() );
         }
         return props;
     }

@@ -39,6 +39,7 @@ class Tokenizer {
     
     private final Document doc;
     private final SpellCheckerOptions options;
+    private final LanguageBundle bundle;
     /** start offset of current paragraph */
     private int paragraphOffset;
     /** end offset of current paragraph */
@@ -79,6 +80,7 @@ class Tokenizer {
 
         this.dictionary = dictionary;
         doc = jText.getDocument();
+        bundle = LanguageBundle.get( locale );
         this.options = options == null ? SpellChecker.getOptions() : options;
         sentences = BreakIterator.getSentenceInstance( locale );
         words = BreakIterator.getWordInstance( locale );
@@ -115,15 +117,7 @@ class Tokenizer {
                 endWord = words.next();
                 //only words with 2 or more characters are checked
                 if( word.length() > 1 && Character.isLetter( word.charAt( 0 ) )){
-                    boolean exist = dictionary.exist( word );
-                    if(!exist && !options.isCaseSensitive()){
-                        exist = dictionary.exist( Utils.getInvertedCapitalizion( word ) );
-                    }else
-                    if( !exist && (isFirstWordInSentence || options.getIgnoreCapitalization()) && Character.isUpperCase( word.charAt( 0 ) ) ) {
-                        // Uppercase check on starting of sentence
-                        String capitalizeWord = word.substring( 0, 1 ).toLowerCase() + word.substring( 1 );
-                        exist = dictionary.exist( capitalizeWord );
-                    }
+                    boolean exist = bundle.existInDictionary( word, dictionary, options, isFirstWordInSentence );
                     
                     if( !exist && options.isIgnoreAllCapsWords() && Utils.isAllCapitalized( word ) ){
                         exist = true;
@@ -133,10 +127,24 @@ class Tokenizer {
                         exist = true;
                     }
                     
+                    if( !exist && startWord + 1 == endWord ) {
+                        char nextChar = sentence.charAt( startWord );
+                        switch( nextChar ) {
+                            case '.':
+                            case '\'':
+                                exist = bundle.existInDictionary( word + nextChar, dictionary, options, isFirstWordInSentence );
+                        }
+                    }
+                    
                     if( !exist && !isWebAddress( word )) {
                         return word;
                     }
                     isFirstWordInSentence = false;
+                } else {
+                    // Handle a colon like a point. The next word can start with upper case.
+                    if( ":".equals( word ) || "(".equals( word ) ){
+                        isFirstWordInSentence = true;
+                    }
                 }
             }
         }
@@ -228,9 +236,9 @@ class Tokenizer {
         }
         try {
             phrase = doc.getText( paragraphOffset, end-paragraphOffset );
-            phrase = Utils.removeUnicodeQuotation( phrase );
+            phrase = Utils.replaceUnicodeQuotation( phrase );
         } catch( BadLocationException e ) {
-            e.printStackTrace();
+        	SpellChecker.getMessageHandler().handleException( e );
         }
         sentences.setText( phrase );
     }

@@ -22,12 +22,21 @@
  */
 package com.inet.jortho;
 
+import java.awt.Dialog;
+import java.awt.Image;
 import java.util.*;
+
+import javax.imageio.ImageIO;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JTextField;
 
 /**
  * @author Volker Berlin
  */
-class Utils {
+public class Utils {
 
     /**
      * Translate a GUI string in one of the supported languages. If the value was not find then the key is returned.
@@ -41,11 +50,106 @@ class Utils {
             ResourceBundle resource = ResourceBundle.getBundle( "com.inet.jortho.i18n.resource" );
             return resource.getString( value );
         } catch( Exception e ) {
-            e.printStackTrace();
+            Locale currentLocale = Locale.getDefault();
+            if (! currentLocale.toString().startsWith("en") && ! value.endsWith( ".tooltip" ) ) { // Tooltip is something extra. Ignore it if not there
+                SpellChecker.getMessageHandler().handleException( e );
+            }
         }
         return value;
     }
 
+    /**
+     * Creates a JButton with a text, tooltip and a key modifier as needed
+     * @param resource the key of the language resource.
+     * @return a new JButton based on the resource
+     */
+    static JButton getButton( String resource ) {
+        JButton button;
+
+        CustomUIProvider customProvider = SpellChecker.getCustomUIProvider();
+        if( customProvider != null ) {
+            button = customProvider.getButton( resource );
+        } else {
+            button = new JButton( Utils.getResource( resource ) );
+
+            String tooltipKey = resource + ".tooltip";
+            String tooltip = Utils.getResource( tooltipKey );
+            if( tooltip != tooltipKey ) {
+                button.setToolTipText( tooltip );
+            }
+        }
+
+        return button;
+    }
+
+    /**
+     * Creates a JTextField as needed
+     * @return a new JTextField based on the resource
+     */
+    static JTextField getTextField() {
+        JTextField textField;
+
+        CustomUIProvider customProvider = SpellChecker.getCustomUIProvider();
+        if( customProvider != null ) {
+            textField = customProvider.getTextField();
+        } else {
+            textField = new JTextField();
+        }
+
+        return textField;
+    }
+
+    /**
+     * Creates a JLabel as needed
+     *
+     * @param text The text to be on the label
+     * @return a new JLabel based on the resource
+     */
+    static JLabel getLabel( String text ) {
+        JLabel label;
+
+        CustomUIProvider customProvider = SpellChecker.getCustomUIProvider();
+        if( customProvider != null ) {
+            label = customProvider.getLabel( text );
+        } else {
+            label = new JLabel( text );
+        }
+
+        return label;
+    }
+
+    
+    /**
+     * Creates a JList as needed
+     *
+     * @return a new JList based on the resource
+     */
+    static JList getList() {
+        CustomUIProvider customProvider = SpellChecker.getCustomUIProvider();
+        if( customProvider != null ) {
+            return customProvider.getList();
+        } else {
+            return new JList();
+        }
+    }
+    
+    /**
+     * Set the Icon for an dialog
+     * @param dlg the dialog
+     */
+    static void setDialogIcon(JDialog dlg) {
+        try {
+            Image image = ImageIO.read( dlg.getClass().getResourceAsStream( "icon.png" ) );
+            // setIconImage appeared in Java 6.0 so use reflection to be compatible
+            // with earlier JVMs. Equivalent to calling setIcomImage(image);
+            Class cls = Dialog.class;
+            java.lang.reflect.Method m = cls.getMethod( "setIconImage", new Class[] { Image.class } );
+            m.invoke( dlg, new Object[] { image } );
+        } catch( Throwable e1 ) {
+            // can occur in Java 5 or if the icon was removed, then use the default
+        }
+    }
+    
     /**
      * Create a String where the first letter is written with a uppercase.
      * 
@@ -134,7 +238,7 @@ class Utils {
      *            the word that should be check. It can not be null.
      * @return A new string of the same length as the original.
      */
-    static String removeUnicodeQuotation( String word ) {
+    public static String replaceUnicodeQuotation( String word ) {
         char[] newWord = null;
 
         for( int i = 0; i < word.length(); i++ ) {

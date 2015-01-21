@@ -75,7 +75,7 @@ public class FileUserDictionary implements UserDictionaryProvider{
             writer.write( word );
             writer.close();
         }catch(Exception ex){
-            ex.printStackTrace();
+        	SpellChecker.getMessageHandler().handleException( ex );
         }
     }
 
@@ -104,7 +104,7 @@ public class FileUserDictionary implements UserDictionaryProvider{
             writer.write( wordList );
             writer.close();
         }catch(Exception ex){
-            ex.printStackTrace();
+        	SpellChecker.getMessageHandler().handleException( ex );
         }
     }
 }
